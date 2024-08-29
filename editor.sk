@@ -1,0 +1,162 @@
+command /editor:
+	trigger:
+		if {editMode} is not set:
+			set {editMode} to true
+			broadcast "&a开启编辑模式"
+			clear player's inventory
+			give light blue wool named "&b&lTap" to player
+			give orange wool named "&6&lDouble" to player
+			give yellow wool named "&e&lDrag" to player
+			give white wool named "&f&lHold" to player
+			give pink wool named "&b&l← &d&lFlick(左)" to player
+			give red wool named "&c&lFlick(右) &b&l→" to player
+			give red dye named "&c&l清空场上音符" to player
+			set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to glass
+		else:
+			delete {editMode}
+			broadcast "&c关闭编辑模式"
+			clear player's inventory
+			delete {savedX::*}
+			delete {savedY::*}
+			delete {savedType::*}
+			set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to air
+
+every seconds:
+	if {editMode} is set:
+		send action bar "&a编辑模式: &f手持物品右键添加/删除音符 输入 &bw/a/s/d 时间(秒)&f 生成谱面代码 输入/editor退出编辑模式" to all players
+
+on right click:
+	{editMode} is set
+	cancel event
+	event-block is glass or any wool
+	if player's tool is light blue wool named "&b&lTap":
+		if block at event-location is glass:
+			wait 1 tick
+			set block at event-location to light blue wool
+			add x location of event-location to {savedX::Tap::*}
+			add y location of event-location to {savedY::Tap::*}
+		else if block at event-location is light blue wool:
+			wait 1 tick
+			set block at event-location to glass
+			loop {savedX::Tap::*}:
+				loop-value is x location of event-location
+				delete {savedX::Tap::%loop-index%}
+				delete {savedY::Tap::%loop-index%}
+				exit loop
+	else if player's tool is orange wool named "&6&lDouble":
+		if block at event-location is glass:
+			wait 1 tick
+			set block at event-location to orange wool
+			add x location of event-location to {savedX::Double::*}
+			add y location of event-location to {savedY::Double::*}
+		else if block at event-location is orange wool:
+			wait 1 tick
+			set block at event-location to glass
+			loop {savedX::Double::*}:
+				loop-value is x location of event-location
+				delete {savedX::Double::%loop-index%}
+				delete {savedY::Double::%loop-index%}
+				exit loop
+	else if player's tool is yellow wool named "&e&lDrag":
+		if block at event-location is glass:
+			wait 1 tick
+			set block at event-location to yellow wool
+			add x location of event-location to {savedX::Drag::*}
+			add y location of event-location to {savedY::Drag::*}
+		else if block at event-location is yellow wool:
+			wait 1 tick
+			set block at event-location to glass
+			loop {savedX::Drag::*}:
+				loop-value is x location of event-location
+				delete {savedX::Drag::%loop-index%}
+				delete {savedY::Drag::%loop-index%}
+				exit loop
+	else if player's tool is white wool named "&f&lHold":
+		if block at event-location is glass:
+			wait 1 tick
+			set block at event-location to white wool
+			add x location of event-location to {savedX::Hold::*}
+			add y location of event-location to {savedY::Hold::*}
+		else if block at event-location is white wool:
+			wait 1 tick
+			set block at event-location to glass
+			loop {savedX::Hold::*}:
+				loop-value is x location of event-location
+				delete {savedX::Hold::%loop-index%}
+				delete {savedY::Hold::%loop-index%}
+				exit loop
+	else if player's tool is pink wool named "&b&l← &d&lFlick(左)":
+		if block at event-location is glass:
+			wait 1 tick
+			set block at event-location to pink wool
+			add x location of event-location to {savedX::Flick::*}
+			add y location of event-location to {savedY::Flick::*}
+			set {savedType::Flick} to "left"
+		else if block at event-location is pink wool:
+			wait 1 tick
+			set block at event-location to glass
+			loop {savedX::Flick::*}:
+				loop-value is x location of event-location
+				delete {savedX::Flick::%loop-index%}
+				delete {savedY::Flick::%loop-index%}
+				delete {savedType::Flick}
+				exit loop
+	else if player's tool is red wool named "&c&lFlick(右) &b&l→":
+		if block at event-location is glass:
+			wait 1 tick
+			set block at event-location to red wool
+			add x location of event-location to {savedX::Flick::*}
+			add y location of event-location to {savedY::Flick::*}
+			set {savedType::Flick} to "right"
+		else if block at event-location is red wool:
+			wait 1 tick
+			set block at event-location to glass
+			loop {savedX::Flick::*}:
+				loop-value is x location of event-location
+				delete {savedX::Flick::%loop-index%}
+				delete {savedY::Flick::%loop-index%}
+				delete {savedType::Flick}
+				exit loop
+	else if player's tool is red dye named "&c&l清空场上音符":
+		delete {savedX::*}
+		delete {savedY::*}
+		delete {savedType::*}
+		set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to glass
+
+on chat:
+	{editMode} is set
+	cancel event
+	set {_1} to chat message
+	if {_1} start with "w ":
+		replace all "w " with "" in {_1}
+		set {_face} to "w"
+	if {_1} start with "a ":
+		replace all "a " with "" in {_1}
+		set {_face} to "a"
+	if {_1} start with "s ":
+		replace all "s " with "" in {_1}
+		set {_face} to "s"
+	if {_1} start with "d ":
+		replace all "d " with "" in {_1}
+		set {_face} to "d"
+	set {_1} to {_1} parsed as number
+	{_1} is set
+	set {_gen} to "empty"
+	if {savedX::Tap::1} is set:
+		set {_gen} to "tap(%{_1}%, ""%{_face}%"", %{savedX::Tap::1} - 0.5%, %{savedY::Tap::1} - 0.5%, false)"
+	if {savedX::Drag::1} is set:
+		set {_gen} to "drag(%{_1}%, ""%{_face}%"", %{savedX::Drag::1} - 0.5%, %{savedY::Drag::1} - 0.5%, false)"
+	if {savedX::Hold::1} is set:
+		set {_gen} to "hold(%{_1}%, ""%{_face}%"", %{savedX::Hold::1} - 0.5%, %{savedY::Hold::1} - 0.5%, false)"
+	if {savedX::Flick::1} is set:
+		set {_gen} to "flick(%{_1}%, ""%{_face}%"", ""%{savedType::Flick}%"", false)"
+	if {savedX::Double::1} is set:
+		set {_gen} to "double(%{_1}%, ""%{_face}%"", %{savedX::Double::1} - 0.5%, %{savedY::Double::1} - 0.5%, %{savedX::Double::2} - 0.5%, %{savedY::Double::2} - 0.5%, false)"
+	{_gen} is not "empty"
+	if {_gen} contains "<none>":
+		replace all "<none>" with "&e<none>&c" in {_gen}
+		broadcast "&c%{_gen}%"
+		broadcast "&f你的音符格式出现了缺失，请修改音符再尝试生成"
+	else:
+		broadcast "&a%{_gen}%"
+		log "%{_gen}%" to file "generated.log"

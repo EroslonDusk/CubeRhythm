@@ -1,0 +1,375 @@
+########################################################
+#                                                      #
+#                   谱面读取部分                       #
+#                                                      #
+########################################################
+
+function tap(time: number, face: text, x: number, y: number, glowing: boolean):
+	add 1 to {maxNote}
+	set {_null} to random uuid
+	set {_type} to "tap"
+	add {_type} to {loadedNotes::type::*}
+	add {_time} to {loadedNotes::time::*}
+	add {_face} to {loadedNotes::face::*}
+	add {_x} to {loadedNotes::x::*}
+	add {_y} to {loadedNotes::y::*}
+	add {_glowing} to {loadedNotes::glowing::*}
+	add {_null} to {loadedNotes::turn::*}
+	add {_null} to {loadedNotes::x1::*}
+	add {_null} to {loadedNotes::y1::*}
+	add {_null} to {loadedNotes::x2::*}
+	add {_null} to {loadedNotes::y2::*}
+	add {_null} to {loadedNotes::section::*}
+	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+
+function drag(time: number, face: text, x: number, y: number, glowing: boolean):
+	add 1 to {maxNote}
+	set {_null} to random uuid
+	set {_type} to "drag"
+	add {_type} to {loadedNotes::type::*}
+	add {_time} to {loadedNotes::time::*}
+	add {_face} to {loadedNotes::face::*}
+	add {_x} to {loadedNotes::x::*}
+	add {_y} to {loadedNotes::y::*}
+	add {_glowing} to {loadedNotes::glowing::*}
+	add {_null} to {loadedNotes::turn::*}
+	add {_null} to {loadedNotes::x1::*}
+	add {_null} to {loadedNotes::y1::*}
+	add {_null} to {loadedNotes::x2::*}
+	add {_null} to {loadedNotes::y2::*}
+	add {_null} to {loadedNotes::section::*}
+	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+
+function hold(time: number, face: text, x: number, y: number, glowing: boolean):
+	set {_null} to random uuid
+	set {_type} to "hold"
+	add {_type} to {loadedNotes::type::*}
+	add {_time} to {loadedNotes::time::*}
+	add {_face} to {loadedNotes::face::*}
+	add {_x} to {loadedNotes::x::*}
+	add {_y} to {loadedNotes::y::*}
+	add {_glowing} to {loadedNotes::glowing::*}
+	add {_null} to {loadedNotes::turn::*}
+	add {_null} to {loadedNotes::x1::*}
+	add {_null} to {loadedNotes::y1::*}
+	add {_null} to {loadedNotes::x2::*}
+	add {_null} to {loadedNotes::y2::*}
+	add {_null} to {loadedNotes::section::*}
+	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+
+function flick(time: number, face: text, turn: text, glowing: boolean):
+	add 1 to {maxNote}
+	set {_null} to random uuid
+	set {_type} to "flick"
+	add {_type} to {loadedNotes::type::*}
+	add {_time} to {loadedNotes::time::*}
+	add {_face} to {loadedNotes::face::*}
+	add {_turn} to {loadedNotes::turn::*}
+	add {_glowing} to {loadedNotes::glowing::*}
+	add {_null} to {loadedNotes::x::*}
+	add {_null} to {loadedNotes::y::*}
+	add {_null} to {loadedNotes::x1::*}
+	add {_null} to {loadedNotes::y1::*}
+	add {_null} to {loadedNotes::x2::*}
+	add {_null} to {loadedNotes::y2::*}
+	add {_null} to {loadedNotes::section::*}
+	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+
+function double(time: number, face: text, x1: number, y1: number, x2: number, y2: number, glowing: boolean):
+	add 2 to {maxNote}
+	set {_null} to random uuid
+	set {_type} to "double"
+	add {_type} to {loadedNotes::type::*}
+	add {_time} to {loadedNotes::time::*}
+	add {_face} to {loadedNotes::face::*}
+	add {_x1} to {loadedNotes::x1::*}
+	add {_y1} to {loadedNotes::y1::*}
+	add {_x2} to {loadedNotes::x2::*}
+	add {_y2} to {loadedNotes::y2::*}
+	add {_null} to {loadedNotes::turn::*}
+	add {_null} to {loadedNotes::x::*}
+	add {_null} to {loadedNotes::y::*}
+	add {_glowing} to {loadedNotes::glowing::*}
+	add {_null} to {loadedNotes::section::*}
+	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+
+function execution(time: number, section: section):
+	set {_null} to random uuid
+	set {_type} to "execution"
+	add {_type} to {loadedNotes::type::*}
+	add {_time} to {loadedNotes::time::*}
+	add {_null} to {loadedNotes::face::*}
+	add {_null} to {loadedNotes::x1::*}
+	add {_null} to {loadedNotes::y1::*}
+	add {_null} to {loadedNotes::x2::*}
+	add {_null} to {loadedNotes::y2::*}
+	add {_null} to {loadedNotes::turn::*}
+	add {_null} to {loadedNotes::x::*}
+	add {_null} to {loadedNotes::y::*}
+	add false to {loadedNotes::glowing::*}
+	add {_section} to {loadedNotes::section::*}
+	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+
+function drawTap(face: text, x: number, y: number, z: number, glowing: boolean):
+	set {_x1} to {_x}+0.5
+	set {_y1} to {_y}-0.5
+	set {_z1} to {_z}+0.5
+	if {_face} is "w":
+		set {_loc1} to location({_x}, {_y}, {_z}, world "world", 0, 0)
+		set {_loc2} to location({_x1}, {_y1}, {_z1}, world "world", 0, 0)
+	if {_face} is "a":
+		remove 1 from {_x1}
+		set {_loc1} to location({_z}, {_y}, -1*{_x}, world "world", 90, 0)
+		set {_loc2} to location({_z1}, {_y1}, -1*{_x1}, world "world", 90, 0)
+	if {_face} is "s":
+		remove 1 from {_x1}
+		remove 1 from {_z1}
+		set {_loc1} to location(-1*{_x}+1, {_y}, -1*{_z}+1, world "world", 180, 0)
+		set {_loc2} to location(-1*{_x1}, {_y1}, -1*{_z1}, world "world", 180, 0)
+	if {_face} is "d":
+		remove 1 from {_z1}
+		set {_loc1} to location(-1*{_z}+1, {_y}, {_x}+1, world "world", 270, 0)
+		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 270, 0)
+	summon block display at {_loc1}
+	set display block data of last spawned entity to light_blue_concrete
+	set display scale of last spawned entity to vector(1,1,0.5)
+	set {_uuid} to uuid of last spawned entity
+	if {_glowing} is true:
+		set glowing of last spawned entity to true
+	summon interaction at {_loc2}
+	set interaction height of last spawned entity to 2
+	set interaction width of last spawned entity to 2
+	set metadata value "notetype" of last spawned entity to "tap"
+	set metadata value "face" of last spawned entity to "%{_face}%"
+	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+
+function drawHold(face: text, x: number, y: number, z: number, glowing: boolean):
+	set {_x1} to {_x}+0.5
+	set {_y1} to {_y}-0.5+20
+	set {_z1} to {_z}+1
+	if {_face} is "w":
+		set {_loc1} to location({_x}, {_y}, {_z}, world "world", 0, 0)
+		set {_loc2} to location({_x1}, {_y1}, {_z1}, world "world", 0, 0)
+	if {_face} is "a":
+		remove 1 from {_x1}
+		set {_loc1} to location({_z}, {_y}, -1*{_x}+1, world "world", -90, 0)
+		set {_loc2} to location({_z1}, {_y1}, -1*{_x1}, world "world", -90, 0)
+	if {_face} is "s":
+		remove 1 from {_x1}
+		remove 1 from {_z1}
+		set {_loc1} to location(-1*{_x}+1, {_y}, -1*{_z}+1, world "world", 180, 0)
+		set {_loc2} to location(-1*{_x1}, {_y1}, -1*{_z1}, world "world", 180, 0)
+	if {_face} is "d":
+		remove 1 from {_z1}
+		set {_loc1} to location(-1*{_z}+1, {_y}, {_x}, world "world", 90, 0)
+		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 90, 0)
+	summon block display at {_loc1}
+	set display block data of last spawned entity to white_concrete
+	set display scale of last spawned entity to vector(1,1,2*{speed})
+	set {_uuid} to uuid of last spawned entity
+	if {_glowing} is true:
+		set glowing of last spawned entity to true
+	summon interaction at {_loc2}
+	set interaction height of last spawned entity to 2
+	set interaction width of last spawned entity to 2
+	set metadata value "notetype" of last spawned entity to "hold"
+	set metadata value "face" of last spawned entity to "%{_face}%"
+	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+
+function drawDrag(face: text, x: number, y: number, z: number, glowing: boolean):
+	set {_x1} to {_x}+0.5
+	set {_y1} to {_y}-0.5
+	set {_z1} to {_z}+1
+	if {_face} is "w":
+		set {_loc1} to location({_x}, {_y}, {_z}, world "world", 0, 0)
+		set {_loc2} to location({_x1}, {_y1}, {_z1}, world "world", 0, 0)
+	if {_face} is "a":
+		remove 1 from {_x1}
+		set {_loc1} to location({_z}, {_y}, -1*{_x}, world "world", 90, 0)
+		set {_loc2} to location({_z1}, {_y1}, -1*{_x1}, world "world", 90, 0)
+	if {_face} is "s":
+		remove 1 from {_x1}
+		remove 1 from {_z1}
+		set {_loc1} to location(-1*{_x}+1, {_y}, -1*{_z}+1, world "world", 180, 0)
+		set {_loc2} to location(-1*{_x1}, {_y1}, -1*{_z1}, world "world", 180, 0)
+	if {_face} is "d":
+		remove 1 from {_z1}
+		set {_loc1} to location(-1*{_z}+1, {_y}, {_x}+1, world "world", 270, 0)
+		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 270, 0)
+	summon block display at {_loc1}
+	set display block data of last spawned entity to yellow_concrete
+	set display scale of last spawned entity to vector(1,1,0.5)
+	set {_uuid} to uuid of last spawned entity
+	if {_glowing} is true:
+		set glowing of last spawned entity to true
+	summon interaction at {_loc2}
+	set interaction height of last spawned entity to 2
+	set interaction width of last spawned entity to 2
+	set metadata value "notetype" of last spawned entity to "drag"
+	set metadata value "face" of last spawned entity to "%{_face}%"
+	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+
+function drawFlick(face: text, z: number, turn: text, glowing: boolean):
+	set {_x} to 0
+	set {_y} to 0
+	set {_z} to {_z}-0.5
+	set {_x1} to {_x}+0.5
+	set {_y1} to 20
+	set {_x2} to -2
+	set {_y2} to -2
+	set {_z1} to {_z}+1
+	if {_face} is "w":
+		set {_loc1} to location({_x2}, {_y2}, {_z}, world "world", 0, 0)
+		set {_loc2} to location({_x1}, {_y1}, {_z1}, world "world", 0, 0)
+		set {_loc3} to location({_x}+0.75, {_y}-2.75, {_z}+0.4, world "world", 180, 0)
+	if {_face} is "a":
+		remove 1 from {_x1}
+		set {_loc1} to location({_z}+1, {_y2}, -1*{_x2}-4, world "world", 90, 0)
+		set {_loc2} to location({_z1}, {_y1}, -1*{_x1}, world "world", 90, 0)
+		set {_loc3} to location({_z}+0.4, {_y}-2.75, -1*{_x}+0.25, world "world", 90, 0)
+	if {_face} is "s":
+		remove 1 from {_x1}
+		remove 1 from {_z1}
+		set {_loc1} to location(-1*{_x2}+1, {_y2}, -1*{_z}+1, world "world", 180, 0)
+		set {_loc2} to location(-1*{_x1}, {_y1}, -1*{_z1}, world "world", 180, 0)
+		set {_loc3} to location(-1*{_x}+0.25, {_y}-2.75, -1*{_z}+0.6, world "world", 0, 0)
+	if {_face} is "d":
+		remove 1 from {_z1}
+		set {_loc1} to location(-1*{_z}, {_y2}, {_x2}+5, world "world", 270, 0)
+		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 270, 0)
+		set {_loc3} to location(-1*{_z}+0.6, {_y}-2.75, {_x}+0.75, world "world", 270, 0)   
+	summon block display at {_loc1}
+	set display block data of last spawned entity to white_stained_glass_pane[east=true,north=false,south=false,waterlogged=false,west=true]
+	set display scale of last spawned entity to vector(5,5,1)
+	set {_uuid} to uuid of last spawned entity
+	if {_glowing} is true:
+		set glowing of last spawned entity to true
+	if {_turn} is "left":
+		summon text display at {_loc3}:
+			set display text of the entity to "§f←"
+			set display scale of entity to vector(20,20,0)
+			set display text background color of the entity to bukkitColor(0,0,0,0)
+			set metadata value "linkbind" of entity to {_uuid}
+	if {_turn} is "right":
+		summon text display at {_loc3}:
+			set display text of the entity to "§f→"
+			set display scale of entity to vector(20,20,0)
+			set display text background color of the entity to bukkitColor(0,0,0,0)
+			set metadata value "linkbind" of entity to {_uuid}
+	summon interaction at {_loc2}
+	set interaction height of last spawned entity to 2
+	set interaction width of last spawned entity to 2
+	set metadata value "notetype" of last spawned entity to "flick"
+	set metadata value "face" of last spawned entity to "%{_face}%"
+	set metadata value "turn" of last spawned entity to "%{_turn}%"
+	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+
+function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, yb: number, zb: number, glowing: boolean):
+	set {_xa1} to {_xa}+0.5
+	set {_ya1} to {_ya}-0.5
+	set {_za1} to {_za}+1
+	if {_face} is "w":
+		set {_loc1} to location({_xa}, {_ya}, {_za}, world "world", 0, 0)
+		set {_loc2} to location({_xa1}, {_ya1}, {_za1}, world "world", 0, 0)
+	if {_face} is "a":
+		remove 1 from {_xa1}
+		set {_loc1} to location({_za}, {_ya}, -1*{_xa}, world "world", 90, 0)
+		set {_loc2} to location({_za1}, {_ya1}, -1*{_xa1}, world "world", 90, 0)
+	if {_face} is "s":
+		remove 1 from {_xa1}
+		remove 1 from {_za1}
+		set {_loc1} to location(-1*{_xa}+1, {_ya}, -1*{_za}+1, world "world", 180, 0)
+		set {_loc2} to location(-1*{_xa1}, {_ya1}, -1*{_za1}, world "world", 180, 0)
+	if {_face} is "d":
+		remove 1 from {_za1}
+		set {_loc1} to location(-1*{_za}+1, {_ya}, {_xa}+1, world "world", 270, 0)
+		set {_loc2} to location(-1*{_za1}, {_ya1}, {_xa1}, world "world", 270, 0)
+	summon block display at {_loc1}
+	set display block data of last spawned entity to orange_concrete
+	set display scale of last spawned entity to vector(1,1,0.5)
+	set {_uuid} to uuid of last spawned entity
+	if {_glowing} is true:
+		set glowing of last spawned entity to true
+	summon interaction at {_loc2}
+	set interaction height of last spawned entity to 2
+	set interaction width of last spawned entity to 2
+	set metadata value "notetype" of last spawned entity to "double"
+	set metadata value "face" of last spawned entity to "%{_face}%"
+	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+	set {_entity1} to last spawned entity
+	set {_uuid1} to uuid of last spawned entity
+	
+	set {_xb1} to {_xb}+0.5
+	set {_yb1} to {_yb}-0.5
+	set {_zb1} to {_zb}+1
+	if {_face} is "w":
+		set {_loc3} to location({_xb}, {_yb}, {_zb}, world "world", 0, 0)
+		set {_loc4} to location({_xb1}, {_yb1}, {_zb1}, world "world", 0, 0)
+	if {_face} is "a":
+		remove 1 from {_xb1}
+		set {_loc3} to location({_zb}, {_yb}, -1*{_xb}, world "world", 90, 0)
+		set {_loc4} to location({_zb1}, {_yb1}, -1*{_xb1}, world "world", 90, 0)
+	if {_face} is "s":
+		remove 1 from {_xb1}
+		remove 1 from {_zb1}
+		set {_loc3} to location(-1*{_xb}+1, {_yb}, -1*{_zb}+1, world "world", 180, 0)
+		set {_loc4} to location(-1*{_xb1}, {_yb1}, -1*{_zb1}, world "world", 180, 0)
+	if {_face} is "d":
+		remove 1 from {_zb1}
+		set {_loc3} to location(-1*{_zb}+1, {_yb}, {_xb}+1, world "world", 270, 0)
+		set {_loc4} to location(-1*{_zb1}, {_yb1}, {_xb1}, world "world", 270, 0)
+	summon block display at {_loc3}
+	set display block data of last spawned entity to orange_concrete
+	set display scale of last spawned entity to vector(1,1,0.5)
+	set {_uuid} to uuid of last spawned entity
+	if {_glowing} is true:
+		set glowing of last spawned entity to true
+	summon interaction at {_loc4}
+	set interaction height of last spawned entity to 2
+	set interaction width of last spawned entity to 2
+	set metadata value "notetype" of last spawned entity to "double"
+	set metadata value "face" of last spawned entity to "%{_face}%"
+	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+	set {_entity2} to last spawned entity
+	set {_uuid2} to uuid of last spawned entity
+	set metadata value "linknote" of {_entity1} to "%{_uuid2}%"
+	set metadata value "linknote" of {_entity2} to "%{_uuid1}%" #击中1时消除2，击中2时消除1
+	set {_d1} to distance between {_loc1} and {_loc3}
+	set {_d3} to distance between {_loc1} and {_loc3}
+	set {_d2} to abs({_xa} - {_xb})
+	set {_acos} to acos({_d2}/{_d1}) - 90
+	#broadcast "distance: %{_d1}%"
+	#broadcast "angle: %{_acos}%"
+	if {_ya} <= {_yb}:
+		{_loc2}.add(0, 1, -0.8) if {_face} is "w"
+		{_loc2}.add(0, 1, 0.8) if {_face} is "s"
+		{_loc2}.add(-0.8, 1, 0) if {_face} is "a"
+		{_loc2}.add(0.8, 1, 0) if {_face} is "d"
+		summon block display at {_loc2}:
+			set display block data of entity to white_concrete
+			set display scale of entity to vector(0.1,{_d3},0.1)
+			set metadata value "note1" of entity to {_uuid2}
+			set metadata value "note2" of entity to {_uuid1}
+			set metadata value "face" of entity to {_face}
+			set pitch of entity to {_acos}
+			set yaw of entity to -90 if {_face} is "w"
+			set yaw of entity to -180 if {_face} is "a"
+			set yaw of entity to 90 if {_face} is "s"
+			set yaw of entity to 0 if {_face} is "d"
+	else:
+		{_loc4}.add(0, 1, -0.9) if {_face} is "w"
+		{_loc4}.add(0, 1, 0.9) if {_face} is "s"
+		{_loc4}.add(-0.9, 1, 0) if {_face} is "a"
+		{_loc4}.add(0.9, 1, 0) if {_face} is "d"
+		summon block display at {_loc4}:
+			set display block data of entity to white_concrete
+			set display scale of entity to vector(0.1,{_d3},0.1)
+			set metadata value "note1" of entity to {_uuid2}
+			set metadata value "note2" of entity to {_uuid1}
+			set metadata value "face" of entity to {_face}
+			set pitch of entity to {_acos}
+			set yaw of entity to 90 if {_face} is "w"
+			set yaw of entity to 0 if {_face} is "a"
+			set yaw of entity to -90 if {_face} is "s"
+			set yaw of entity to -180 if {_face} is "d"
+		

@@ -1,0 +1,165 @@
+function playChart(id: text):
+	loop enabled scripts:
+		loop-value start with "charts"
+		if loop-value contains "_properties":
+			set {_null} to ""
+		else:
+			disable script loop-value
+	quitGame()
+	wait 1 tick
+	send title "&a谱面加载中……" with subtitle "&a &a" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+	enable script "charts\-%{_id}%"
+	wait 3 seconds
+	loop all players:
+		execute loop-player command "start"
+		exit loop
+	set {playing} to {_id}
+
+function refresh(p: player):
+	delete {loadedCharts::*}
+	delete {length::*}
+	loop enabled scripts:
+		loop-value start with "charts"
+		if loop-value contains "_properties":
+			disable script loop-value
+	wait 1 tick
+	loop disabled scripts:
+		loop-value start with "charts"
+		if loop-value contains "_properties":
+			enable script loop-value
+	wait 5 ticks
+	infoGUI({_p})
+
+function registerChart(id: text, name: text, level: text, artist: text, author: text, length: number):
+	add {_id} to {loadedCharts::id::*}
+	add {_name} to {loadedCharts::name::*}
+	add {_level} to {loadedCharts::level::*}
+	add {_artist} to {loadedCharts::artist::*}
+	add {_author} to {loadedCharts::author::*}
+	set {length::%{_id}%} to {_length}
+
+command /play:
+	trigger:
+		refresh(player)
+
+function infoGUI(p: player):
+	set {_infoGUI} to chest inventory with 6 rows named "选择谱面"
+	loop integers from 46 to 48:
+		set slot loop-value of {_infoGUI} to gray stained glass pane named ""
+	set slot 45 of {_infoGUI} to oak sign named "&f喜欢 &eCube Rhythm&f 吗？" with lore "&7加入我们的QQ群聊%nl%&b300846184%nl%&7和大家一起分享谱面!"
+	set slot 49 of {_infoGUI} to book named "&f如何导入谱面？" with lore "%nl%&e1. &7打开目录 &f服务端\plugins\Skript\scripts%nl%&e2. &7把谱面文件&f(谱面.sk 和 谱面_properties.sk)&7扔进去%nl%&e3. &7输入 &b/sk reload \charts\ &7稍等片刻即可导入%nl%   &c(需要管理员权限 后台输入op %name of {_p}%)%nl%%nl%&f如何作谱？%nl%%nl%&7详见Cube Rhythm Wiki%nl%&a"
+	set slot 50 of {_infoGUI} to feather named "&f音符流速: &e%{speed}%" with lore "%nl%&7音符每Tick(1/20秒)移动的距离(米)%nl%&7推荐范围: 1~2.5%nl%&f过高或过低的流速会严重影响游戏体验%nl%%nl%&e点击修改"
+	set slot 51 of {_infoGUI} to clock named "&f偏移: &e%{offset}%ms" with lore "%nl%&7单位: 毫秒(ms)%nl%&7偏移越高，音符生成越滞后，反之提前%nl%&7如果你遇到了音画不同步，请调整此项%nl%&f注意:第一次播放音画不同步属正常现象%nl%%nl%&e点击修改"
+	set slot 52 of {_infoGUI} to note block named "&f打击音效: %{hitSound}%" with lore "%nl%&7击中音符时播放打击音效%nl%%nl%&e点击开启/关闭"
+	set slot 53 of {_infoGUI} to slime ball named "&a刷新列表" with lore "%nl%&7重载所有谱面配置文件并刷新列表%nl%&f如果你想导入新谱面，这个按钮并不能帮你%nl%%nl%&e点击刷新"
+	loop indices of {loadedCharts::id::*}:
+		set {_slot} to (loop-value parsed as integer) - 1
+		{_slot} is set
+		set {_best} to {best::%{loadedCharts::id::%loop-value%}%}
+		set {_best} to 0 if {_best} is not set
+		set slot {_slot} of {_infoGUI} to music disc cat named "&f%{loadedCharts::name::%loop-value%}%" with lore "%nl%&8· &7难度: &f%{loadedCharts::level::%loop-value%}%%nl%&8· &7作曲: &f%{loadedCharts::artist::%loop-value%}%%nl%&8· &7谱师: &f%{loadedCharts::author::%loop-value%}%%nl%&8· &7时长: &f%{length::%{loadedCharts::id::%loop-value%}%}%%nl%&8· &7最好成绩: &f%{_best}% &7%getRank({_best})%%nl%%nl%&7输入 /reset 离开游戏%nl%%nl%&e点击开始!"
+	open {_infoGUI} to {_p}
+
+function getRank(score: number) :: text:
+	return "&eSSS+" if {_score} >= 1000000
+	return "&eSSS" if {_score} is between 999999 and 990000
+	return "&eSS" if {_score} is between 989999 and 980000
+	return "&eS" if {_score} is between 979999 and 960000
+	return "&aAAA" if {_score} is between 959999 and 950000
+	return "&aAA" if {_score} is between 949999 and 940000
+	return "&aA" if {_score} is between 939999 and 930000
+	return "&bBBB" if {_score} is between 929999 and 920000
+	return "&bBB" if {_score} is between 919999 and 910000
+	return "&bB" if {_score} is between 909999 and 900000
+	return "&2C" if {_score} is between 899999 and 850000
+	return "&7D" if {_score} <= 849999
+
+on inventory click:
+	cancel event
+	if name of event-inventory is "选择谱面":
+		if index of event-slot < 50:
+			set {_slot} to index of event-slot + 1
+			if {loadedCharts::id::%{_slot}%} is set:
+				close player's inventory
+				playChart({loadedCharts::id::%{_slot}%})
+		else:
+			setSpeedGUI(player) if index of event-slot = 50
+			setOffsetGUI(player) if index of event-slot = 51
+			setHitSound(player) if index of event-slot = 52
+			refresh(player) if event-slot is slime ball
+			set event-slot to barrier named "&c请稍等……" if index of event-slot = 53
+	if name of event-inventory is "调速":
+		setSpeedGUI(player) if index of event-slot = 50
+		setOffsetGUI(player) if index of event-slot = 51
+		setHitSound(player) if index of event-slot = 52
+		infoGUI(player) if index of event-slot = 53
+		remove 0.5 from {speed} if index of event-slot = 19
+		setSpeedGUI(player) if index of event-slot = 19
+		remove 0.1 from {speed} if index of event-slot = 20
+		setSpeedGUI(player) if index of event-slot = 20
+		remove 0.01 from {speed} if index of event-slot = 21
+		setSpeedGUI(player) if index of event-slot = 21
+		add 0.5 to {speed} if index of event-slot = 25
+		setSpeedGUI(player) if index of event-slot = 25
+		add 0.1 to {speed} if index of event-slot = 24
+		setSpeedGUI(player) if index of event-slot = 24
+		add 0.01 to {speed} if index of event-slot = 23
+		setSpeedGUI(player) if index of event-slot = 23
+	if name of event-inventory is "偏移调整":
+		setSpeedGUI(player) if index of event-slot = 50
+		setOffsetGUI(player) if index of event-slot = 51
+		setHitSound(player) if index of event-slot = 52
+		infoGUI(player) if index of event-slot = 53
+		remove 50 from {offset} if index of event-slot = 19
+		setOffsetGUI(player) if index of event-slot = 19
+		remove 10 from {offset} if index of event-slot = 20
+		setOffsetGUI(player) if index of event-slot = 20
+		remove 1 from {offset} if index of event-slot = 21
+		setOffsetGUI(player) if index of event-slot = 21
+		add 50 to {offset} if index of event-slot = 25
+		setOffsetGUI(player) if index of event-slot = 25
+		add 10 to {offset} if index of event-slot = 24
+		setOffsetGUI(player) if index of event-slot = 24
+		add 1 to {offset} if index of event-slot = 23
+		setOffsetGUI(player) if index of event-slot = 23
+
+function setSpeedGUI(p: player):
+	set {_infoGUI} to chest inventory with 6 rows named "调速"
+	loop integers from 45 to 49:
+		set slot loop-value of {_infoGUI} to gray stained glass pane named ""
+	set slot 50 of {_infoGUI} to feather named "&f音符流速: &e%{speed}%" with lore "%nl%&7音符每Tick(1/20秒)移动的距离(米)%nl%&7推荐范围: 1~2.5%nl%&f过高或过低的流速会严重影响游戏体验%nl%%nl%&e点击修改"
+	set slot 51 of {_infoGUI} to clock named "&f偏移: &e%{offset}%ms" with lore "%nl%&7单位: 毫秒(ms)%nl%&7偏移越高，音符生成越滞后，反之提前%nl%&7如果你遇到了音画不同步，请调整此项%nl%&f注意:第一次播放音画不同步属正常现象%nl%%nl%&e点击修改"
+	set slot 52 of {_infoGUI} to note block named "&f打击音效: %{hitSound}%" with lore "%nl%&7击中音符时播放打击音效%nl%%nl%&e点击开启/关闭"
+	set slot 53 of {_infoGUI} to music disc cat named "&a选择谱面" with lore "%nl%&e点击返回"
+	set slot 19 of {_infoGUI} to 50 orange stained glass panes named "&6-0.5" with lore "&7当前: %{speed}%"
+	set slot 20 of {_infoGUI} to 10 orange stained glass panes named "&6-0.1" with lore "&7当前: %{speed}%"
+	set slot 21 of {_infoGUI} to 1 orange stained glass pane named "&6-0.01" with lore "&7当前: %{speed}%"
+	set slot 22 of {_infoGUI} to feather named "&f音符流速: &e%{speed}%" with lore "%nl%&7音符每Tick(1/20秒)移动的距离(米)%nl%&7推荐范围: 1~2.5%nl%&f过高或过低的流速会严重影响游戏体验"
+	set slot 25 of {_infoGUI} to 50 light blue stained glass panes named "&b+0.5" with lore "&7当前: %{speed}%"
+	set slot 24 of {_infoGUI} to 10 light blue stained glass panes named "&b+0.1" with lore "&7当前: %{speed}%"
+	set slot 23 of {_infoGUI} to 1 light blue stained glass pane named "&b+0.01" with lore "&7当前: %{speed}%"
+	open {_infoGUI} to {_p}
+
+function setOffsetGUI(p: player):
+	set {_infoGUI} to chest inventory with 6 rows named "偏移调整"
+	loop integers from 45 to 49:
+		set slot loop-value of {_infoGUI} to gray stained glass pane named ""
+	set slot 50 of {_infoGUI} to feather named "&f音符流速: &e%{speed}%" with lore "%nl%&7音符每Tick(1/20秒)移动的距离(米)%nl%&7推荐范围: 1~2.5%nl%&f过高或过低的流速会严重影响游戏体验%nl%%nl%&e点击修改"
+	set slot 51 of {_infoGUI} to clock named "&f偏移: &e%{offset}%ms" with lore "%nl%&7单位: 毫秒(ms)%nl%&7偏移越高，音符生成越滞后，反之提前%nl%&7如果你遇到了音画不同步，请调整此项%nl%&f注意:第一次播放音画不同步属正常现象%nl%%nl%&e点击修改"
+	set slot 52 of {_infoGUI} to note block named "&f打击音效: %{hitSound}%" with lore "%nl%&7击中音符时播放打击音效%nl%%nl%&e点击开启/关闭"
+	set slot 53 of {_infoGUI} to music disc cat named "&a选择谱面" with lore "%nl%&e点击返回"
+	set slot 19 of {_infoGUI} to 50 orange stained glass panes named "&6-50" with lore "&7当前: %{offset}%ms"
+	set slot 20 of {_infoGUI} to 10 orange stained glass panes named "&6-10" with lore "&7当前: %{offset}%ms"
+	set slot 21 of {_infoGUI} to 1 orange stained glass pane named "&6-1" with lore "&7当前: %{offset}%ms"
+	set slot 22 of {_infoGUI} to clock named "&f偏移: &e%{offset}%ms" with lore "%nl%&7单位: 毫秒(ms)%nl%&7偏移越高，音符生成越滞后，反之提前%nl%&7如果你遇到了音画不同步，请调整此项%nl%&f注意:第一次播放音画不同步属正常现象"
+	set slot 25 of {_infoGUI} to 50 light blue stained glass panes named "&b+50" with lore "&7当前: %{offset}%ms"
+	set slot 24 of {_infoGUI} to 10 light blue stained glass panes named "&b+10" with lore "&7当前: %{offset}%ms"
+	set slot 23 of {_infoGUI} to 1 light blue stained glass pane named "&b+1" with lore "&7当前: %{offset}%ms"
+	open {_infoGUI} to {_p}
+
+function setHitSound(p: player):
+	if {hitSound} is "&a开":
+		set {hitSound} to "&c关"
+	else:
+		set {hitSound} to "&a开"
+	infoGUI({_p})

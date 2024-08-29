@@ -1,0 +1,195 @@
+########################################################
+#                                                      #
+#                     游戏结算                         #
+#                                                      #
+########################################################
+
+function end():
+	clear {actor}'s inventory
+	if {combo} = {maxNote}:
+		if {statistics::exact} = {maxNote}:
+			perfectPerformance()
+		else:
+			fullCombo()
+	set {_base} to 0
+	wait 30 ticks
+	set level progress of all players to 0
+	{actor} is set
+	loop 30 times:
+		{actor} is set
+		add 0.01 to {_base}
+		loop all text displays:
+			set {_loc} to location of loop-entity
+			if metadata value "score" of loop-entity is true:
+				{_loc}.add(0, {_base}, 0)
+			if metadata value "level" of loop-entity is true:
+				{_loc}.add(0, {_base}, 0)
+			if metadata value "combo" of loop-entity is true:
+				set {_base2} to {_base}*5
+				{_loc}.add(0, {_base2}, 0)
+			if metadata value "perfect" of loop-entity is true:
+				set {_base2} to {_base}*5
+				{_loc}.add(0, {_base2}, 0)
+			teleport loop-entity to {_loc}
+		wait 1 tick
+	{actor} is set
+	delete all text displays
+	wait 5 ticks
+	{actor} is set
+	result()
+	result2()
+	wait 2 seconds
+	{actor} is set
+	result3()
+	result4()
+
+function fullCombo():
+	set {_loc1} to location(0.5, 0.5, 10, world "world", -90, 90)
+	summon text display at {_loc1}:
+		set display translation of the entity to vector(0,-1.5,0)
+		set display brightness of the entity to displayBrightness(10,10)
+		set display right rotation of the entity to axisAngle(90 * (3.14 / 180), 0, 1, 0)
+		set display text of the entity to "§bFull Combo"
+		set display scale of entity to vector(40,40,40)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "perfect" of the entity to true
+		set display text opacity of the entity to 255
+		set {_entity} to the entity
+	set {_angle} to 90
+	set {_del} to 22
+	set {_size} to 40
+	loop 30 times:
+		set {_del} to {_del} * 0.8
+		set {_size} to {_size} * 0.7
+		remove {_del} from {_angle}
+		set pitch of {_entity} to {_angle}
+		set display scale of {_entity} to vector({_size}+5,{_size}+5,{_size}+5)
+		set display translation of {_entity} to vector(0,-1.5*({_size}+5)*0.1,0)
+		wait 1 tick
+
+function perfectPerformance():
+	set {_loc1} to location(0.5, 0.5, 10, world "world", -90, 90)
+	summon text display at {_loc1}:
+		set display translation of the entity to vector(0,-1.5,0)
+		set display brightness of the entity to displayBrightness(10,10)
+		set display right rotation of the entity to axisAngle(90 * (3.14 / 180), 0, 1, 0)
+		set display text of the entity to "§ePerfect          ", "    Performance!"
+		set display scale of entity to vector(40,40,40)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "perfect" of the entity to true
+		set display text opacity of the entity to 255
+		set {_entity} to the entity
+	set {_angle} to 90
+	set {_del} to 22
+	set {_size} to 40
+	loop 30 times:
+		set {_del} to {_del} * 0.8
+		set {_size} to {_size} * 0.7
+		remove {_del} from {_angle}
+		set pitch of {_entity} to {_angle}
+		set display scale of {_entity} to vector({_size}+5,{_size}+5,{_size}+5)
+		set display translation of {_entity} to vector(0,-1.5*({_size}+5)*0.1,0)
+		wait 1 tick
+
+function result():
+	play sound "entity.player.levelup" to all players
+	
+	if {best::%{playing}%} is not set:
+		set {best::%{playing}%} to {score}
+		send title "&e初次游玩!" with subtitle "&e &e" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+	else if {score} > {best::%{playing}%}:
+		set {best::%{playing}%} to {score}
+		send title "&e新记录!" with subtitle "&e &e" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+	
+	set {_loc1} to location(0.5, 0.5, 10, world "world", 180, 0)
+	summon text display at {_loc1}:
+		set display translation of the entity to vector(-0.2,-1,0)
+		set display brightness of the entity to displayBrightness(10,10)
+		set display text of the entity to "§e"
+		set display scale of entity to vector(10,10,10)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "result" of the entity to true
+		set display text opacity of the entity to 0
+		set {_entity} to the entity
+	loop 60 times:
+		add 255/20 to {_alpha}
+		set {_alpha} to 255 if {_alpha} > 255
+		set display text opacity of {_entity} to {_alpha}
+		wait 1 tick
+		set display text of {_entity} to "&eSSS+" if {displayScore} >= 1000000
+		set display text of {_entity} to "&eSSS" if {displayScore} is between 999999 and 990000
+		set display text of {_entity} to "&eSS" if {displayScore} is between 989999 and 980000
+		set display text of {_entity} to "&eS" if {displayScore} is between 979999 and 960000
+		set display text of {_entity} to "&aAAA" if {displayScore} is between 959999 and 950000
+		set display text of {_entity} to "&aAA" if {displayScore} is between 949999 and 940000
+		set display text of {_entity} to "&aA" if {displayScore} is between 939999 and 930000
+		set display text of {_entity} to "&bBBB" if {displayScore} is between 929999 and 920000
+		set display text of {_entity} to "&bBB" if {displayScore} is between 919999 and 910000
+		set display text of {_entity} to "&bB" if {displayScore} is between 909999 and 900000
+		set display text of {_entity} to "&2C" if {displayScore} is between 899999 and 850000
+		set display text of {_entity} to "&7D" if {displayScore} <= 849999
+
+function result2():
+	set {_loc1} to location(0.5, 0, 10, world "world", 180, 0)
+	summon text display at {_loc1}:
+		set display translation of the entity to vector(0,-1.5,0)
+		set display brightness of the entity to displayBrightness(10,10)
+		set display text of the entity to "§f"
+		set display scale of entity to vector(3,3,3)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "result" of the entity to true
+		set display text opacity of the entity to 0
+		set {_entity} to the entity
+		set {_tempScore2} to {score}
+		set {_tempScore} to {_tempScore2} * 0.75
+	loop 60 times:
+		add 255/20 to {_alpha}
+		set {_tempScore} to 0.75 * {_tempScore}
+		set {displayScore} to round({_tempScore2} - {_tempScore})
+		set {_alpha} to 255 if {_alpha} > 255
+		set display text opacity of {_entity} to {_alpha}
+		set display text of {_entity} to "§f%{displayScore}%"
+		wait 1 tick
+
+function result3():
+	set {_loc1} to location(0.5, 0, 10, world "world", 180, 0)
+	summon text display at {_loc1}:
+		set display translation of the entity to vector(0,-4.5,0)
+		set display brightness of the entity to displayBrightness(10,10)
+		set display line width of the entity to 400
+		set display text of the entity to "&bExact &f%{statistics::exact}%&e(+%{statistics::exacthold}%) &8| &eJust &f%{statistics::just}% &8| &4Miss &c%{statistics::miss}%", "", "&7输入 [/reset] 重置游戏"
+		set display scale of entity to vector(2,2,2)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "result" of the entity to true
+		set display text opacity of the entity to 0
+		set {_entity} to the entity
+	set {_height} to 2
+	loop 30 times:
+		set {_height} to {_height} * 0.9
+		set display translation of {_entity} to vector(0,-4.5-{_height},0)
+		add 255/10 to {_alpha}
+		set {_alpha} to 255 if {_alpha} > 255
+		set display text opacity of {_entity} to {_alpha}
+		wait 1 tick
+
+function result4():
+	set {_loc1} to location(0.5, 0, 10, world "world", 180, 0)
+	summon text display at {_loc1}:
+		set display translation of the entity to vector(0,4.5,0)
+		set display brightness of the entity to displayBrightness(10,10)
+		set display line width of the entity to 400
+		set display text of the entity to "&f%{song}%&f          %{level}%"
+		set display scale of entity to vector(2,2,2)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "result" of the entity to true
+		set display text opacity of the entity to 0
+		set {_entity} to the entity
+	set {_height} to 2
+	loop 30 times:
+		set {_height} to {_height} * 0.9
+		set display translation of {_entity} to vector(0,4.5+{_height},0)
+		add 255/10 to {_alpha}
+		set {_alpha} to 255 if {_alpha} > 255
+		set display text opacity of {_entity} to {_alpha}
+		wait 1 tick
+

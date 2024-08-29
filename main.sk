@@ -1,0 +1,733 @@
+
+########################################################
+#                                                      #
+#                      初始化                          #
+#                                                      #
+########################################################
+
+on load:
+	set {speed} to 1 if {speed} is not set
+	set {offset} to 0 if {preTime} is not set
+	delete {actor}
+	clear all players' inventory
+	set {hitSound} to "&a开" if {hitSound} is not set
+	delete {playing}
+
+on break:
+	cancel event
+
+on join:
+	teleport player to location(0.5, -1, 0.5, world "world", 0, 0)
+	set player's gamemode to survival
+	set player's level to 0
+
+on first join:
+	wait 1 second
+	playChart("simpletone")
+
+on player move:
+	player's gamemode is survival
+	cancel event
+
+on server list ping:
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+
+########################################################
+#                                                      #
+#                     操作部分                         #
+#                                                      #
+########################################################
+
+on right click:
+	holding()
+	#broadcast "%nl%&aA: on right click 点击实体:%clicked entity% 朝向实体:%target of player ignoring blocks%"
+	#broadcast "&cFind A" if {cancel::A} is true
+	#broadcast "&cFind B" if {cancel::B} is true
+	#broadcast "&cFind C" if {cancel::C} is true
+	#broadcast "&cFind D" if {cancel::D} is true
+	set {cancel::A} to true
+	#broadcast "&aPassed A"
+	#broadcast "cancel add: A"
+	if metadata value "notetype" of target of player ignoring blocks is "tap" or "double":
+		hitNote(target of player ignoring blocks)
+	wait 1 tick
+	delete {cancel::A}
+
+on shoot:
+	shooter is a player
+	cancel event
+	holding()
+	#broadcast "%nl%&aB: on shoot 朝向实体:%target of shooter ignoring blocks%"
+	#broadcast "&cFind A" if {cancel::A} is true
+	#broadcast "&cFind B" if {cancel::B} is true
+	#broadcast "&cFind C" if {cancel::C} is true
+	#broadcast "&cFind D" if {cancel::D} is true
+	#if metadata value "notetype" of target of shooter ignoring blocks is not "double": #这里有一个bug 暂时修不了 临时弄的方案
+	set {_blocked} to true if {cancel::A} is true
+	{_blocked} is not set
+	set {cancel::B} to true
+	#broadcast "&aPassed B"
+	#broadcast "cancel add: B"
+	if metadata value "notetype" of target of shooter ignoring blocks is "tap" or "double":
+		hitNote(target of shooter ignoring blocks)
+	wait 1 tick
+	delete {cancel::B}
+
+on left click:
+	holding()
+	#broadcast "%nl%&aC: on left click 点击实体:%clicked entity% 朝向实体:%target of player ignoring blocks%"
+	#broadcast "&cFind A" if {cancel::A} is true
+	#broadcast "&cFind B" if {cancel::B} is true
+	#broadcast "&cFind C" if {cancel::C} is true
+	#broadcast "&cFind D" if {cancel::D} is true
+	set {cancel::C} to true
+	#broadcast "&aPassed C"
+	#broadcast "cancel add: C"
+	if metadata value "notetype" of target of player ignoring blocks is "tap" or "double":
+		hitNote(target of player ignoring blocks)
+	wait 1 tick
+	delete {cancel::C}
+
+on damage:
+	holding()
+	if target of attacker ignoring blocks is set:
+		set {_target} to target of attacker ignoring blocks
+	else if victim is set:
+		set {_target} to victim
+	#broadcast "%nl%&aD: on damage 点击实体:%victim% 朝向实体:%target of attacker ignoring blocks%"
+	#broadcast "&cFind A" if {cancel::A} is true
+	#broadcast "&cFind B" if {cancel::B} is true
+	#broadcast "&cFind C" if {cancel::C} is true
+	#broadcast "&cFind D" if {cancel::D} is true
+	set {cancel::D} to true
+	#broadcast "&aPassed D"
+	#broadcast "cancel add: D"
+	if metadata value "notetype" of {_target} is "tap" or "double":
+		hitNote({_target})
+	wait 1 tick
+	delete {cancel::D}
+
+on arm swing:
+	#broadcast "&eE: on arm swing 修一个小bug"
+	#broadcast "&cFind A" if {cancel::A} is true
+	#broadcast "&cFind B" if {cancel::B} is true
+	#broadcast "&cFind C" if {cancel::C} is true
+	#broadcast "&cFind D" if {cancel::D} is true
+	if metadata value "notetype" of target of player ignoring blocks is "double":
+		set {_blocked} to true if {cancel::B} is true
+		set {_blocked} to true if {cancel::D} is true
+	else:
+		set {_blocked} to true if {cancel::A} is true
+		set {_blocked} to true if {cancel::B} is true
+		set {_blocked} to true if {cancel::C} is true
+		set {_blocked} to true if {cancel::D} is true
+	{_blocked} is not set
+	#broadcast "&aPassed E"
+	if metadata value "notetype" of target of player ignoring blocks is "tap" or "double":
+		hitNote(target of player ignoring blocks)
+
+function holding():
+	add 1 to {holding}
+	wait 0.3 seconds
+	remove 1 from {holding}
+
+########################################################
+#                                                      #
+#                   谱面播放部分                       #
+#                                                      #
+########################################################
+
+on load:
+	delete {timer}
+	loop all interactions:
+		delete loop-entity
+	loop all block displays:
+		delete loop-entity
+	loop all text displays:
+		delete loop-entity
+	delete {loadedNotes::*}
+	set {combo} to 0
+	set {maxNote} to 0
+	set {score} to 0
+	set {hitNotes} to 0
+	delete {statistics::*}
+	createComboDisplay()
+	
+command /speed <number>:
+	trigger:
+		set {speed} to argument
+		send title "&a流速已设置为 &f%{speed}%" with subtitle "&7Tip: &f推荐流速设置在1.0~2.5之间" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+
+command /offset <integer>:
+	trigger:
+		set {offset} to argument
+		send title "&a偏移已设置为 &f%{offset}%毫秒" with subtitle "&7Tip: &f偏移越大，音符越延后生成，反之提前生成" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+
+command /reset:
+	trigger:
+		delete {timer}
+		set all players' level to 0
+		set all players' level progress to 0
+		clear all players' inventory
+		stop all sounds for all players
+		delete {loadedNotes::*}
+		loop all interactions:
+			delete loop-entity
+		loop all block displays:
+			delete loop-entity
+		loop all text displays:
+			delete loop-entity
+		set {combo} to 0
+		set {maxNote} to 0
+		set {score} to 0
+		set {hitNotes} to 0
+		delete {statistics::*}
+		createComboDisplay()
+		wait 0.1 second
+		send title "&c加载谱面中，不要操作……" with subtitle "&a &a" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+		loadChart()
+		send title "&a加载完毕!" with subtitle "&a &a" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+		delete {actor}
+		delete {playing}
+
+function quitGame():
+	delete {timer}
+	clear all players' inventory
+	stop all sounds for all players
+	delete {loadedNotes::*}
+	loop all interactions:
+		delete loop-entity
+	loop all block displays:
+		delete loop-entity
+	loop all text displays:
+		delete loop-entity
+	set {combo} to 0
+	set {maxNote} to 0
+	set {score} to 0
+	set {hitNotes} to 0
+	delete {statistics::*}
+	createComboDisplay()
+	delete {actor}
+	delete {playing}
+
+command /start:
+	trigger:
+		send title "&f%{song}%" with subtitle "&8曲: &7%{artist}% &8· 谱: &7%{author}%" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+		play sound "%{sound}%" to all players
+		loop all text displays:
+			if metadata value "combo" of loop-entity is set:
+				set display text of loop-entity to "§f"
+			if metadata value "score" of loop-entity is set:
+				set display text of loop-entity to "§8"
+		wait 2 seconds
+		set {actor} to player
+		stop all sounds for all players
+		set slot 0 of {actor} to snowball named "&f"
+		set slot 1 of {actor} to snowball named "&f"
+		set slot 2 of {actor} to snowball named "&f"
+		set slot 3 of {actor} to snowball named "&f"
+		set slot 4 of {actor} to snowball named "&f"
+		set slot 5 of {actor} to snowball named "&f"
+		set slot 6 of {actor} to snowball named "&f"
+		set slot 7 of {actor} to snowball named "&f"
+		set slot 8 of {actor} to snowball named "&f"
+		set {timer} to 0
+		set {combo} to 0
+		set {score} to 0
+		set {hitNotes} to 0
+		set {alphaTime} to 11
+		set {statistics::exact} to 0
+		set {statistics::just} to 0
+		set {statistics::miss} to 0
+		set {statistics::exactHold} to 0
+		loop {loadedNotes::type::*}:
+			add 3 to {loadedNotes::time::%loop-index%}
+			add 0.001*{offset} to {loadedNotes::time::%loop-index%}
+		wait 3 seconds
+		play sound "%{sound}%" to all players
+
+every ticks:
+	{timer} is set
+	loop all block displays:
+		if metadata value "note1" of loop-entity is set:
+			set {_loc4} to location of loop-entity
+			if metadata value "face" of loop-entity is "w":
+				set {_speed} to {speed} * -1
+				{_loc4}.add(0, 0, {_speed}) 
+				teleport loop-entity to {_loc4}
+			if metadata value "face" of loop-entity is "a":
+				set {_speed} to {speed} * -1
+				{_loc4}.add({_speed}, 0, 0) 
+				teleport loop-entity to {_loc4}
+			if metadata value "face" of loop-entity is "s":
+				set {_speed} to {speed}
+				{_loc4}.add(0, 0, {_speed}) 
+				teleport loop-entity to {_loc4}
+			if metadata value "face" of loop-entity is "d":
+				set {_speed} to {speed}
+				{_loc4}.add({_speed}, 0, 0) 
+				teleport loop-entity to {_loc4}
+
+every ticks:
+	{timer} is set
+	set {_count} to 0
+	set {_notes} to 0
+	add 1 to {timer}
+	if ({timer} / {length::%{playing}%} / 20) < 0.99:
+		set level progress of all players to ({timer} / {length::%{playing}%} / 20)
+	else:
+		set level progress of all players to 0.99
+	loop all interactions:
+		add 1 to {_count}
+	if {_count} < 30:
+		loop {loadedNotes::type::*}:
+			add 1 to {_notes}
+		if {_notes} = 0:
+			if {_count} = 0:
+				delete {timer}
+				end()
+		else:
+			loop {loadedNotes::type::*}:
+				if loop-value is not "execution":
+					set {_summonDistance} to {speed} * 20 * ({loadedNotes::time::%loop-index%} - ({timer} / 20)) + 4
+					{_summonDistance} < 50
+					if loop-value is "tap":
+						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
+						set {_face} to {loadedNotes::face::%loop-index%}
+						set {_x} to {loadedNotes::x::%loop-index%}
+						set {_y} to {loadedNotes::y::%loop-index%}
+						set {_z} to {speed} * 20 * {loadedNotes::time::%loop-index%} + 4
+						set {_glowing} to {loadedNotes::glowing::%loop-index%}
+						drawTap({_face}, {_x}, {_y}, {_z}, {_glowing})
+						delete {loadedNotes::type::%loop-index%}
+						delete {loadedNotes::time::%loop-index%}
+						delete {loadedNotes::face::%loop-index%}
+						delete {loadedNotes::x::%loop-index%}
+						delete {loadedNotes::y::%loop-index%}
+						delete {loadedNotes::glowing::%loop-index%}
+						delete {loadedNotes::section::%loop-index%}
+					if loop-value is "hold":
+						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
+						set {_face} to {loadedNotes::face::%loop-index%}
+						set {_x} to {loadedNotes::x::%loop-index%}
+						set {_y} to {loadedNotes::y::%loop-index%}
+						set {_z} to {speed} * 20 * {loadedNotes::time::%loop-index%} + 4
+						set {_glowing} to {loadedNotes::glowing::%loop-index%}
+						drawHold({_face}, {_x}, {_y}, {_z}, {_glowing})
+						delete {loadedNotes::type::%loop-index%}
+						delete {loadedNotes::time::%loop-index%}
+						delete {loadedNotes::face::%loop-index%}
+						delete {loadedNotes::x::%loop-index%}
+						delete {loadedNotes::y::%loop-index%}
+						delete {loadedNotes::glowing::%loop-index%}
+						delete {loadedNotes::section::%loop-index%}
+					if loop-value is "drag":
+						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
+						set {_face} to {loadedNotes::face::%loop-index%}
+						set {_x} to {loadedNotes::x::%loop-index%}
+						set {_y} to {loadedNotes::y::%loop-index%}
+						set {_z} to {speed} * 20 * {loadedNotes::time::%loop-index%} + 4
+						set {_glowing} to {loadedNotes::glowing::%loop-index%}
+						drawDrag({_face}, {_x}, {_y}, {_z}, {_glowing})
+						delete {loadedNotes::type::%loop-index%}
+						delete {loadedNotes::time::%loop-index%}
+						delete {loadedNotes::face::%loop-index%}
+						delete {loadedNotes::x::%loop-index%}
+						delete {loadedNotes::y::%loop-index%}
+						delete {loadedNotes::glowing::%loop-index%}
+						delete {loadedNotes::section::%loop-index%}
+					if loop-value is "flick":
+						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
+						set {_face} to {loadedNotes::face::%loop-index%}
+						set {_z} to {speed} * 20 * {loadedNotes::time::%loop-index%} + 4
+						{_z} < 50
+						set {_turn} to {loadedNotes::turn::%loop-index%}
+						set {_glowing} to {loadedNotes::glowing::%loop-index%}
+						drawFlick({_face}, {_z}, {_turn}, {_glowing})
+						delete {loadedNotes::type::%loop-index%}
+						delete {loadedNotes::time::%loop-index%}
+						delete {loadedNotes::face::%loop-index%}
+						delete {loadedNotes::turn::%loop-index%}
+						delete {loadedNotes::glowing::%loop-index%}
+						delete {loadedNotes::section::%loop-index%}
+					if loop-value is "double":
+						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
+						set {_face} to {loadedNotes::face::%loop-index%}
+						set {_z} to {speed} * 20 * {loadedNotes::time::%loop-index%} + 4
+						{_z} < 50
+						set {_x1} to {loadedNotes::x1::%loop-index%}
+						set {_y1} to {loadedNotes::y1::%loop-index%}
+						set {_x2} to {loadedNotes::x2::%loop-index%}
+						set {_y2} to {loadedNotes::y2::%loop-index%}
+						set {_glowing} to {loadedNotes::glowing::%loop-index%}
+						drawDouble({_face}, {_x1}, {_y1}, {_z}, {_x2}, {_y2}, {_z}, {_glowing})
+						delete {loadedNotes::type::%loop-index%}
+						delete {loadedNotes::time::%loop-index%}
+						delete {loadedNotes::face::%loop-index%}
+						delete {loadedNotes::x1::%loop-index%}
+						delete {loadedNotes::y1::%loop-index%}
+						delete {loadedNotes::x2::%loop-index%}
+						delete {loadedNotes::y2::%loop-index%}
+						delete {loadedNotes::glowing::%loop-index%}
+						delete {loadedNotes::section::%loop-index%}
+					exit loop
+				else:
+					if {loadedNotes::time::%loop-index%} - ({timer} / 20) <= 0:
+						run section {loadedNotes::section::%loop-index%}
+						#broadcast "run section {loadedNotes::section::%loop-index%} = %{loadedNotes::section::%loop-index%}%"
+						delete {loadedNotes::type::%loop-index%}
+						delete {loadedNotes::time::%loop-index%}
+						delete {loadedNotes::face::%loop-index%}
+						delete {loadedNotes::x1::%loop-index%}
+						delete {loadedNotes::y1::%loop-index%}
+						delete {loadedNotes::x2::%loop-index%}
+						delete {loadedNotes::y2::%loop-index%}
+						delete {loadedNotes::glowing::%loop-index%}
+						delete {loadedNotes::section::%loop-index%}
+	
+	loop all interactions:
+		set {_loc1} to location of loop-entity
+		set {_ent1} to loop-entity
+		
+		loop all block displays:
+			if uuid of loop-entity-2 is metadata value "linkuuid" of loop-entity-1:
+				set {_loc2} to location of loop-entity-2
+				set {_entity2} to loop-entity-2
+				exit loop
+		
+		loop all text displays:
+			if metadata value "linkbind" of loop-entity-2 is metadata value "linkuuid" of loop-entity-1:
+				set {_loc3} to location of loop-entity-2
+				set {_entity3} to loop-entity-2
+				exit this loop
+			else:
+				delete {_entity3}
+				delete {_loc3}
+		
+		if metadata value "face" of loop-entity is "w":
+			set {_speed} to {speed} * -1
+			{_loc1}.add(0, 0, {_speed})
+			{_loc2}.add(0, 0, {_speed})
+			{_loc3}.add(0, 0, {_speed})
+			
+			set {_yt} to y location of {_loc1}+0.5
+			if z location of loop-entity < 25:
+				loop all text displays:
+					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
+					deleteEntity(loop-entity-2)
+				set {_alpha} to 100 - (z location of {_loc1} - 4) * 4
+				set {_alpha} to 100 if {_alpha} > 100
+				set {_alpha} to 1 if {_alpha} < 1
+				set {_temp} to {_yt}-{_alpha}/100*0.5+0.5125
+				set {_temp2} to x location of {_loc1} - 0.0125
+				metadata value "notetype" of loop-entity is not "flick"
+				summon text display at location({_temp2}, {_temp}, 4, world "world", 180, 0):
+					set display text of the entity to "§f█"
+					set display text background color of the entity to bukkitColor(0,0,0,0)
+					set display scale of the entity to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
+					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set display shadow strength of the entity to 0
+				summon text display at location(x location of {_loc1}, {_yt}, 4.001, world "world", 180, 0):
+					set display text of the entity to "§f█"
+					set display text background color of the entity to bukkitColor(0,0,0,0)
+					set display scale of the entity to vector(3,3,1)
+					set display text opacity of the entity to {_alpha}
+					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set display shadow strength of the entity to 0
+			
+			if z location of loop-entity <= 4 + {speed}:
+				metadata value "notetype" of loop-entity is neither "tap" nor "double"
+				if metadata value "notetype" of loop-entity is "drag":
+					metadata value "hited" of loop-entity is true
+					deleteNote(loop-entity)
+					exact(loop-entity)
+				else if metadata value "notetype" of loop-entity is "hold":
+					{holding} > 0
+					deleteNote(loop-entity)
+					exact(loop-entity)
+				else if metadata value "notetype" of loop-entity is "flick":
+					checkIfTurned(loop-entity)
+					deleteNote(loop-entity)
+			
+			if z location of loop-entity < 4 - {speed}*4:
+				deleteNote(loop-entity)
+				miss()
+			
+		if metadata value "face" of loop-entity is "a":
+			set {_speed} to {speed} * -1
+			{_loc1}.add({_speed}, 0, 0)
+			{_loc2}.add({_speed}, 0, 0)
+			{_loc3}.add({_speed}, 0, 0)
+			
+			set {_yt} to y location of {_loc1}+0.5
+			if x location of loop-entity < 25:
+				loop all text displays:
+					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
+					deleteEntity(loop-entity-2)
+				set {_alpha} to 100 - (x location of {_loc1} - 4) * 4
+				set {_alpha} to 100 if {_alpha} > 100
+				set {_alpha} to 1 if {_alpha} < 1
+				set {_temp} to {_yt}-{_alpha}/100*0.5+0.5125
+				set {_temp2} to z location of {_loc1} + 0.0125
+				metadata value "notetype" of loop-entity is not "flick"
+				summon text display at location(4, {_temp}, {_temp2}, world "world", 90, 0):
+					set display text of the entity to "§f█"
+					set display text background color of the entity to bukkitColor(0,0,0,0)
+					set display scale of the entity to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
+					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set display shadow strength of the entity to 0
+				summon text display at location(4.001, {_yt}, z location of {_loc1}, world "world", 90, 0):
+					set display text of the entity to "§f█"
+					set display text background color of the entity to bukkitColor(0,0,0,0)
+					set display scale of the entity to vector(3,3,1)
+					set display text opacity of the entity to {_alpha}
+					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set display shadow strength of the entity to 0
+			
+			if x location of loop-entity <= 4 + {speed}:
+				metadata value "notetype" of loop-entity is neither "tap" nor "double"
+				if metadata value "notetype" of loop-entity is "drag":
+					metadata value "hited" of loop-entity is true
+					deleteNote(loop-entity)
+					exact(loop-entity)
+				else if metadata value "notetype" of loop-entity is "hold":
+					{holding} > 0
+					deleteNote(loop-entity)
+					exact(loop-entity)
+				else if metadata value "notetype" of loop-entity is "flick":
+					checkIfTurned(loop-entity)
+					deleteNote(loop-entity)
+			
+			if x location of loop-entity < 4 - {speed}*4:
+				deleteNote(loop-entity)
+				miss()
+			
+		if metadata value "face" of loop-entity is "s":
+			{_loc1}.add(0, 0, {speed})
+			{_loc2}.add(0, 0, {speed})
+			{_loc3}.add(0, 0, {speed})
+			
+			set {_yt} to y location of {_loc1}+0.5
+			if z location of loop-entity > -25:
+				loop all text displays:
+					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
+					deleteEntity(loop-entity-2)
+				set {_alpha} to 100 - (z location of {_loc1} * -1 - 4) * 4
+				set {_alpha} to 100 if {_alpha} > 100
+				set {_alpha} to 1 if {_alpha} < 1
+				set {_temp} to {_yt}-{_alpha}/100*0.5+0.5125
+				set {_temp2} to x location of {_loc1} + 0.0125
+				metadata value "notetype" of loop-entity is not "flick"
+				summon text display at location({_temp2}, {_temp}, -4, world "world", 0, 0):
+					set display text of the entity to "§f█"
+					set display text background color of the entity to bukkitColor(0,0,0,0)
+					set display scale of the entity to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
+					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set display shadow strength of the entity to 0
+				summon text display at location(x location of {_loc1}, {_yt}, -4.001, world "world", 0, 0):
+					set display text of the entity to "§f█"
+					set display text background color of the entity to bukkitColor(0,0,0,0)
+					set display scale of the entity to vector(3,3,1)
+					set display text opacity of the entity to {_alpha}
+					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set display shadow strength of the entity to 0
+			
+			if z location of loop-entity >= -4 - {speed}:
+				metadata value "notetype" of loop-entity is neither "tap" nor "double"
+				if metadata value "notetype" of loop-entity is "drag":
+					metadata value "hited" of loop-entity is true
+					deleteNote(loop-entity)
+					exact(loop-entity)
+				else if metadata value "notetype" of loop-entity is "hold":
+					{holding} > 0
+					deleteNote(loop-entity)
+					exact(loop-entity)
+				else if metadata value "notetype" of loop-entity is "flick":
+					checkIfTurned(loop-entity)
+					deleteNote(loop-entity)
+			
+			if z location of loop-entity > -4 + {speed}*4:
+				deleteNote(loop-entity)
+				miss()
+			
+		if metadata value "face" of loop-entity is "d":
+			{_loc1}.add({speed}, 0, 0)
+			{_loc2}.add({speed}, 0, 0)
+			{_loc3}.add({speed}, 0, 0)
+			
+			set {_yt} to y location of {_loc1}+0.5
+			if x location of loop-entity > -25:
+				loop all text displays:
+					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
+					deleteEntity(loop-entity-2)
+				set {_alpha} to 100 - (x location of {_loc1} * -1 - 4) * 4
+				set {_alpha} to 100 if {_alpha} > 100
+				set {_alpha} to 1 if {_alpha} < 1
+				set {_temp} to {_yt}-{_alpha}/100*0.5+0.5125
+				set {_temp2} to z location of {_loc1} - 0.0125
+				metadata value "notetype" of loop-entity is not "flick"
+				summon text display at location(-4, {_temp}, {_temp2}, world "world", -90, 0):
+					set display text of the entity to "§f█"
+					set display text background color of the entity to bukkitColor(0,0,0,0)
+					set display scale of the entity to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
+					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set display shadow strength of the entity to 0
+				summon text display at location(-4.001, {_yt}, z location of {_loc1}, world "world", -90, 0):
+					set display text of the entity to "§f█"
+					set display text background color of the entity to bukkitColor(0,0,0,0)
+					set display scale of the entity to vector(3,3,1)
+					set display text opacity of the entity to {_alpha}
+					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set display shadow strength of the entity to 0
+			
+			if x location of loop-entity >= -4 - {speed}:
+				metadata value "notetype" of loop-entity is neither "tap" nor "double"
+				if metadata value "notetype" of loop-entity is "drag":
+					metadata value "hited" of loop-entity is true
+					deleteNote(loop-entity)
+					exact(loop-entity)
+				else if metadata value "notetype" of loop-entity is "hold":
+					{holding} > 0
+					deleteNote(loop-entity)
+					exact(loop-entity)
+				else if metadata value "notetype" of loop-entity is "flick":
+					checkIfTurned(loop-entity)
+					deleteNote(loop-entity)
+			
+			if x location of loop-entity > -4 + {speed}*4:
+				deleteNote(loop-entity)
+				miss()
+			
+		teleport loop-entity to {_loc1}
+		teleport {_entity2} to {_loc2}
+		teleport {_entity3} to {_loc3} if {_entity3} is set
+
+########################################################
+#                                                      #
+#                   场景布置部分                       #
+#                                                      #
+########################################################
+
+every ticks:
+	{timer} > 0
+	if {alphaTime} > 0:
+		remove 1 from {alphaTime}
+		set {scoreEntityAlpha} to -127 + {alphaTime} * 12.6
+	
+	loop all text displays:
+		if metadata value "combo" of loop-entity is set:
+			if {combo} >= 3:
+				set display text of loop-entity to "§f%{combo}%"
+			else:
+				set display text of loop-entity to "§f"
+		if metadata value "score" of loop-entity is set:
+			if {score} >= 1000000:
+				set display text of loop-entity to "§f%{score}%"
+			else if {score} >= 100000:
+				set display text of loop-entity to "§80§f%{score}%"
+			else if {score} >= 10000:
+				set display text of loop-entity to "§800§f%{score}%"
+			else if {score} >= 1000:
+				set display text of loop-entity to "§8000§f%{score}%"
+			else if {score} >= 100:
+				set display text of loop-entity to "§80000§f%{score}%"
+			else if {score} >= 10:
+				set display text of loop-entity to "§800000§f%{score}%"
+			else:
+				set display text of loop-entity to "§8000000§f%{score}%"
+			set display text opacity of loop-entity to {scoreEntityAlpha}
+		if metadata value "level" of loop-entity is set:
+			if {level} is set:
+				set display text of loop-entity to "§f%{level}%"
+			else:
+				set display text of loop-entity to "§f"
+
+function createComboDisplay():
+	set {_loc1} to location(0.5, -8, 40, world "world", 180, 0)
+	set {_loc2} to location(40, -8, 0.5, world "world", 90, 0)
+	set {_loc3} to location(0.5, -8, -40, world "world", 0, 0)
+	set {_loc4} to location(-40, -8, 0.5, world "world", -90, 0) 
+	summon text display at {_loc1}:
+		set display text of the entity to "§fReady"
+		set display scale of entity to vector(50,50,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "combo" of the entity to true
+		set display text opacity of the entity to 255
+	summon text display at {_loc2}:
+		set display text of the entity to "§f→"
+		set display scale of entity to vector(50,50,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "combo" of the entity to true
+		set display text opacity of the entity to 255
+	summon text display at {_loc3}:
+		set display text of the entity to "§f↓"
+		set display scale of entity to vector(50,50,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "combo" of the entity to true
+		set display text opacity of the entity to 255
+	summon text display at {_loc4}:
+		set display text of the entity to "§f←"
+		set display scale of entity to vector(50,50,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "combo" of the entity to true
+		set display text opacity of the entity to 255
+	set {_loc5} to location(2.5, 3.2, 5, world "world", 180, 0)
+	set {_loc6} to location(5, 3.2, -1.5, world "world", 90, 0)
+	set {_loc7} to location(-1.5, 3.2, -4, world "world", 0, 0)
+	set {_loc8} to location(-4, 3.2, 2.5, world "world", -90, 0)
+	summon text display at {_loc5}:
+		set display text alignment of the entity to left aligned
+		set display text of the entity to "&f          输入 /play 播放谱面"
+		set display scale of entity to vector(2,2,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "score" of the entity to true
+		set display text opacity of the entity to 127
+	summon text display at {_loc6}:
+		set display text alignment of the entity to left aligned
+		set display text of the entity to "§8"
+		set display scale of entity to vector(2,2,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "score" of the entity to true
+		set display text opacity of the entity to 127
+	summon text display at {_loc7}:
+		set display text alignment of the entity to left aligned
+		set display text of the entity to "§8"
+		set display scale of entity to vector(2,2,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "score" of the entity to true
+		set display text opacity of the entity to 127
+	summon text display at {_loc8}:
+		set display text alignment of the entity to left aligned
+		set display text of the entity to "§8"
+		set display scale of entity to vector(2,2,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "score" of the entity to true
+		set display text opacity of the entity to 127
+	set {_loc9} to location(-1.5, 3.2, 5, world "world", 180, 0)
+	set {_loca} to location(5, 3.2, 2.5, world "world", 90, 0)
+	set {_locb} to location(2.5, 3.2, -4, world "world", 0, 0)
+	set {_locc} to location(-4, 3.2, -1.5, world "world", -90, 0)
+	summon text display at {_loc9}:
+		set display text alignment of the entity to left aligned
+		set display text of the entity to "§8"
+		set display scale of entity to vector(2,2,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "level" of the entity to true
+	summon text display at {_loca}:
+		set display text alignment of the entity to left aligned
+		set display text of the entity to "§8"
+		set display scale of entity to vector(2,2,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "level" of the entity to true
+	summon text display at {_locb}:
+		set display text alignment of the entity to left aligned
+		set display text of the entity to "§8"
+		set display scale of entity to vector(2,2,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "level" of the entity to true
+	summon text display at {_locc}:
+		set display text alignment of the entity to left aligned
+		set display text of the entity to "§8"
+		set display scale of entity to vector(2,2,0)
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set metadata value "level" of the entity to true
