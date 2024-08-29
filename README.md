@@ -9,6 +9,7 @@
 
 ## 下载地址
 服务端：https://workdrive.zoho.com.cn/file/kjthr3cdaa012cb6445fba14999004439f1e9
+
 资源包：https://workdrive.zohopublic.com.cn/file/kjthr1bfd03cca0724e20bca77ebfd8917970
 
 如果你对Cube Rhythm感兴趣，欢迎加入我们的QQ群聊：[300846184](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=SgCNDOGEwRfCo1iKtLBknSuKhanpQmLZ&authKey=G7trk03ZTQeU7%2FDH6Ph89M%2FG5vrvkrSxO%2BtdFKwlmSeJOwlb4TjihMTWVtdoyqxI&noverify=0&group_code=300846184)
