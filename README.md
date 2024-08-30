@@ -12,7 +12,7 @@
 https://github.com/EroslonDusk/CubeRhythm/wiki
 
 ## 下载地址
-服务端：https://workdrive.zoho.com.cn/file/kjthr3cdaa012cb6445fba14999004439f1e9
+服务端：https://www.123pan.com/s/eaNjVv-SuZBA
 
 资源包：https://workdrive.zohopublic.com.cn/file/kjthr1bfd03cca0724e20bca77ebfd8917970
 
