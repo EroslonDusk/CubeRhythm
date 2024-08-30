@@ -31,7 +31,7 @@ on player move:
 	cancel event
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.2%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #

@@ -1,29 +1,85 @@
-command /editor:
-	trigger:
-		if {editMode} is not set:
-			set {editMode} to true
-			broadcast "&a开启编辑模式"
-			clear player's inventory
-			give light blue wool named "&b&lTap" to player
-			give orange wool named "&6&lDouble" to player
-			give yellow wool named "&e&lDrag" to player
-			give white wool named "&f&lHold" to player
-			give pink wool named "&b&l← &d&lFlick(左)" to player
-			give red wool named "&c&lFlick(右) &b&l→" to player
-			give red dye named "&c&l清空场上音符" to player
-			set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to glass
-		else:
-			delete {editMode}
-			broadcast "&c关闭编辑模式"
-			clear player's inventory
-			delete {savedX::*}
-			delete {savedY::*}
-			delete {savedType::*}
-			set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to air
+on load:
+	set {editor::bpm} to 120 if {editor::bpm} is not set
+	set {editor::tick} to 0 if {editor::tick} is not set
+	set {editor::length} to 1 if {editor::length} is not set
+	set {editor::preTime} to 0 if {editor::preTime} is not set
+	
 
-every seconds:
+command /editor [<text>] [<number>]:
+	trigger:
+		if arg-1 is not set:
+			if {editMode} is not set:
+				delete {savedX::*}
+				delete {savedY::*}
+				delete {savedType::*}
+				set {editMode} to true
+				message "&a开启编辑模式"
+				message ""
+				message "&e/editor help &7-&f 查看命令帮助"
+				message "&e/editor bpm <number> &7-&f 每分钟拍数"
+				message "&b/step <integer> &7-&f /step 4 表示步长为1/4拍"
+				message "&b/b <number> &7-&f 传送到某一拍"
+				message "&e/editor pretime <number> &7-&f 将第1拍的时间设置为x秒，不是变速曲就设为0并且不要动"
+				message ""
+				message "&f/editor &c退出编辑模式"
+				message ""
+				clear player's inventory
+				give light blue wool named "&b&lTap" to player
+				give orange wool named "&6&lDouble" to player
+				give yellow wool named "&e&lDrag" to player
+				give white wool named "&f&lHold" to player
+				give pink wool named "&b&l← &d&lFlick(左)" to player
+				give red wool named "&c&lFlick(右) &b&l→" to player
+				give red dye named "&c&l清空场上音符" to player
+				give lime concrete named "&a&l步进1格" to player
+				give red concrete named "&c&l后退1格" to player
+				set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to glass
+			else:
+				delete {editMode}
+				message "&c关闭编辑模式"
+				clear player's inventory
+				delete {savedX::*}
+				delete {savedY::*}
+				delete {savedType::*}
+				set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to air
+		else if arg-1 is "bpm":
+			arg-2 is set
+			set {editor::bpm} to arg-2
+			send title "&a✔" with subtitle "&a &a" to player for 0.5 seconds with fade in 0.5 seconds and fade out 0.5 seconds
+		else if arg-1 is "pretime":
+			arg-2 is set
+			set {editor::preTime} to arg-2
+			send title "&a✔" with subtitle "&a &a" to player for 0.5 seconds with fade in 0.5 seconds and fade out 0.5 seconds
+		else if arg-1 is "help":
+			message ""
+			message "&e/editor help &7-&f 查看命令帮助"
+			message "&e/editor bpm <number> &7-&f 每分钟拍数"
+			message "&b/step <integer> &7-&f /step 4 表示步长为1/4拍"
+			message "&b/b <number> &7-&f 传送到某一拍"
+			message "&e/editor pretime <number> &7-&f 将第1拍的时间设置为x秒，不是变速曲就设为0并且不要动"
+			message ""
+			message "&f/editor &c退出编辑模式"
+			message ""
+
+command /b <number>:
+	trigger:
+		if {editMode} is set:
+			argument is set
+			set {editor::tick} to ((argument) - 1) * {editor::length}
+			send title "&a✔" with subtitle "&a &a" to player for 0.5 seconds with fade in 0.5 seconds and fade out 0.5 seconds
+
+command /step <integer>:
+	trigger:
+		if {editMode} is set:
+			argument is set
+			set {_past} to {editor::length}
+			set {editor::length} to argument
+			set {editor::tick} to {editor::tick} * {editor::length} / {_past}
+			send title "&a✔" with subtitle "&a &a" to player for 0.5 seconds with fade in 0.5 seconds and fade out 0.5 seconds
+
+every 2 ticks:
 	if {editMode} is set:
-		send action bar "&a编辑模式: &f手持物品右键添加/删除音符 输入 &bw/a/s/d 时间(秒)&f 生成谱面代码 输入/editor退出编辑模式" to all players
+		send action bar "&6BPM: &f%{editor::bpm}% &8| &b位置: &f%floor({editor::tick}/{editor::length}) + 1% : %mod({editor::tick}, {editor::length})% / %{editor::length}% (%{editor::tick}/{editor::length}*(60/{editor::bpm})+{editor::preTime}%s) &8| &a步长: &f1 / %{editor::length}% &8| &f输入w/a/s/d生成 " to all players
 
 on right click:
 	{editMode} is set
@@ -122,24 +178,19 @@ on right click:
 		delete {savedY::*}
 		delete {savedType::*}
 		set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to glass
+	else if player's tool is lime concrete:
+		add 1 to {editor::tick}
+	else if player's tool is red concrete:
+		remove 1 from {editor::tick}
+	
 
 on chat:
 	{editMode} is set
 	cancel event
 	set {_1} to chat message
-	if {_1} start with "w ":
-		replace all "w " with "" in {_1}
-		set {_face} to "w"
-	if {_1} start with "a ":
-		replace all "a " with "" in {_1}
-		set {_face} to "a"
-	if {_1} start with "s ":
-		replace all "s " with "" in {_1}
-		set {_face} to "s"
-	if {_1} start with "d ":
-		replace all "d " with "" in {_1}
-		set {_face} to "d"
-	set {_1} to {_1} parsed as number
+	if {_1} is "w" or "a" or "s" or "d":
+		set {_face} to {_1}
+	set {_1} to {editor::tick}/{editor::length}*(60/{editor::bpm})+{editor::preTime}
 	{_1} is set
 	set {_gen} to "empty"
 	if {savedX::Tap::1} is set:
