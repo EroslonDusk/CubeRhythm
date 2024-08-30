@@ -8,6 +8,7 @@
 on load:
 	set {speed} to 1 if {speed} is not set
 	set {offset} to 0 if {preTime} is not set
+	set {indicator} to "&c关" if {indicator} is not set
 	delete {actor}
 	clear all players' inventory
 	set {hitSound} to "&a开" if {hitSound} is not set
@@ -30,7 +31,7 @@ on player move:
 	cancel event
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -243,6 +244,7 @@ command /start:
 		loop {loadedNotes::type::*}:
 			add 3 to {loadedNotes::time::%loop-index%}
 			add 0.001*{offset} to {loadedNotes::time::%loop-index%}
+			add 0.001*{chartOffset::%{playing}%} to {loadedNotes::time::%loop-index%}
 		wait 3 seconds
 		play sound "%{sound}%" to all players
 
@@ -613,28 +615,37 @@ every ticks:
 	if {alphaTime} > 0:
 		remove 1 from {alphaTime}
 		set {scoreEntityAlpha} to -127 + {alphaTime} * 12.6
-	
+	if {indicator} is "&a开":
+		if {statistics::miss} = 0:
+			if {statistics::just} = 0:
+				set {_color} to "§e"
+			else:
+				set {_color} to "§b"
+		else:
+			set {_color} to "§f"
+	else:
+		set {_color} to "§f"
 	loop all text displays:
 		if metadata value "combo" of loop-entity is set:
 			if {combo} >= 3:
-				set display text of loop-entity to "§f%{combo}%"
+				set display text of loop-entity to "%{_color}%%{combo}%"
 			else:
 				set display text of loop-entity to "§f"
 		if metadata value "score" of loop-entity is set:
 			if {score} >= 1000000:
-				set display text of loop-entity to "§f%{score}%"
+				set display text of loop-entity to "%{_color}%%{score}%"
 			else if {score} >= 100000:
-				set display text of loop-entity to "§80§f%{score}%"
+				set display text of loop-entity to "§80%{_color}%%{score}%"
 			else if {score} >= 10000:
-				set display text of loop-entity to "§800§f%{score}%"
+				set display text of loop-entity to "§800%{_color}%%{score}%"
 			else if {score} >= 1000:
-				set display text of loop-entity to "§8000§f%{score}%"
+				set display text of loop-entity to "§8000%{_color}%%{score}%"
 			else if {score} >= 100:
-				set display text of loop-entity to "§80000§f%{score}%"
+				set display text of loop-entity to "§80000%{_color}%%{score}%"
 			else if {score} >= 10:
-				set display text of loop-entity to "§800000§f%{score}%"
+				set display text of loop-entity to "§800000%{_color}%%{score}%"
 			else:
-				set display text of loop-entity to "§8000000§f%{score}%"
+				set display text of loop-entity to "§8000000%{_color}%%{score}%"
 			set display text opacity of loop-entity to {scoreEntityAlpha}
 		if metadata value "level" of loop-entity is set:
 			if {level} is set:
