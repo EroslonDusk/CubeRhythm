@@ -8,6 +8,9 @@
    （需要比较强劲的电脑！个人测试R5 5500U勉强能撑下30个音符同屏）
 2. 在没有与Double音符交互时，对准其左键单击会同时击打两次，目前暂无解决方案
 
+## 制谱向导
+https://github.com/EroslonDusk/CubeRhythm/wiki
+
 ## 下载地址
 服务端：https://workdrive.zoho.com.cn/file/kjthr3cdaa012cb6445fba14999004439f1e9
 
