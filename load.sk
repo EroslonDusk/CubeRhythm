@@ -146,22 +146,22 @@ function drawTap(face: text, x: number, y: number, z: number, glowing: boolean):
 function drawHold(face: text, x: number, y: number, z: number, glowing: boolean):
 	set {_x1} to {_x}+0.5
 	set {_y1} to {_y}-0.5+20
-	set {_z1} to {_z}+1.1
+	set {_z1} to {_z}+1
 	if {_face} is "w":
-		set {_loc1} to location({_x}, {_y}, {_z}, world "world", 0, 0)
+		set {_loc1} to location({_x}, {_y}, {_z}+0.1, world "world", 0, 0)
 		set {_loc2} to location({_x1}, {_y1}, {_z1}, world "world", 0, 0)
 	if {_face} is "a":
 		remove 1 from {_x1}
-		set {_loc1} to location({_z}, {_y}, -1*{_x}+1, world "world", -90, 0)
+		set {_loc1} to location({_z}+0.1, {_y}, -1*{_x}+1, world "world", -90, 0)
 		set {_loc2} to location({_z1}, {_y1}, -1*{_x1}, world "world", -90, 0)
 	if {_face} is "s":
 		remove 1 from {_x1}
 		remove 1 from {_z1}
-		set {_loc1} to location(-1*{_x}+1, {_y}, -1*{_z}+1, world "world", 180, 0)
+		set {_loc1} to location(-1*{_x}+1, {_y}, -1*{_z}+0.9, world "world", 180, 0)
 		set {_loc2} to location(-1*{_x1}, {_y1}, -1*{_z1}, world "world", 180, 0)
 	if {_face} is "d":
 		remove 1 from {_z1}
-		set {_loc1} to location(-1*{_z}+1, {_y}, {_x}, world "world", 90, 0)
+		set {_loc1} to location(-1*{_z}+0.9, {_y}, {_x}, world "world", 90, 0)
 		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 90, 0)
 	summon block display at {_loc1}
 	set display block data of last spawned entity to white_concrete
