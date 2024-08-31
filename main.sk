@@ -31,7 +31,7 @@ on player move:
 	cancel event
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.2.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.3%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -414,27 +414,42 @@ every ticks:
 			
 			set {_yt} to y location of {_loc1}+0.5
 			if z location of loop-entity < 25:
-				loop all text displays:
-					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
-					deleteEntity(loop-entity-2)
 				set {_alpha} to 100 - (z location of {_loc1} - 4) * 4
 				set {_alpha} to 100 if {_alpha} > 100
 				set {_alpha} to 1 if {_alpha} < 1
 				set {_temp} to {_yt}-{_alpha}/100*0.5+0.5125
 				set {_temp2} to x location of {_loc1} - 0.0125
+				set {_color} to "§b" if metadata value "notetype" of loop-entity is "tap"
+				set {_color} to "§e" if metadata value "notetype" of loop-entity is "drag"
+				set {_color} to "§6" if metadata value "notetype" of loop-entity is "double"
+				delete {_haveAnchor}
+				loop all text displays:
+					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
+					if metadata value "anchor" of loop-entity-2 is 1:
+						set {_haveAnchor} to true
+						set display scale of loop-entity-2 to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
+						set display text opacity of loop-entity-2 to {_alpha}
+						set display text of loop-entity-2 to "§f%{_color}%█"
+						teleport loop-entity-2 to location({_temp2}, {_temp}, 4, world "world", 180, 0)
+					if metadata value "anchor" of loop-entity-2 is 2:
+						set {_haveAnchor} to true
+						set display text of loop-entity-2 to "§f█"
+						set display text opacity of loop-entity-2 to {_alpha}
+				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
 				summon text display at location({_temp2}, {_temp}, 4, world "world", 180, 0):
-					set display text of the entity to "§f█"
+					set display text of the entity to "§f"
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set display scale of the entity to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set metadata value "anchor" of the entity to 1
 					set display shadow strength of the entity to 0
-				summon text display at location(x location of {_loc1}, {_yt}, 4.001, world "world", 180, 0):
-					set display text of the entity to "§f█"
+				summon text display at location(x location of {_loc1}, {_yt}, 4.05, world "world", 180, 0):
+					set display text of the entity to "§f"
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set display scale of the entity to vector(3,3,1)
-					set display text opacity of the entity to {_alpha}
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set metadata value "anchor" of the entity to 2
 					set display shadow strength of the entity to 0
 			
 			if z location of loop-entity <= 4 + {speed}:
@@ -463,27 +478,42 @@ every ticks:
 			
 			set {_yt} to y location of {_loc1}+0.5
 			if x location of loop-entity < 25:
-				loop all text displays:
-					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
-					deleteEntity(loop-entity-2)
 				set {_alpha} to 100 - (x location of {_loc1} - 4) * 4
 				set {_alpha} to 100 if {_alpha} > 100
 				set {_alpha} to 1 if {_alpha} < 1
 				set {_temp} to {_yt}-{_alpha}/100*0.5+0.5125
 				set {_temp2} to z location of {_loc1} + 0.0125
+				set {_color} to "§b" if metadata value "notetype" of loop-entity is "tap"
+				set {_color} to "§e" if metadata value "notetype" of loop-entity is "drag"
+				set {_color} to "§6" if metadata value "notetype" of loop-entity is "double"
+				delete {_haveAnchor}
+				loop all text displays:
+					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
+					if metadata value "anchor" of loop-entity-2 is 1:
+						set {_haveAnchor} to true
+						set display scale of loop-entity-2 to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
+						set display text opacity of loop-entity-2 to {_alpha}
+						set display text of loop-entity-2 to "§f%{_color}%█"
+						teleport loop-entity-2 to location(4, {_temp}, {_temp2}, world "world", 90, 0)
+					if metadata value "anchor" of loop-entity-2 is 2:
+						set {_haveAnchor} to true
+						set display text of loop-entity-2 to "§f█"
+						set display text opacity of loop-entity-2 to {_alpha}
+				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
 				summon text display at location(4, {_temp}, {_temp2}, world "world", 90, 0):
-					set display text of the entity to "§f█"
+					set display text of the entity to "§f"
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set display scale of the entity to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set metadata value "anchor" of the entity to 1
 					set display shadow strength of the entity to 0
-				summon text display at location(4.001, {_yt}, z location of {_loc1}, world "world", 90, 0):
-					set display text of the entity to "§f█"
+				summon text display at location(4.05, {_yt}, z location of {_loc1}, world "world", 90, 0):
+					set display text of the entity to "§f"
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set display scale of the entity to vector(3,3,1)
-					set display text opacity of the entity to {_alpha}
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set metadata value "anchor" of the entity to 2
 					set display shadow strength of the entity to 0
 			
 			if x location of loop-entity <= 4 + {speed}:
@@ -511,27 +541,43 @@ every ticks:
 			
 			set {_yt} to y location of {_loc1}+0.5
 			if z location of loop-entity > -25:
-				loop all text displays:
-					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
-					deleteEntity(loop-entity-2)
 				set {_alpha} to 100 - (z location of {_loc1} * -1 - 4) * 4
 				set {_alpha} to 100 if {_alpha} > 100
 				set {_alpha} to 1 if {_alpha} < 1
 				set {_temp} to {_yt}-{_alpha}/100*0.5+0.5125
 				set {_temp2} to x location of {_loc1} + 0.0125
+				set {_color} to "§b" if metadata value "notetype" of loop-entity is "tap"
+				set {_color} to "§e" if metadata value "notetype" of loop-entity is "drag"
+				set {_color} to "§6" if metadata value "notetype" of loop-entity is "double"
+				delete {_haveAnchor}
+				loop all text displays:
+					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
+					if metadata value "anchor" of loop-entity-2 is 1:
+						set {_haveAnchor} to true
+						set display scale of loop-entity-2 to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
+						set display text opacity of loop-entity-2 to {_alpha}
+						set display text of loop-entity-2 to "§f%{_color}%█"
+						teleport loop-entity-2 to location({_temp2}, {_temp}, -4, world "world", 0, 0)
+					if metadata value "anchor" of loop-entity-2 is 2:
+						set {_haveAnchor} to true
+						set display text of loop-entity-2 to "§f█"
+						set display text opacity of loop-entity-2 to {_alpha}
+				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
 				summon text display at location({_temp2}, {_temp}, -4, world "world", 0, 0):
-					set display text of the entity to "§f█"
+					set display text of the entity to "§f"
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set display scale of the entity to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set metadata value "anchor" of the entity to 1
 					set display shadow strength of the entity to 0
-				summon text display at location(x location of {_loc1}, {_yt}, -4.001, world "world", 0, 0):
-					set display text of the entity to "§f█"
+				summon text display at location(x location of {_loc1}, {_yt}, -4.05, world "world", 0, 0):
+					set display text of the entity to "§f"
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set display scale of the entity to vector(3,3,1)
 					set display text opacity of the entity to {_alpha}
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set metadata value "anchor" of the entity to 2
 					set display shadow strength of the entity to 0
 			
 			if z location of loop-entity >= -4 - {speed}:
@@ -559,27 +605,42 @@ every ticks:
 			
 			set {_yt} to y location of {_loc1}+0.5
 			if x location of loop-entity > -25:
-				loop all text displays:
-					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
-					deleteEntity(loop-entity-2)
 				set {_alpha} to 100 - (x location of {_loc1} * -1 - 4) * 4
 				set {_alpha} to 100 if {_alpha} > 100
 				set {_alpha} to 1 if {_alpha} < 1
 				set {_temp} to {_yt}-{_alpha}/100*0.5+0.5125
 				set {_temp2} to z location of {_loc1} - 0.0125
+				set {_color} to "§b" if metadata value "notetype" of loop-entity is "tap"
+				set {_color} to "§e" if metadata value "notetype" of loop-entity is "drag"
+				set {_color} to "§6" if metadata value "notetype" of loop-entity is "double"
+				delete {_haveAnchor}
+				loop all text displays:
+					metadata value "belongsto" of loop-entity-2 is uuid of {_ent1}
+					if metadata value "anchor" of loop-entity-2 is 1:
+						set {_haveAnchor} to true
+						set display scale of loop-entity-2 to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
+						set display text opacity of loop-entity-2 to {_alpha}
+						set display text of loop-entity-2 to "§f%{_color}%█"
+						teleport loop-entity-2 to location(-4, {_temp}, {_temp2}, world "world", -90, 0)
+					if metadata value "anchor" of loop-entity-2 is 2:
+						set {_haveAnchor} to true
+						set display text of loop-entity-2 to "§f█"
+						set display text opacity of loop-entity-2 to {_alpha}
+				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
 				summon text display at location(-4, {_temp}, {_temp2}, world "world", -90, 0):
-					set display text of the entity to "§f█"
+					set display text of the entity to "§f"
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set display scale of the entity to vector({_alpha}/100*4-1,{_alpha}/100*4-1,1)
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set metadata value "anchor" of the entity to 1
 					set display shadow strength of the entity to 0
-				summon text display at location(-4.001, {_yt}, z location of {_loc1}, world "world", -90, 0):
-					set display text of the entity to "§f█"
+				summon text display at location(-4.05, {_yt}, z location of {_loc1}, world "world", -90, 0):
+					set display text of the entity to "§f"
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set display scale of the entity to vector(3,3,1)
-					set display text opacity of the entity to {_alpha}
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
+					set metadata value "anchor" of the entity to 2
 					set display shadow strength of the entity to 0
 			
 			if x location of loop-entity >= -4 - {speed}:

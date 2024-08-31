@@ -24,7 +24,7 @@ every ticks:
 function exact(entity: entity):
 	if metadata value "notetype" of {_entity} is not "hold":
 		add 1 to {combo}
-	if metadata value "notetype" of {_entity} is not "hold":
+		play sound "entity.player.hurt" with pitch 2 to all players if {hitSound} is "&a开"
 		add 1 to {hitNotes}
 		add 1 to {statistics::exact}
 	else:
@@ -66,6 +66,7 @@ function exact(entity: entity):
 		exit loop
 
 function great(entity: entity, el: text):
+	play sound "entity.player.hurt" with pitch 2 to all players if {hitSound} is "&a开"
 	add 1 to {combo}
 	add 0.7 to {hitNotes}
 	add 1 to {statistics::just}
@@ -144,8 +145,6 @@ function hitNote(entity: entity):
 function deleteNote(entity: entity):
 	set {_uuid} to uuid of {_entity}
 	set {_linkuuid} to metadata value "linkuuid" of {_entity}
-	if metadata value "notetype" of {_entity} is not "hold":
-		play sound "entity.player.hurt" with pitch 2 to all players if {hitSound} is "&a开"
 	metadata value "linkuuid" of {_entity} is set
 	loop all block displays:
 		if uuid of loop-entity is {_linkuuid}:
