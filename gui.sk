@@ -80,7 +80,7 @@ function getRank(score: number) :: text:
 on inventory click:
 	cancel event
 	if name of event-inventory is "选择谱面":
-		if index of event-slot < 50:
+		if index of event-slot < 45:
 			set {_slot} to index of event-slot + 1
 			if {loadedCharts::id::%{_slot}%} is set:
 				close player's inventory
