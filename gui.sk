@@ -52,23 +52,26 @@ command /play:
 			infoGUI(player)
 
 function infoGUI(p: player):
-	set {_infoGUI} to chest inventory with 6 rows named "选择谱面"
-	loop integers from 47 to 48:
-		set slot loop-value of {_infoGUI} to gray stained glass pane named ""
-	set slot 45 of {_infoGUI} to oak sign named "&f喜欢 &eCube Rhythm&f 吗？" with lore "&7加入我们的QQ群聊%nl%&b300846184%nl%&7和大家一起分享谱面!"
-	set slot 46 of {_infoGUI} to book named "&a◆ &f如何导入谱面？" with lore "%nl%&e1. &7打开目录 &f服务端\plugins\Skript\scripts\charts%nl%&e2. &7把谱面文件&f(谱面.sk 和 谱面_properties.sk)&7扔进去%nl%&e3. &7输入 &b/sk reload \charts\ &7稍等片刻即可导入%nl%   &c(需要管理员权限 后台输入op %name of {_p}%)%nl%%nl%&a◆ &f如何写谱？%nl%%nl%&7请浏览：%nl%&7https://github.com/EroslonDusk/CubeRhythm/wiki%nl%&a"
-	set slot 49 of {_infoGUI} to feather named "&f音符流速: &e%{speed}%" with lore "%nl%&7音符每Tick(1/20秒)移动的距离(米)%nl%&7推荐范围: 1~2.5%nl%&f过高或过低的流速会严重影响游戏体验%nl%%nl%&e点击修改"
-	set slot 50 of {_infoGUI} to clock named "&f偏移: &e%{offset}%ms" with lore "%nl%&7单位: 毫秒(ms)%nl%&7偏移越高，音符生成越滞后，反之提前%nl%&7如果你遇到了音画不同步，请调整此项%nl%&f注意:第一次播放音画不同步属正常现象%nl%%nl%&e点击修改"
-	set slot 51 of {_infoGUI} to note block named "&f打击音效: %{hitSound}%" with lore "%nl%&7击中音符时播放打击音效%nl%%nl%&e点击开启/关闭"
-	set slot 52 of {_infoGUI} to gold block named "&fFull Combo/Perfect指示器: %{indicator}%" with lore "%nl%&7将连击数和分数区域%nl%&7根据您的游戏表现显示不同颜色%nl%%nl%&e点击开启/关闭"
-	set slot 53 of {_infoGUI} to slime ball named "&a刷新列表" with lore "%nl%&7重载所有谱面配置文件并刷新列表%nl%&f如果你想导入新谱面，这个按钮并不能帮你%nl%%nl%&e点击刷新"
-	loop indices of {loadedCharts::id::*}:
-		set {_slot} to (loop-value parsed as integer) - 1
-		{_slot} is set
-		set {_best} to {best::%{loadedCharts::id::%loop-value%}%}
-		set {_best} to 0 if {_best} is not set
-		set slot {_slot} of {_infoGUI} to music disc cat named "&f%{loadedCharts::name::%loop-value%}%" with lore "%nl%&8· &7难度: &f%{loadedCharts::level::%loop-value%}%%nl%&8· &7作曲: &f%{loadedCharts::artist::%loop-value%}%%nl%&8· &7谱师: &f%{loadedCharts::author::%loop-value%}%%nl%&8· &7时长: &f%{length::%{loadedCharts::id::%loop-value%}%}%%nl%&8· &7最好成绩: &f%{_best}% &7%getRank({_best})%%nl%%nl%&7输入 /reset 离开游戏%nl%%nl%&8[&a左键&8] &f开始游玩%nl%&8[&d右键&8] &c删除成绩%nl%&f"
-	open {_infoGUI} to {_p}
+	if {actor} is not set:
+		set {_infoGUI} to chest inventory with 6 rows named "选择谱面"
+		set slot 47 of {_infoGUI} to gray stained glass pane named ""
+		set slot 45 of {_infoGUI} to oak sign named "&f喜欢 &eCube Rhythm&f 吗？" with lore "&7加入我们的QQ群聊%nl%&b300846184%nl%&7和大家一起分享谱面!"
+		set slot 46 of {_infoGUI} to book named "&a◆ &f如何导入谱面？" with lore "%nl%&e1. &7打开目录 &f服务端\plugins\Skript\scripts\charts%nl%&e2. &7把谱面文件&f(谱面.sk 和 谱面_properties.sk)&7扔进去%nl%&e3. &7输入 &b/sk reload \charts\ &7稍等片刻即可导入%nl%   &c(需要管理员权限 后台输入op %name of {_p}%)%nl%%nl%&a◆ &f如何写谱？%nl%%nl%&7请浏览：%nl%&7https://github.com/EroslonDusk/CubeRhythm/wiki%nl%&a"
+		set slot 48 of {_infoGUI} to piston named "&f自动演奏: %{autoPlay}%" with lore "%nl%&7自动演奏歌曲，无需操作%nl%&f该模式下游玩成绩无效%nl%%nl%&e点击开启/关闭"
+		set slot 49 of {_infoGUI} to feather named "&f音符流速: &e%{speed}%" with lore "%nl%&7音符每Tick(1/20秒)移动的距离(米)%nl%&7推荐范围: 1~2.5%nl%&f过高或过低的流速会严重影响游戏体验%nl%%nl%&e点击修改"
+		set slot 50 of {_infoGUI} to clock named "&f偏移: &e%{offset}%ms" with lore "%nl%&7单位: 毫秒(ms)%nl%&7偏移越高，音符生成越滞后，反之提前%nl%&7如果你遇到了音画不同步，请调整此项%nl%&f注意:第一次播放音画不同步属正常现象%nl%%nl%&e点击修改"
+		set slot 51 of {_infoGUI} to note block named "&f打击音效: %{hitSound}%" with lore "%nl%&7击中音符时播放打击音效%nl%%nl%&e点击开启/关闭"
+		set slot 52 of {_infoGUI} to gold block named "&fFull Combo/Perfect指示器: %{indicator}%" with lore "%nl%&7将连击数和分数区域%nl%&7根据您的游戏表现显示不同颜色%nl%%nl%&e点击开启/关闭"
+		set slot 53 of {_infoGUI} to slime ball named "&a刷新列表" with lore "%nl%&7重载所有谱面配置文件并刷新列表%nl%&f如果你想导入新谱面，这个按钮并不能帮你%nl%%nl%&e点击刷新"
+		loop indices of {loadedCharts::id::*}:
+			set {_slot} to (loop-value parsed as integer) - 1
+			{_slot} is set
+			set {_best} to {best::%{loadedCharts::id::%loop-value%}%}
+			set {_best} to 0 if {_best} is not set
+			set slot {_slot} of {_infoGUI} to music disc cat named "&f%{loadedCharts::name::%loop-value%}%" with lore "%nl%&8· &7难度: &f%{loadedCharts::level::%loop-value%}%%nl%&8· &7作曲: &f%{loadedCharts::artist::%loop-value%}%%nl%&8· &7谱师: &f%{loadedCharts::author::%loop-value%}%%nl%&8· &7时长: &f%{length::%{loadedCharts::id::%loop-value%}%}%%nl%&8· &7最好成绩: &f%{_best}% &7%getRank({_best})%%nl%%nl%&7输入 /reset 离开游戏%nl%%nl%&8[&a左键&8] &f开始游玩%nl%&8[&d右键&8] &c删除成绩%nl%&f"
+		open {_infoGUI} to {_p}
+	else:
+		send "&c游戏期间不可打开面板！如果要退出游玩，请输入 /reset ！" to {_p}
 
 function getRank(score: number) :: text:
 	return "&eSSS+" if {_score} >= 1000000
@@ -113,6 +116,7 @@ on inventory click:
 					close player's inventory
 					playChart({loadedCharts::id::%{_slot}%})
 		else:
+			setAutoPlay(player) if index of event-slot = 48
 			setSpeedGUI(player) if index of event-slot = 49
 			setOffsetGUI(player) if index of event-slot = 50
 			setHitSound(player) if index of event-slot = 51
@@ -161,6 +165,7 @@ on inventory click:
 			delete {best::%{_id}%}
 			delete metadata value "prepareToDelete" of player
 			close player's inventory
+			send "&a清除成绩成功" to player
 		if index of event-slot = 24:
 			infoGUI(player)
 			delete metadata value "prepareToDelete" of player
@@ -215,3 +220,9 @@ function setIndicator(p: player):
 		set {indicator} to "&a开"
 	infoGUI({_p})
 
+function setAutoPlay(p: player):
+	if {autoPlay} is "&a开":
+		set {autoPlay} to "&c关"
+	else:
+		set {autoPlay} to "&a开"
+	infoGUI({_p})

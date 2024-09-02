@@ -35,13 +35,16 @@ function end():
 	{actor} is set
 	delete all text displays
 	wait 5 ticks
-	{actor} is set
-	result()
-	result2()
-	wait 2 seconds
-	{actor} is set
-	result3()
-	result4()
+	if {autoPlay} is not "&a开":
+		{actor} is set
+		result()
+		result2()
+		wait 2 seconds
+		{actor} is set
+		result3()
+		result4()
+	else:
+		quitGame()
 
 function fullCombo():
 	set {_loc1} to location(0.5, 0.5, 10, world "world", -90, 90)

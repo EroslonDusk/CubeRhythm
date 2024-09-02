@@ -5,6 +5,7 @@
 ########################################################
 
 every ticks:
+	{autoplay} is not "&a开"
 	loop all players:
 		{actor} is loop-player
 		set {_entity} to target of loop-player ignoring blocks
@@ -40,7 +41,12 @@ function exact(entity: entity):
 	set yaw of {_loc} to -90 if {_face} is "d"
 	{_loc}.add(0, 0.5, 0)
 	if metadata value "notetype" of {_entity} is "drag" or "hold" or "flick":
-		{_loc}.add(0, -20, 0)
+		if {autoplay} is not "&a开":
+			{_loc}.add(0, -20, 0)
+		else if metadata value "notetype" of {_entity} is "drag":
+			{_loc}.add(0, 0, 0)
+		else:
+			{_loc}.add(0, -20, 0)
 		#broadcast "%y location of {_loc}%"
 	summon text display at {_loc}:
 		set {_alpha} to 255
@@ -169,6 +175,7 @@ function checkIfTurned(entity: entity):
 	exact({_entity})
 	set {_face} to metadata value "face" of {_entity}
 	set {_turn} to metadata value "turn" of {_entity}
+	{autoplay} is not "&a开"
 	wait 0.5 seconds
 	loop all players:
 		{actor} is loop-player
