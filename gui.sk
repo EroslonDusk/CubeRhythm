@@ -1,5 +1,6 @@
 on load:
 	set {loaded} to true
+	delete {loading}
 
 function playChart(id: text):
 	loop enabled scripts:
@@ -10,13 +11,21 @@ function playChart(id: text):
 			disable script loop-value
 	quitGame()
 	wait 1 tick
-	send title "&a谱面加载中……" with subtitle "&a &a" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+	send title "&a &a" with subtitle "&a谱面加载中…… (1/2)" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
 	enable script "charts\-%{_id}%"
-	wait 3 seconds
-	loop all players:
-		execute loop-player command "start"
-		exit loop
-	set {playing} to {_id}
+	wait 1 tick
+	set {loading} to {_id}
+
+every 10 ticks:
+	{loading} is set
+	if script "charts\%{loading}%.sk" is loaded:
+		send title "&a &a" with subtitle "&a谱面加载中…… (2/2)" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+		set {playing} to {loading}
+		delete {loading}
+		wait 3 seconds
+		execute {actor} command "start"
+		
+		
 
 function refresh(p: player):
 	delete {loadedCharts::*}
@@ -115,6 +124,7 @@ on inventory click:
 				else:
 					close player's inventory
 					playChart({loadedCharts::id::%{_slot}%})
+					set {actor} to player
 		else:
 			setAutoPlay(player) if index of event-slot = 48
 			setSpeedGUI(player) if index of event-slot = 49

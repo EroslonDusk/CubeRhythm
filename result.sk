@@ -96,7 +96,7 @@ function perfectPerformance():
 
 function result():
 	play sound "entity.player.levelup" to all players
-	
+	add {statistics::exactHold} to {score}
 	if {best::%{playing}%} is not set:
 		set {best::%{playing}%} to {score}
 		send title "&e初次游玩!" with subtitle "&e &e" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds

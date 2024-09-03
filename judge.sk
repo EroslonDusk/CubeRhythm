@@ -29,7 +29,6 @@ function exact(entity: entity):
 		add 1 to {hitNotes}
 		add 1 to {statistics::exact}
 	else:
-		add {maxNote}*0.000001 to {hitNotes}
 		add 1 to {statistics::exactHold}
 	set {alphaTime} to 11
 	set {score} to floor(1000000/{maxNote}*{hitNotes})
@@ -130,10 +129,13 @@ function hitNote(entity: entity):
 		exact({_entity})
 		set {_canRemove} to true
 	else if abs({_time}) <= 200:
-		if {_time} > 0:
-			great({_entity}, "early")
+		if metadata value "glowing" of {_entity} is true:
+			exact({_entity})
 		else:
-			great({_entity}, "late")
+			if {_time} > 0:
+				great({_entity}, "early")
+			else:
+				great({_entity}, "late")
 		set {_canRemove} to true
 	{_canRemove} is set
 	if metadata value "notetype" of {_entity} is "double":

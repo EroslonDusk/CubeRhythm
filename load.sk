@@ -130,18 +130,21 @@ function drawTap(face: text, x: number, y: number, z: number, glowing: boolean):
 		remove 1 from {_z1}
 		set {_loc1} to location(-1*{_z}+1, {_y}, {_x}+1, world "world", 270, 0)
 		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 270, 0)
-	summon block display at {_loc1}
-	set display block data of last spawned entity to light_blue_concrete
-	set display scale of last spawned entity to vector(1,1,0.5)
-	set {_uuid} to uuid of last spawned entity
-	if {_glowing} is true:
-		set glowing of last spawned entity to true
-	summon interaction at {_loc2}
-	set interaction height of last spawned entity to 2
-	set interaction width of last spawned entity to 2
-	set metadata value "notetype" of last spawned entity to "tap"
-	set metadata value "face" of last spawned entity to "%{_face}%"
-	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+	summon block display at {_loc1}:
+		set display block data of entity to light_blue_concrete
+		set display scale of entity to vector(1,1,0.5)
+		set {_uuid} to uuid of entity
+		if {_glowing} is true:
+			set glowing of entity to true
+			set display glow color override of {_display} to bukkitColor(0,224,255,255)
+	summon interaction at {_loc2}:
+		set interaction height of entity to 2
+		set interaction width of entity to 2
+		set metadata value "notetype" of entity to "tap"
+		set metadata value "face" of entity to "%{_face}%"
+		set metadata value "linkuuid" of entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+		if {_glowing} is true:
+			set metadata value "glowing" of entity to true
 
 function drawHold(face: text, x: number, y: number, z: number, glowing: boolean):
 	set {_x1} to {_x}+0.5
@@ -163,18 +166,21 @@ function drawHold(face: text, x: number, y: number, z: number, glowing: boolean)
 		remove 1 from {_z1}
 		set {_loc1} to location(-1*{_z}+0.9, {_y}, {_x}, world "world", 90, 0)
 		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 90, 0)
-	summon block display at {_loc1}
-	set display block data of last spawned entity to white_concrete
-	set display scale of last spawned entity to vector(1,1,2*{speed})
-	set {_uuid} to uuid of last spawned entity
-	if {_glowing} is true:
-		set glowing of last spawned entity to true
-	summon interaction at {_loc2}
-	set interaction height of last spawned entity to 2
-	set interaction width of last spawned entity to 2
-	set metadata value "notetype" of last spawned entity to "hold"
-	set metadata value "face" of last spawned entity to "%{_face}%"
-	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+	summon block display at {_loc1}:
+		set display block data of entity to white_concrete
+		set display scale of entity to vector(1,1,2*{speed})
+		set {_uuid} to uuid of entity
+		if {_glowing} is true:
+			set glowing of entity to true
+			set display glow color override of {_display} to bukkitColor(255,255,255,100)
+	summon interaction at {_loc2}:
+		set interaction height of entity to 2
+		set interaction width of entity to 2
+		set metadata value "notetype" of entity to "hold"
+		set metadata value "face" of entity to "%{_face}%"
+		set metadata value "linkuuid" of entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+		if {_glowing} is true:
+			set metadata value "glowing" of entity to true
 
 function drawDrag(face: text, x: number, y: number, z: number, glowing: boolean):
 	set {_x1} to {_x}+0.5
@@ -196,18 +202,21 @@ function drawDrag(face: text, x: number, y: number, z: number, glowing: boolean)
 		remove 1 from {_z1}
 		set {_loc1} to location(-1*{_z}+1, {_y}, {_x}+1, world "world", 270, 0)
 		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 270, 0)
-	summon block display at {_loc1}
-	set display block data of last spawned entity to yellow_concrete
-	set display scale of last spawned entity to vector(1,1,0.5)
-	set {_uuid} to uuid of last spawned entity
-	if {_glowing} is true:
-		set glowing of last spawned entity to true
-	summon interaction at {_loc2}
-	set interaction height of last spawned entity to 2
-	set interaction width of last spawned entity to 2
-	set metadata value "notetype" of last spawned entity to "drag"
-	set metadata value "face" of last spawned entity to "%{_face}%"
-	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+	summon block display at {_loc1}:
+		set display block data of entity to yellow_concrete
+		set display scale of entity to vector(1,1,0.5)
+		set {_uuid} to uuid of entity
+		if {_glowing} is true:
+			set glowing of entity to true
+			set display glow color override of {_display} to bukkitColor(255,235,42,255)
+	summon interaction at {_loc2}:
+		set interaction height of entity to 2
+		set interaction width of entity to 2
+		set metadata value "notetype" of entity to "drag"
+		set metadata value "face" of entity to "%{_face}%"
+		set metadata value "linkuuid" of entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+		if {_glowing} is true:
+			set metadata value "glowing" of entity to true
 
 function drawFlick(face: text, z: number, turn: text, glowing: boolean):
 	set {_x} to 0
@@ -238,12 +247,12 @@ function drawFlick(face: text, z: number, turn: text, glowing: boolean):
 		set {_loc1} to location(-1*{_z}, {_y2}, {_x2}+5, world "world", 270, 0)
 		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 270, 0)
 		set {_loc3} to location(-1*{_z}+0.6, {_y}-2.75, {_x}+0.75, world "world", 270, 0)   
-	summon block display at {_loc1}
-	set display block data of last spawned entity to white_stained_glass_pane[east=true,north=false,south=false,waterlogged=false,west=true]
-	set display scale of last spawned entity to vector(5,5,1)
-	set {_uuid} to uuid of last spawned entity
-	if {_glowing} is true:
-		set glowing of last spawned entity to true
+	summon block display at {_loc1}:
+		set display block data of entity to white_stained_glass_pane[east=true,north=false,south=false,waterlogged=false,west=true]
+		set display scale of entity to vector(5,5,0.1)
+		set {_uuid} to uuid of entity
+		if {_glowing} is true:
+			set glowing of entity to true
 	if {_turn} is "left":
 		summon text display at {_loc3}:
 			set display text of the entity to "§f←"
@@ -256,13 +265,15 @@ function drawFlick(face: text, z: number, turn: text, glowing: boolean):
 			set display scale of entity to vector(20,20,0)
 			set display text background color of the entity to bukkitColor(0,0,0,0)
 			set metadata value "linkbind" of entity to {_uuid}
-	summon interaction at {_loc2}
-	set interaction height of last spawned entity to 2
-	set interaction width of last spawned entity to 2
-	set metadata value "notetype" of last spawned entity to "flick"
-	set metadata value "face" of last spawned entity to "%{_face}%"
-	set metadata value "turn" of last spawned entity to "%{_turn}%"
-	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+	summon interaction at {_loc2}:
+		set interaction height of entity to 2
+		set interaction width of entity to 2
+		set metadata value "notetype" of entity to "flick"
+		set metadata value "face" of entity to "%{_face}%"
+		set metadata value "turn" of entity to "%{_turn}%"
+		set metadata value "linkuuid" of entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+		if {_glowing} is true:
+			set metadata value "glowing" of entity to true
 
 function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, yb: number, zb: number, glowing: boolean):
 	set {_xa1} to {_xa}+0.5
@@ -284,20 +295,23 @@ function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, 
 		remove 1 from {_za1}
 		set {_loc1} to location(-1*{_za}+1, {_ya}, {_xa}+1, world "world", 270, 0)
 		set {_loc2} to location(-1*{_za1}, {_ya1}, {_xa1}, world "world", 270, 0)
-	summon block display at {_loc1}
-	set display block data of last spawned entity to orange_concrete
-	set display scale of last spawned entity to vector(1,1,0.5)
-	set {_uuid} to uuid of last spawned entity
-	if {_glowing} is true:
-		set glowing of last spawned entity to true
-	summon interaction at {_loc2}
-	set interaction height of last spawned entity to 2
-	set interaction width of last spawned entity to 2
-	set metadata value "notetype" of last spawned entity to "double"
-	set metadata value "face" of last spawned entity to "%{_face}%"
-	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
-	set {_entity1} to last spawned entity
-	set {_uuid1} to uuid of last spawned entity
+	summon block display at {_loc1}:
+		set display block data of entity to orange_concrete
+		set display scale of entity to vector(1,1,0.5)
+		set {_uuid} to uuid of entity
+		if {_glowing} is true:
+			set glowing of entity to true
+			set display glow color override of {_display} to bukkitColor(255,180,0,255)
+	summon interaction at {_loc2}:
+		set interaction height of entity to 2
+		set interaction width of entity to 2
+		set metadata value "notetype" of entity to "double"
+		set metadata value "face" of entity to "%{_face}%"
+		set metadata value "linkuuid" of entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+		set {_entity1} to entity
+		set {_uuid1} to uuid of entity
+		if {_glowing} is true:
+			set metadata value "glowing" of entity to true
 	
 	set {_xb1} to {_xb}+0.5
 	set {_yb1} to {_yb}-0.5
@@ -318,20 +332,24 @@ function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, 
 		remove 1 from {_zb1}
 		set {_loc3} to location(-1*{_zb}+1, {_yb}, {_xb}+1, world "world", 270, 0)
 		set {_loc4} to location(-1*{_zb1}, {_yb1}, {_xb1}, world "world", 270, 0)
-	summon block display at {_loc3}
-	set display block data of last spawned entity to orange_concrete
-	set display scale of last spawned entity to vector(1,1,0.5)
-	set {_uuid} to uuid of last spawned entity
-	if {_glowing} is true:
-		set glowing of last spawned entity to true
-	summon interaction at {_loc4}
-	set interaction height of last spawned entity to 2
-	set interaction width of last spawned entity to 2
-	set metadata value "notetype" of last spawned entity to "double"
-	set metadata value "face" of last spawned entity to "%{_face}%"
-	set metadata value "linkuuid" of last spawned entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
-	set {_entity2} to last spawned entity
-	set {_uuid2} to uuid of last spawned entity
+	summon block display at {_loc3}:
+		set display block data of entity to orange_concrete
+		set display scale of entity to vector(1,1,0.5)
+		set {_uuid} to uuid of entity
+		if {_glowing} is true:
+			set glowing of entity to true
+			set display glow color override of {_display} to bukkitColor(255,180,0,255)
+	summon interaction at {_loc4}:
+		set interaction height of entity to 2
+		set interaction width of entity to 2
+		set metadata value "notetype" of entity to "double"
+		set metadata value "face" of entity to "%{_face}%"
+		set metadata value "linkuuid" of entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
+		set {_entity2} to entity
+		set {_uuid2} to uuid of entity
+		if {_glowing} is true:
+			set metadata value "glowing" of entity to true
+	
 	set metadata value "linknote" of {_entity1} to "%{_uuid2}%"
 	set metadata value "linknote" of {_entity2} to "%{_uuid1}%" #击中1时消除2，击中2时消除1
 	set {_d1} to distance between {_loc1} and {_loc3}
