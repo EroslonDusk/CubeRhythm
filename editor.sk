@@ -7,6 +7,7 @@ on load:
 
 command /editor [<text>] [<number>]:
 	trigger:
+		player's gamemode is not spectator
 		if arg-1 is not set:
 			if {editMode} is not set:
 				delete {savedX::*}
@@ -63,6 +64,7 @@ command /editor [<text>] [<number>]:
 
 command /b <number>:
 	trigger:
+		player's gamemode is not spectator
 		if {editMode} is set:
 			argument is set
 			set {editor::tick} to ((argument) - 1) * {editor::length}
@@ -70,6 +72,7 @@ command /b <number>:
 
 command /step <integer>:
 	trigger:
+		player's gamemode is not spectator
 		if {editMode} is set:
 			argument is set
 			set {_past} to {editor::length}
@@ -84,6 +87,7 @@ every 2 ticks:
 on right click:
 	{editMode} is set
 	cancel event
+	player's gamemode is not spectator
 	event-block is glass or any wool
 	if player's tool is light blue wool named "&b&lTap":
 		if block at event-location is glass:
@@ -186,6 +190,7 @@ on right click:
 
 on chat:
 	{editMode} is set
+	player's gamemode is not spectator
 	cancel event
 	set {_1} to chat message
 	if {_1} is "w" or "a" or "s" or "d":
@@ -206,8 +211,12 @@ on chat:
 	{_gen} is not "empty"
 	if {_gen} contains "<none>":
 		replace all "<none>" with "&e<none>&c" in {_gen}
-		broadcast "&c%{_gen}%"
+		broadcast "&c✘ &c%{_gen}%"
 		broadcast "&f你的音符格式出现了缺失，请修改音符再尝试生成"
 	else:
-		broadcast "&a%{_gen}%"
+		broadcast "&a✔ &b%{_gen}%" if {_gen} contains "tap"
+		broadcast "&a✔ &e%{_gen}%" if {_gen} contains "drag"
+		broadcast "&a✔ &f%{_gen}%" if {_gen} contains "hold"
+		broadcast "&a✔ &d%{_gen}%" if {_gen} contains "flick"
+		broadcast "&a✔ &6%{_gen}%" if {_gen} contains "double"
 		log "%{_gen}%" to file "generated.log"

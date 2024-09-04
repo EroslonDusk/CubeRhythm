@@ -168,7 +168,7 @@ function drawHold(face: text, x: number, y: number, z: number, glowing: boolean)
 		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 90, 0)
 	summon block display at {_loc1}:
 		set display block data of entity to white_concrete
-		set display scale of entity to vector(1,1,2*{speed})
+		set display scale of entity to vector(1,1,2*{speed::%uuid of {actor}%})
 		set {_uuid} to uuid of entity
 		if {_glowing} is true:
 			set glowing of entity to true
@@ -249,7 +249,7 @@ function drawFlick(face: text, z: number, turn: text, glowing: boolean):
 		set {_loc3} to location(-1*{_z}+0.6, {_y}-2.75, {_x}+0.75, world "world", 270, 0)   
 	summon block display at {_loc1}:
 		set display block data of entity to white_stained_glass_pane[east=true,north=false,south=false,waterlogged=false,west=true]
-		set display scale of entity to vector(5,5,0.1)
+		set display scale of entity to vector(5,5,1)
 		set {_uuid} to uuid of entity
 		if {_glowing} is true:
 			set glowing of entity to true

@@ -6,13 +6,8 @@
 ########################################################
 
 on load:
-	set {speed} to 1 if {speed} is not set
-	set {offset} to 0 if {preTime} is not set
-	set {indicator} to "&c关" if {indicator} is not set
 	delete {actor}
 	clear all players' inventory
-	set {hitSound} to "&a开" if {hitSound} is not set
-	set {autoPlay} to "&c关" if {autoPlay} is not set
 	delete {playing}
 
 on break:
@@ -22,17 +17,27 @@ on join:
 	teleport player to location(0.5, -1, 0.5, world "world", 0, 0)
 	set player's gamemode to survival
 	set player's level to 0
-
-on first join:
-	wait 1 second
-	playChart("simpletone")
+	set {speed::%uuid of player%} to 1 if {speed::%uuid of player%} is not set
+	set {offset::%uuid of player%} to 0 if {offset::%uuid of player%} is not set
+	set {hitSound::%uuid of player%} to "&a开" if {hitSound::%uuid of player%} is not set
+	set {autoPlay::%uuid of player%} to "&c关" if {autoPlay::%uuid of player%} is not set
+	set {indicator::%uuid of player%} to "&c关" if {indicator::%uuid of player%} is not set
+	wait 1 tick
+	if online player count > 1:
+		set player's gamemode to spectator
+	else:
+		{firstJoin::%uuid of player%} is not set
+		set {firstJoin::%uuid of player%} to true
+		set {actor} to player
+		wait 1 second
+		playChart("simpletone")
 
 on player move:
 	player's gamemode is survival
 	cancel event
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.5%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.6%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -41,7 +46,8 @@ on server list ping:
 ########################################################
 
 on right click:
-	{autoplay} is not "&a开"
+	{autoplay::%uuid of {actor}%} is not "&a开"
+	player is {actor}
 	holding()
 	#broadcast "%nl%&aA: on right click 点击实体:%clicked entity% 朝向实体:%target of player ignoring blocks%"
 	#broadcast "&cFind A" if {cancel::A} is true
@@ -59,7 +65,8 @@ on right click:
 on shoot:
 	shooter is a player
 	cancel event
-	{autoplay} is not "&a开"
+	shooter is {actor}
+	{autoplay::%uuid of {actor}%} is not "&a开"
 	holding()
 	#broadcast "%nl%&aB: on shoot 朝向实体:%target of shooter ignoring blocks%"
 	#broadcast "&cFind A" if {cancel::A} is true
@@ -78,7 +85,8 @@ on shoot:
 	delete {cancel::B}
 
 on left click:
-	{autoplay} is not "&a开"
+	{autoplay::%uuid of {actor}%} is not "&a开"
+	player is {actor}
 	holding()
 	#broadcast "%nl%&aC: on left click 点击实体:%clicked entity% 朝向实体:%target of player ignoring blocks%"
 	#broadcast "&cFind A" if {cancel::A} is true
@@ -94,7 +102,8 @@ on left click:
 	delete {cancel::C}
 
 on damage:
-	{autoplay} is not "&a开"
+	{autoplay::%uuid of {actor}%} is not "&a开"
+	player is {actor}
 	holding()
 	if target of attacker ignoring blocks is set:
 		set {_target} to target of attacker ignoring blocks
@@ -114,7 +123,8 @@ on damage:
 	delete {cancel::D}
 
 on arm swing:
-	{autoplay} is not "&a开"
+	{autoplay::%uuid of {actor}%} is not "&a开"
+	player is {actor}
 	#broadcast "&eE: on arm swing 修一个小bug"
 	#broadcast "&cFind A" if {cancel::A} is true
 	#broadcast "&cFind B" if {cancel::B} is true
@@ -162,19 +172,20 @@ on load:
 	
 command /speed <number>:
 	trigger:
-		set {speed} to argument
-		send title "&a流速已设置为 &f%{speed}%" with subtitle "&7Tip: &f推荐流速设置在1.0~2.5之间" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+		set {speed::%uuid of player%} to argument
+		send title "&a流速已设置为 &f%{speed::%uuid of player%}%" with subtitle "&7Tip: &f推荐流速设置在1.0~2.5之间" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
 
 command /offset <integer>:
 	trigger:
-		set {offset} to argument
-		send title "&a偏移已设置为 &f%{offset}%毫秒" with subtitle "&7Tip: &f偏移越大，音符越延后生成，反之提前生成" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+		set {offset::%uuid of player%} to argument
+		send title "&a偏移已设置为 &f%{offset::%uuid of player%}%毫秒" with subtitle "&7Tip: &f偏移越大，音符越延后生成，反之提前生成" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
 
 command /reset:
 	trigger:
 		quitGame()
 
 function quitGame():
+	delete {actor} if {playing} is set
 	delete {timer}
 	clear all players' inventory
 	stop all sounds for all players
@@ -191,7 +202,6 @@ function quitGame():
 	set {hitNotes} to 0
 	delete {statistics::*}
 	createComboDisplay()
-	delete {actor}
 	delete {playing}
 
 command /start:
@@ -226,7 +236,7 @@ command /start:
 		set {statistics::exactHold} to 0
 		loop {loadedNotes::type::*}:
 			add 3 to {loadedNotes::time::%loop-index%}
-			add 0.001*{offset} to {loadedNotes::time::%loop-index%}
+			add 0.001*{offset::%uuid of player%} to {loadedNotes::time::%loop-index%}
 			add 0.001*{chartOffset::%{playing}%} to {loadedNotes::time::%loop-index%}
 		wait 3 seconds
 		play sound "%{sound}%" to all players
@@ -237,19 +247,19 @@ every ticks:
 		if metadata value "note1" of loop-entity is set:
 			set {_loc4} to location of loop-entity
 			if metadata value "face" of loop-entity is "w":
-				set {_speed} to {speed} * -1
+				set {_speed} to {speed::%uuid of {actor}%} * -1
 				{_loc4}.add(0, 0, {_speed}) 
 				teleport loop-entity to {_loc4}
 			if metadata value "face" of loop-entity is "a":
-				set {_speed} to {speed} * -1
+				set {_speed} to {speed::%uuid of {actor}%} * -1
 				{_loc4}.add({_speed}, 0, 0) 
 				teleport loop-entity to {_loc4}
 			if metadata value "face" of loop-entity is "s":
-				set {_speed} to {speed}
+				set {_speed} to {speed::%uuid of {actor}%}
 				{_loc4}.add(0, 0, {_speed}) 
 				teleport loop-entity to {_loc4}
 			if metadata value "face" of loop-entity is "d":
-				set {_speed} to {speed}
+				set {_speed} to {speed::%uuid of {actor}%}
 				{_loc4}.add({_speed}, 0, 0) 
 				teleport loop-entity to {_loc4}
 
@@ -274,14 +284,14 @@ every ticks:
 		else:
 			loop {loadedNotes::type::*}:
 				if loop-value is not "execution":
-					set {_summonDistance} to {speed} * 20 * ({loadedNotes::time::%loop-index%} - ({timer} / 20)) + 4
+					set {_summonDistance} to {speed::%uuid of {actor}%} * 20 * ({loadedNotes::time::%loop-index%} - ({timer} / 20)) + 4
 					{_summonDistance} < 50
 					if loop-value is "tap":
 						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
 						set {_face} to {loadedNotes::face::%loop-index%}
 						set {_x} to {loadedNotes::x::%loop-index%}
 						set {_y} to {loadedNotes::y::%loop-index%}
-						set {_z} to {speed} * 20 * {loadedNotes::time::%loop-index%} + 4
+						set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
 						set {_glowing} to {loadedNotes::glowing::%loop-index%}
 						drawTap({_face}, {_x}, {_y}, {_z}, {_glowing})
 						delete {loadedNotes::type::%loop-index%}
@@ -296,7 +306,7 @@ every ticks:
 						set {_face} to {loadedNotes::face::%loop-index%}
 						set {_x} to {loadedNotes::x::%loop-index%}
 						set {_y} to {loadedNotes::y::%loop-index%}
-						set {_z} to {speed} * 20 * {loadedNotes::time::%loop-index%} + 4
+						set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
 						set {_glowing} to {loadedNotes::glowing::%loop-index%}
 						drawHold({_face}, {_x}, {_y}, {_z}, {_glowing})
 						delete {loadedNotes::type::%loop-index%}
@@ -311,7 +321,7 @@ every ticks:
 						set {_face} to {loadedNotes::face::%loop-index%}
 						set {_x} to {loadedNotes::x::%loop-index%}
 						set {_y} to {loadedNotes::y::%loop-index%}
-						set {_z} to {speed} * 20 * {loadedNotes::time::%loop-index%} + 4
+						set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
 						set {_glowing} to {loadedNotes::glowing::%loop-index%}
 						drawDrag({_face}, {_x}, {_y}, {_z}, {_glowing})
 						delete {loadedNotes::type::%loop-index%}
@@ -324,7 +334,7 @@ every ticks:
 					if loop-value is "flick":
 						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
 						set {_face} to {loadedNotes::face::%loop-index%}
-						set {_z} to {speed} * 20 * {loadedNotes::time::%loop-index%} + 4
+						set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
 						{_z} < 50
 						set {_turn} to {loadedNotes::turn::%loop-index%}
 						set {_glowing} to {loadedNotes::glowing::%loop-index%}
@@ -338,7 +348,7 @@ every ticks:
 					if loop-value is "double":
 						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
 						set {_face} to {loadedNotes::face::%loop-index%}
-						set {_z} to {speed} * 20 * {loadedNotes::time::%loop-index%} + 4
+						set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
 						{_z} < 50
 						set {_x1} to {loadedNotes::x1::%loop-index%}
 						set {_y1} to {loadedNotes::y1::%loop-index%}
@@ -390,7 +400,7 @@ every ticks:
 				delete {_loc3}
 		
 		if metadata value "face" of loop-entity is "w":
-			set {_speed} to {speed} * -1
+			set {_speed} to {speed::%uuid of {actor}%} * -1
 			{_loc1}.add(0, 0, {_speed})
 			{_loc2}.add(0, 0, {_speed})
 			{_loc3}.add(0, 0, {_speed})
@@ -423,8 +433,8 @@ every ticks:
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
 					set metadata value "anchor" of the entity to 1
 			
-			if z location of loop-entity <= 4 + {speed}:
-				if {autoPlay} is "&a开":
+			if z location of loop-entity <= 4 + {speed::%uuid of {actor}%}:
+				if {autoPlay::%uuid of {actor}%} is "&a开":
 					deleteNote(loop-entity)
 					exact(loop-entity)
 				else:
@@ -441,12 +451,12 @@ every ticks:
 						checkIfTurned(loop-entity)
 						deleteNote(loop-entity)
 			
-			if z location of loop-entity < 4 - {speed}*4:
+			if z location of loop-entity < 4 - {speed::%uuid of {actor}%}*4:
 				deleteNote(loop-entity)
 				miss()
 			
 		if metadata value "face" of loop-entity is "a":
-			set {_speed} to {speed} * -1
+			set {_speed} to {speed::%uuid of {actor}%} * -1
 			{_loc1}.add({_speed}, 0, 0)
 			{_loc2}.add({_speed}, 0, 0)
 			{_loc3}.add({_speed}, 0, 0)
@@ -479,8 +489,8 @@ every ticks:
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
 					set metadata value "anchor" of the entity to 1
 			
-			if x location of loop-entity <= 4 + {speed}:
-				if {autoPlay} is "&a开":
+			if x location of loop-entity <= 4 + {speed::%uuid of {actor}%}:
+				if {autoPlay::%uuid of {actor}%} is "&a开":
 					deleteNote(loop-entity)
 					exact(loop-entity)
 				else:
@@ -497,14 +507,14 @@ every ticks:
 						checkIfTurned(loop-entity)
 						deleteNote(loop-entity)
 			
-			if x location of loop-entity < 4 - {speed}*4:
+			if x location of loop-entity < 4 - {speed::%uuid of {actor}%}*4:
 				deleteNote(loop-entity)
 				miss()
 			
 		if metadata value "face" of loop-entity is "s":
-			{_loc1}.add(0, 0, {speed})
-			{_loc2}.add(0, 0, {speed})
-			{_loc3}.add(0, 0, {speed})
+			{_loc1}.add(0, 0, {speed::%uuid of {actor}%})
+			{_loc2}.add(0, 0, {speed::%uuid of {actor}%})
+			{_loc3}.add(0, 0, {speed::%uuid of {actor}%})
 			set {_temp} to {_loc1}
 			{_temp}.add(0, 1, 0)
 			
@@ -534,8 +544,8 @@ every ticks:
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
 					set metadata value "anchor" of the entity to 1
 			
-			if z location of loop-entity >= -4 - {speed}:
-				if {autoPlay} is "&a开":
+			if z location of loop-entity >= -4 - {speed::%uuid of {actor}%}:
+				if {autoPlay::%uuid of {actor}%} is "&a开":
 					deleteNote(loop-entity)
 					exact(loop-entity)
 				else:
@@ -552,14 +562,14 @@ every ticks:
 						checkIfTurned(loop-entity)
 						deleteNote(loop-entity)
 			
-			if z location of loop-entity > -4 + {speed}*4:
+			if z location of loop-entity > -4 + {speed::%uuid of {actor}%}*4:
 				deleteNote(loop-entity)
 				miss()
 			
 		if metadata value "face" of loop-entity is "d":
-			{_loc1}.add({speed}, 0, 0)
-			{_loc2}.add({speed}, 0, 0)
-			{_loc3}.add({speed}, 0, 0)
+			{_loc1}.add({speed::%uuid of {actor}%}, 0, 0)
+			{_loc2}.add({speed::%uuid of {actor}%}, 0, 0)
+			{_loc3}.add({speed::%uuid of {actor}%}, 0, 0)
 			set {_temp} to {_loc1}
 			{_temp}.add(0, 1, 0)
 			
@@ -589,8 +599,8 @@ every ticks:
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
 					set metadata value "anchor" of the entity to 1
 			
-			if x location of loop-entity >= -4 - {speed}:
-				if {autoPlay} is "&a开":
+			if x location of loop-entity >= -4 - {speed::%uuid of {actor}%}:
+				if {autoPlay::%uuid of {actor}%} is "&a开":
 					deleteNote(loop-entity)
 					exact(loop-entity)
 				else:
@@ -607,7 +617,7 @@ every ticks:
 						checkIfTurned(loop-entity)
 						deleteNote(loop-entity)
 			
-			if x location of loop-entity > -4 + {speed}*4:
+			if x location of loop-entity > -4 + {speed::%uuid of {actor}%}*4:
 				deleteNote(loop-entity)
 				miss()
 			
@@ -626,7 +636,7 @@ every ticks:
 	if {alphaTime} > 0:
 		remove 1 from {alphaTime}
 		set {scoreEntityAlpha} to -127 + {alphaTime} * 12.6
-	if {indicator} is "&a开":
+	if {indicator::%uuid of {actor}%} is "&a开":
 		if {statistics::miss} = 0:
 			if {statistics::just} = 0:
 				set {_color} to "§e"

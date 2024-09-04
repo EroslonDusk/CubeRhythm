@@ -5,7 +5,7 @@
 ########################################################
 
 every ticks:
-	{autoplay} is not "&a开"
+	{autoPlay::%uuid of {actor}%} is not "&a开"
 	loop all players:
 		{actor} is loop-player
 		set {_entity} to target of loop-player ignoring blocks
@@ -14,8 +14,8 @@ every ticks:
 		if metadata value "notetype" of {_entity} is "drag":
 			set {_x} to z location of {_target} if metadata value "face" of {_entity} is "w" or "s"
 			set {_x} to x location of {_target} if metadata value "face" of {_entity} is "a" or "d"
-			set {_time} to ({_x} - 4) / {speed} * 50 if metadata value "face" of {_entity} is "w" or "a"
-			set {_time} to (-1 * {_x} - 4) / {speed} * 50 if metadata value "face" of {_entity} is "s" or "d"
+			set {_time} to ({_x} - 4) / {speed::%uuid of {actor}%} * 50 if metadata value "face" of {_entity} is "w" or "a"
+			set {_time} to (-1 * {_x} - 4) / {speed::%uuid of {actor}%} * 50 if metadata value "face" of {_entity} is "s" or "d"
 			if abs({_time}) <= 200:
 				{_target}.add(0, 20, 0)
 				teleport {_entity} to {_target}
@@ -25,7 +25,7 @@ every ticks:
 function exact(entity: entity):
 	if metadata value "notetype" of {_entity} is not "hold":
 		add 1 to {combo}
-		play sound "entity.player.hurt" with pitch 2 to all players if {hitSound} is "&a开"
+		play sound "entity.player.hurt" with pitch 2 to all players if {hitSound::%uuid of {actor}%} is "&a开"
 		add 1 to {hitNotes}
 		add 1 to {statistics::exact}
 	else:
@@ -40,7 +40,7 @@ function exact(entity: entity):
 	set yaw of {_loc} to -90 if {_face} is "d"
 	{_loc}.add(0, 0.5, 0)
 	if metadata value "notetype" of {_entity} is "drag" or "hold" or "flick":
-		if {autoplay} is not "&a开":
+		if {autoPlay::%uuid of {actor}%} is not "&a开":
 			{_loc}.add(0, -20, 0)
 		else if metadata value "notetype" of {_entity} is "drag":
 			{_loc}.add(0, 0, 0)
@@ -71,7 +71,7 @@ function exact(entity: entity):
 		exit loop
 
 function great(entity: entity, el: text):
-	play sound "entity.player.hurt" with pitch 2 to all players if {hitSound} is "&a开"
+	play sound "entity.player.hurt" with pitch 2 to all players if {hitSound::%uuid of {actor}%} is "&a开"
 	add 1 to {combo}
 	add 0.7 to {hitNotes}
 	add 1 to {statistics::just}
@@ -122,8 +122,8 @@ function hitNote(entity: entity):
 	set {_loc} to location of {_entity}
 	set {_x} to z location of {_loc} if metadata value "face" of {_entity} is "w" or "s"
 	set {_x} to x location of {_loc} if metadata value "face" of {_entity} is "a" or "d"
-	set {_time} to ({_x} - 4) / {speed} * 50 if metadata value "face" of {_entity} is "w" or "a"
-	set {_time} to (-1 * {_x} - 4) / {speed} * 50 if metadata value "face" of {_entity} is "s" or "d"
+	set {_time} to ({_x} - 4) / {speed::%uuid of {actor}%} * 50 if metadata value "face" of {_entity} is "w" or "a"
+	set {_time} to (-1 * {_x} - 4) / {speed::%uuid of {actor}%} * 50 if metadata value "face" of {_entity} is "s" or "d"
 	#broadcast "%{_time}%ms"
 	if abs({_time}) <= 80:
 		exact({_entity})
@@ -177,7 +177,7 @@ function checkIfTurned(entity: entity):
 	exact({_entity})
 	set {_face} to metadata value "face" of {_entity}
 	set {_turn} to metadata value "turn" of {_entity}
-	{autoplay} is not "&a开"
+	{autoPlay::%uuid of {actor}%} is not "&a开"
 	wait 0.5 seconds
 	loop all players:
 		{actor} is loop-player

@@ -35,7 +35,7 @@ function end():
 	{actor} is set
 	delete all text displays
 	wait 5 ticks
-	if {autoPlay} is not "&a开":
+	if {autoPlay::%uuid of {actor}%} is not "&a开":
 		{actor} is set
 		result()
 		result2()
@@ -97,11 +97,11 @@ function perfectPerformance():
 function result():
 	play sound "entity.player.levelup" to all players
 	add {statistics::exactHold} to {score}
-	if {best::%{playing}%} is not set:
-		set {best::%{playing}%} to {score}
+	if {best::%uuid of {actor}%::%{playing}%} is not set:
+		set {best::%uuid of {actor}%::%{playing}%} to {score}
 		send title "&e初次游玩!" with subtitle "&e &e" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
-	else if {score} > {best::%{playing}%}:
-		set {best::%{playing}%} to {score}
+	else if {score} > {best::%uuid of {actor}%::%{playing}%}:
+		set {best::%uuid of {actor}%::%{playing}%} to {score}
 		send title "&e新记录!" with subtitle "&e &e" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
 	
 	set {_loc1} to location(0.5, 0.5, 10, world "world", 180, 0)
@@ -119,18 +119,7 @@ function result():
 		set {_alpha} to 255 if {_alpha} > 255
 		set display text opacity of {_entity} to {_alpha}
 		wait 1 tick
-		set display text of {_entity} to "&eSSS+" if {displayScore} >= 1000000
-		set display text of {_entity} to "&eSSS" if {displayScore} is between 999999 and 990000
-		set display text of {_entity} to "&eSS" if {displayScore} is between 989999 and 980000
-		set display text of {_entity} to "&eS" if {displayScore} is between 979999 and 960000
-		set display text of {_entity} to "&aAAA" if {displayScore} is between 959999 and 950000
-		set display text of {_entity} to "&aAA" if {displayScore} is between 949999 and 940000
-		set display text of {_entity} to "&aA" if {displayScore} is between 939999 and 930000
-		set display text of {_entity} to "&bBBB" if {displayScore} is between 929999 and 920000
-		set display text of {_entity} to "&bBB" if {displayScore} is between 919999 and 910000
-		set display text of {_entity} to "&bB" if {displayScore} is between 909999 and 900000
-		set display text of {_entity} to "&2C" if {displayScore} is between 899999 and 850000
-		set display text of {_entity} to "&7D" if {displayScore} <= 849999
+		set display text of {_entity} to getRank({displayScore})
 
 function result2():
 	set {_loc1} to location(0.5, 0, 10, world "world", 180, 0)
