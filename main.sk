@@ -37,7 +37,7 @@ on player move:
 	cancel event
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.6%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.6.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -413,7 +413,7 @@ every ticks:
 				set {_alpha} to 100 if {_alpha} > 100
 				set {_alpha} to 1 if {_alpha} < 1
 				set {_scale} to 0 + {_alpha}/25
-				set {_color} to "§b" if metadata value "notetype" of loop-entity is "tap"
+				set {_color} to "§3" if metadata value "notetype" of loop-entity is "tap"
 				set {_color} to "§e" if metadata value "notetype" of loop-entity is "drag"
 				set {_color} to "§6" if metadata value "notetype" of loop-entity is "double"
 				delete {_haveAnchor}
@@ -423,11 +423,11 @@ every ticks:
 						set {_haveAnchor} to true
 						set display scale of loop-entity-2 to vector({_scale},{_scale},{_scale})
 						set display translation of loop-entity-2 to vector({_scale}*-0.015,{_scale}*-0.15,0)
-						set display text opacity of loop-entity-2 to {_alpha}
+						set display text opacity of loop-entity-2 to {_alpha} * 2
 						set display text of loop-entity-2 to "§f%{_color}%█"
 				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
-				summon text display at location(x location of {_loc1}, y location of {_temp}, 4, world "world", 180, 0):
+				summon text display at location(x location of {_loc1}, y location of {_temp}, 5, world "world", 180, 0):
 					set display text of the entity to "§f"
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
@@ -469,7 +469,7 @@ every ticks:
 				set {_alpha} to 100 if {_alpha} > 100
 				set {_alpha} to 1 if {_alpha} < 1
 				set {_scale} to 0 + {_alpha}/25
-				set {_color} to "§b" if metadata value "notetype" of loop-entity is "tap"
+				set {_color} to "§3" if metadata value "notetype" of loop-entity is "tap"
 				set {_color} to "§e" if metadata value "notetype" of loop-entity is "drag"
 				set {_color} to "§6" if metadata value "notetype" of loop-entity is "double"
 				delete {_haveAnchor}
@@ -479,11 +479,11 @@ every ticks:
 						set {_haveAnchor} to true
 						set display scale of loop-entity-2 to vector({_scale},{_scale},{_scale})
 						set display translation of loop-entity-2 to vector({_scale}*-0.015,{_scale}*-0.15,0)
-						set display text opacity of loop-entity-2 to {_alpha}
+						set display text opacity of loop-entity-2 to {_alpha} * 2
 						set display text of loop-entity-2 to "§f%{_color}%█"
 				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
-				summon text display at location(4, y location of {_temp}, z location of {_loc1}, world "world", 90, 0):
+				summon text display at location(5, y location of {_temp}, z location of {_loc1}, world "world", 90, 0):
 					set display text of the entity to "§f"
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
@@ -520,11 +520,11 @@ every ticks:
 			
 			set {_yt} to y location of {_loc1}+0.5
 			if z location of loop-entity > -25:
-				set {_alpha} to 100 - (z location of {_loc1} * -1 - 4) * 4
+				set {_alpha} to 100 - (z location of {_loc1} * -1 - 3) * 4
 				set {_alpha} to 100 if {_alpha} > 100
 				set {_alpha} to 1 if {_alpha} < 1
 				set {_scale} to 0 + {_alpha}/25
-				set {_color} to "§b" if metadata value "notetype" of loop-entity is "tap"
+				set {_color} to "§3" if metadata value "notetype" of loop-entity is "tap"
 				set {_color} to "§e" if metadata value "notetype" of loop-entity is "drag"
 				set {_color} to "§6" if metadata value "notetype" of loop-entity is "double"
 				delete {_haveAnchor}
@@ -534,7 +534,7 @@ every ticks:
 						set {_haveAnchor} to true
 						set display scale of loop-entity-2 to vector({_scale},{_scale},{_scale})
 						set display translation of loop-entity-2 to vector({_scale}*-0.015,{_scale}*-0.15,0)
-						set display text opacity of loop-entity-2 to {_alpha}
+						set display text opacity of loop-entity-2 to {_alpha} * 2
 						set display text of loop-entity-2 to "§f%{_color}%█"
 				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
@@ -575,11 +575,11 @@ every ticks:
 			
 			set {_yt} to y location of {_loc1}+0.5
 			if x location of loop-entity > -25:
-				set {_alpha} to 100 - (x location of {_loc1} * -1 - 4) * 4
+				set {_alpha} to 100 - (x location of {_loc1} * -1 - 3) * 4
 				set {_alpha} to 100 if {_alpha} > 100
 				set {_alpha} to 1 if {_alpha} < 1
 				set {_scale} to 0 + {_alpha}/25
-				set {_color} to "§b" if metadata value "notetype" of loop-entity is "tap"
+				set {_color} to "§3" if metadata value "notetype" of loop-entity is "tap"
 				set {_color} to "§e" if metadata value "notetype" of loop-entity is "drag"
 				set {_color} to "§6" if metadata value "notetype" of loop-entity is "double"
 				delete {_haveAnchor}
@@ -589,7 +589,7 @@ every ticks:
 						set {_haveAnchor} to true
 						set display scale of loop-entity-2 to vector({_scale},{_scale},{_scale})
 						set display translation of loop-entity-2 to vector({_scale}*-0.015,{_scale}*-0.15,0)
-						set display text opacity of loop-entity-2 to {_alpha}
+						set display text opacity of loop-entity-2 to {_alpha} * 2
 						set display text of loop-entity-2 to "§f%{_color}%█"
 				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
