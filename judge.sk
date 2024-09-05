@@ -70,6 +70,7 @@ function exact(entity: entity):
 		set {_alpha} to 255
 		set display text of the entity to "&b█"
 		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set display text opacity of the entity to 14
 		set {_scale2} to 8
 		set {_scale2toDelete} to 3
 		set display scale of the entity to vector(2,2,2)
@@ -83,7 +84,7 @@ function exact(entity: entity):
 		if {_alpha} > 40:
 			set display text opacity of {_text2} to {_alpha} / 4
 		else:
-			set display text opacity of {_text2} to 10
+			set display text opacity of {_text2} to 14
 		set {_scale} to {_scale} * 0.9
 		set {_scale} to 1 if {_scale} < 1
 		set {_scale2toDelete} to {_scale2toDelete} * 0.7
@@ -148,6 +149,7 @@ function great(entity: entity, el: text):
 		set {_alpha} to 255
 		set display text of the entity to "&e█"
 		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set display text opacity of the entity to 14
 		set {_scale2} to 8
 		set {_scale2toDelete} to 3
 		set display scale of the entity to vector(2,2,2)
@@ -161,7 +163,7 @@ function great(entity: entity, el: text):
 		if {_alpha} > 40:
 			set display text opacity of {_text2} to {_alpha} / 4
 		else:
-			set display text opacity of {_text2} to 10
+			set display text opacity of {_text2} to 14
 		set {_scale} to {_scale} * 0.9
 		set {_scale} to 1 if {_scale} < 1
 		set {_scale2toDelete} to {_scale2toDelete} * 0.5

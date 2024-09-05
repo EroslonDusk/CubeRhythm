@@ -37,7 +37,7 @@ on player move:
 	cancel event
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.6.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.6.2%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -424,7 +424,10 @@ every ticks:
 						set display scale of loop-entity-2 to vector({_scale},{_scale},{_scale})
 						set display translation of loop-entity-2 to vector({_scale}*-0.015,{_scale}*-0.15,0)
 						set display text opacity of loop-entity-2 to {_alpha} * 2
-						set display text of loop-entity-2 to "§f%{_color}%█"
+						if {_alpha} <= 10:
+							set display text of loop-entity-2 to "§f"
+						else:
+							set display text of loop-entity-2 to "§f%{_color}%█"
 				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
 				summon text display at location(x location of {_loc1}, y location of {_temp}, 5, world "world", 180, 0):
@@ -432,6 +435,7 @@ every ticks:
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
 					set metadata value "anchor" of the entity to 1
+					set display text opacity of the entity to 14
 			
 			if z location of loop-entity <= 4 + {speed::%uuid of {actor}%}:
 				if {autoPlay::%uuid of {actor}%} is "&a开":
@@ -480,7 +484,10 @@ every ticks:
 						set display scale of loop-entity-2 to vector({_scale},{_scale},{_scale})
 						set display translation of loop-entity-2 to vector({_scale}*-0.015,{_scale}*-0.15,0)
 						set display text opacity of loop-entity-2 to {_alpha} * 2
-						set display text of loop-entity-2 to "§f%{_color}%█"
+						if {_alpha} <= 10:
+							set display text of loop-entity-2 to "§f"
+						else:
+							set display text of loop-entity-2 to "§f%{_color}%█"
 				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
 				summon text display at location(5, y location of {_temp}, z location of {_loc1}, world "world", 90, 0):
@@ -488,6 +495,7 @@ every ticks:
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
 					set metadata value "anchor" of the entity to 1
+					set display text opacity of the entity to 14
 			
 			if x location of loop-entity <= 4 + {speed::%uuid of {actor}%}:
 				if {autoPlay::%uuid of {actor}%} is "&a开":
@@ -535,7 +543,10 @@ every ticks:
 						set display scale of loop-entity-2 to vector({_scale},{_scale},{_scale})
 						set display translation of loop-entity-2 to vector({_scale}*-0.015,{_scale}*-0.15,0)
 						set display text opacity of loop-entity-2 to {_alpha} * 2
-						set display text of loop-entity-2 to "§f%{_color}%█"
+						if {_alpha} <= 10:
+							set display text of loop-entity-2 to "§f"
+						else:
+							set display text of loop-entity-2 to "§f%{_color}%█"
 				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
 				summon text display at location(x location of {_loc1}, y location of {_temp}, -4, world "world", 0, 0):
@@ -543,6 +554,7 @@ every ticks:
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
 					set metadata value "anchor" of the entity to 1
+					set display text opacity of the entity to 14
 			
 			if z location of loop-entity >= -4 - {speed::%uuid of {actor}%}:
 				if {autoPlay::%uuid of {actor}%} is "&a开":
@@ -590,7 +602,10 @@ every ticks:
 						set display scale of loop-entity-2 to vector({_scale},{_scale},{_scale})
 						set display translation of loop-entity-2 to vector({_scale}*-0.015,{_scale}*-0.15,0)
 						set display text opacity of loop-entity-2 to {_alpha} * 2
-						set display text of loop-entity-2 to "§f%{_color}%█"
+						if {_alpha} <= 10:
+							set display text of loop-entity-2 to "§f"
+						else:
+							set display text of loop-entity-2 to "§f%{_color}%█"
 				{_haveAnchor} is not set
 				metadata value "notetype" of loop-entity is not "flick"
 				summon text display at location(-4, y location of {_temp}, z location of {_loc1}, world "world", -90, 0):
@@ -598,6 +613,7 @@ every ticks:
 					set display text background color of the entity to bukkitColor(0,0,0,0)
 					set metadata value "belongsto" of the entity to uuid of {_ent1}
 					set metadata value "anchor" of the entity to 1
+					set display text opacity of the entity to 14
 			
 			if x location of loop-entity >= -4 - {speed::%uuid of {actor}%}:
 				if {autoPlay::%uuid of {actor}%} is "&a开":
