@@ -396,15 +396,3 @@ function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, 
 			set yaw of entity to 0 if {_face} is "a"
 			set yaw of entity to -90 if {_face} is "s"
 			set yaw of entity to -180 if {_face} is "d"
-
-command /test:
-	trigger:
-		set {_test::time::1} to 8
-		set {_test::time::2} to 4
-		set {_test::time::3} to 5
-		set {_test::time::4} to 3
-		set {_test::time::5} to 7
-		set {_test2::id::*} to sorted indices of {_test::time::*} in ascending order
-		loop {_test2::id::*}:
-			set {_test2::time::%loop-index%} to {_test::time::%loop-value%}
-			broadcast "{_test2::id::%loop-index%} = %{_test2::id::%loop-index%}%   {_test2::time::%loop-index%} = %{_test2::time::%loop-index%}%"
