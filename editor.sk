@@ -5,6 +5,14 @@ on load:
 	set {editor::preTime} to 0 if {editor::preTime} is not set
 	
 
+on swap hand items:
+	cancel event
+	if {editMode} is true:
+		if player is not sneaking:
+			add 1 to {editor::tick}
+		else:
+			remove 1 from {editor::tick}
+
 command /editor [<text>] [<number>]:
 	trigger:
 		player's gamemode is not spectator

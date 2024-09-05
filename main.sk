@@ -37,7 +37,7 @@ on player move:
 	cancel event
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.6.2%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.7%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -165,6 +165,7 @@ on load:
 	delete {loadedNotes::*}
 	set {combo} to 0
 	set {maxNote} to 0
+	set {noteID} to 0
 	set {score} to 0
 	set {hitNotes} to 0
 	delete {statistics::*}
@@ -198,6 +199,7 @@ function quitGame():
 		delete loop-entity
 	set {combo} to 0
 	set {maxNote} to 0
+	set {noteID} to 0
 	set {score} to 0
 	set {hitNotes} to 0
 	delete {statistics::*}
@@ -206,6 +208,32 @@ function quitGame():
 
 command /start:
 	trigger:
+		send title "&a &a" with subtitle "&a谱面加载中…… (3/3)" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+		wait 1 tick
+		set {_count} to 0
+		set {_sortedID::*} to sorted indices of {loadedNotes::time::*} in ascending order
+		loop {_sortedID::*}:
+			set {_sorted::type::%loop-index%} to {loadedNotes::type::%loop-value%}
+			set {_sorted::time::%loop-index%} to {loadedNotes::time::%loop-value%}
+			set {_sorted::face::%loop-index%} to {loadedNotes::face::%loop-value%}
+			set {_sorted::x::%loop-index%} to {loadedNotes::x::%loop-value%}
+			set {_sorted::y::%loop-index%} to {loadedNotes::y::%loop-value%}
+			set {_sorted::x1::%loop-index%} to {loadedNotes::x1::%loop-value%}
+			set {_sorted::y1::%loop-index%} to {loadedNotes::y1::%loop-value%}
+			set {_sorted::x2::%loop-index%} to {loadedNotes::x2::%loop-value%}
+			set {_sorted::y2::%loop-index%} to {loadedNotes::y2::%loop-value%}
+			set {_sorted::turn::%loop-index%} to {loadedNotes::turn::%loop-value%}
+			set {_sorted::glowing::%loop-index%} to {loadedNotes::glowing::%loop-value%}
+			set {_sorted::section::%loop-index%} to {loadedNotes::section::%loop-value%}
+			add 1 to {_count}
+			send action bar "&f已处理 %{_count}% / %{noteID} * 13%" to all players
+		delete {loadedNotes::*}
+		loop indices of {_sorted::*}:
+			loop {_sorted::%loop-value-1%::*}:
+				set {loadedNotes::%loop-value-1%::%loop-index%} to loop-value-2
+				add 1 to {_count}
+				send action bar "&f已处理 %{_count}% / %{noteID} * 13%" to all players
+		wait 1 second
 		send title "&f%{song}%" with subtitle "&8曲: &7%{artist}% &8· 谱: &7%{author}%" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
 		play sound "%{sound}%" to all players
 		loop all text displays:

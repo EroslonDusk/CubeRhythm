@@ -6,6 +6,7 @@
 
 function tap(time: number, face: text, x: number, y: number, glowing: boolean):
 	add 1 to {maxNote}
+	add 1 to {noteID}
 	set {_null} to random uuid
 	set {_type} to "tap"
 	add {_type} to {loadedNotes::type::*}
@@ -20,10 +21,11 @@ function tap(time: number, face: text, x: number, y: number, glowing: boolean):
 	add {_null} to {loadedNotes::x2::*}
 	add {_null} to {loadedNotes::y2::*}
 	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+	send actionbar "&f已加载 %{noteID}% 音符" to all players 
 
 function drag(time: number, face: text, x: number, y: number, glowing: boolean):
 	add 1 to {maxNote}
+	add 1 to {noteID}
 	set {_null} to random uuid
 	set {_type} to "drag"
 	add {_type} to {loadedNotes::type::*}
@@ -38,9 +40,10 @@ function drag(time: number, face: text, x: number, y: number, glowing: boolean):
 	add {_null} to {loadedNotes::x2::*}
 	add {_null} to {loadedNotes::y2::*}
 	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+	send actionbar "&f已加载 %{noteID}% 音符" to all players 
 
 function hold(time: number, face: text, x: number, y: number, glowing: boolean):
+	add 1 to {noteID}
 	set {_null} to random uuid
 	set {_type} to "hold"
 	add {_type} to {loadedNotes::type::*}
@@ -55,9 +58,10 @@ function hold(time: number, face: text, x: number, y: number, glowing: boolean):
 	add {_null} to {loadedNotes::x2::*}
 	add {_null} to {loadedNotes::y2::*}
 	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+	send actionbar "&f已加载 %{noteID}% 音符" to all players 
 
 function flick(time: number, face: text, turn: text, glowing: boolean):
+	add 1 to {noteID}
 	add 1 to {maxNote}
 	set {_null} to random uuid
 	set {_type} to "flick"
@@ -73,9 +77,10 @@ function flick(time: number, face: text, turn: text, glowing: boolean):
 	add {_null} to {loadedNotes::x2::*}
 	add {_null} to {loadedNotes::y2::*}
 	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+	send actionbar "&f已加载 %{noteID}% 音符" to all players 
 
 function double(time: number, face: text, x1: number, y1: number, x2: number, y2: number, glowing: boolean):
+	add 1 to {noteID}
 	add 2 to {maxNote}
 	set {_null} to random uuid
 	set {_type} to "double"
@@ -91,9 +96,10 @@ function double(time: number, face: text, x1: number, y1: number, x2: number, y2
 	add {_null} to {loadedNotes::y::*}
 	add {_glowing} to {loadedNotes::glowing::*}
 	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+	send actionbar "&f已加载 %{noteID}% 音符" to all players 
 
 function execution(time: number, section: section):
+	add 1 to {noteID}
 	set {_null} to random uuid
 	set {_type} to "execution"
 	add {_type} to {loadedNotes::type::*}
@@ -108,7 +114,7 @@ function execution(time: number, section: section):
 	add {_null} to {loadedNotes::y::*}
 	add false to {loadedNotes::glowing::*}
 	add {_section} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{maxNote}% 音符" to all players 
+	send actionbar "&f已加载 %{noteID}% 音符" to all players 
 
 function drawTap(face: text, x: number, y: number, z: number, glowing: boolean):
 	set {_x1} to {_x}+0.5
@@ -390,4 +396,15 @@ function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, 
 			set yaw of entity to 0 if {_face} is "a"
 			set yaw of entity to -90 if {_face} is "s"
 			set yaw of entity to -180 if {_face} is "d"
-		
+
+command /test:
+	trigger:
+		set {_test::time::1} to 8
+		set {_test::time::2} to 4
+		set {_test::time::3} to 5
+		set {_test::time::4} to 3
+		set {_test::time::5} to 7
+		set {_test2::id::*} to sorted indices of {_test::time::*} in ascending order
+		loop {_test2::id::*}:
+			set {_test2::time::%loop-index%} to {_test::time::%loop-value%}
+			broadcast "{_test2::id::%loop-index%} = %{_test2::id::%loop-index%}%   {_test2::time::%loop-index%} = %{_test2::time::%loop-index%}%"
