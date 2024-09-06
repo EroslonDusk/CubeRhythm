@@ -37,7 +37,7 @@ on player move:
 	cancel event
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.7%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.7.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -302,111 +302,115 @@ every ticks:
 		set level progress of all players to 0.99
 	loop all interactions:
 		add 1 to {_count}
-	if {_count} < 30:
+	set {_preSummon} to 0
+	if {_count} < 50:
 		loop {loadedNotes::type::*}:
 			add 1 to {_notes}
+			set {_tempDistance} to {speed::%uuid of {actor}%} * 20 * ({loadedNotes::time::%loop-index%} - ({timer} / 20)) + 4
+			add 1 to {_preSummon} if {_tempDistance} < 50
 		if {_notes} = 0:
 			if {_count} = 0:
 				delete {timer}
 				end()
 		else:
-			loop {loadedNotes::type::*}:
-				if loop-value is not "execution":
-					set {_summonDistance} to {speed::%uuid of {actor}%} * 20 * ({loadedNotes::time::%loop-index%} - ({timer} / 20)) + 4
-					{_summonDistance} < 50
-					if loop-value is "tap":
-						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
-						set {_face} to {loadedNotes::face::%loop-index%}
-						set {_x} to {loadedNotes::x::%loop-index%}
-						set {_y} to {loadedNotes::y::%loop-index%}
-						set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
-						set {_glowing} to {loadedNotes::glowing::%loop-index%}
-						drawTap({_face}, {_x}, {_y}, {_z}, {_glowing})
-						delete {loadedNotes::type::%loop-index%}
-						delete {loadedNotes::time::%loop-index%}
-						delete {loadedNotes::face::%loop-index%}
-						delete {loadedNotes::x::%loop-index%}
-						delete {loadedNotes::y::%loop-index%}
-						delete {loadedNotes::glowing::%loop-index%}
-						delete {loadedNotes::section::%loop-index%}
-					if loop-value is "hold":
-						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
-						set {_face} to {loadedNotes::face::%loop-index%}
-						set {_x} to {loadedNotes::x::%loop-index%}
-						set {_y} to {loadedNotes::y::%loop-index%}
-						set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
-						set {_glowing} to {loadedNotes::glowing::%loop-index%}
-						drawHold({_face}, {_x}, {_y}, {_z}, {_glowing})
-						delete {loadedNotes::type::%loop-index%}
-						delete {loadedNotes::time::%loop-index%}
-						delete {loadedNotes::face::%loop-index%}
-						delete {loadedNotes::x::%loop-index%}
-						delete {loadedNotes::y::%loop-index%}
-						delete {loadedNotes::glowing::%loop-index%}
-						delete {loadedNotes::section::%loop-index%}
-					if loop-value is "drag":
-						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
-						set {_face} to {loadedNotes::face::%loop-index%}
-						set {_x} to {loadedNotes::x::%loop-index%}
-						set {_y} to {loadedNotes::y::%loop-index%}
-						set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
-						set {_glowing} to {loadedNotes::glowing::%loop-index%}
-						drawDrag({_face}, {_x}, {_y}, {_z}, {_glowing})
-						delete {loadedNotes::type::%loop-index%}
-						delete {loadedNotes::time::%loop-index%}
-						delete {loadedNotes::face::%loop-index%}
-						delete {loadedNotes::x::%loop-index%}
-						delete {loadedNotes::y::%loop-index%}
-						delete {loadedNotes::glowing::%loop-index%}
-						delete {loadedNotes::section::%loop-index%}
-					if loop-value is "flick":
-						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
-						set {_face} to {loadedNotes::face::%loop-index%}
-						set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
-						{_z} < 50
-						set {_turn} to {loadedNotes::turn::%loop-index%}
-						set {_glowing} to {loadedNotes::glowing::%loop-index%}
-						drawFlick({_face}, {_z}, {_turn}, {_glowing})
-						delete {loadedNotes::type::%loop-index%}
-						delete {loadedNotes::time::%loop-index%}
-						delete {loadedNotes::face::%loop-index%}
-						delete {loadedNotes::turn::%loop-index%}
-						delete {loadedNotes::glowing::%loop-index%}
-						delete {loadedNotes::section::%loop-index%}
-					if loop-value is "double":
-						remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
-						set {_face} to {loadedNotes::face::%loop-index%}
-						set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
-						{_z} < 50
-						set {_x1} to {loadedNotes::x1::%loop-index%}
-						set {_y1} to {loadedNotes::y1::%loop-index%}
-						set {_x2} to {loadedNotes::x2::%loop-index%}
-						set {_y2} to {loadedNotes::y2::%loop-index%}
-						set {_glowing} to {loadedNotes::glowing::%loop-index%}
-						drawDouble({_face}, {_x1}, {_y1}, {_z}, {_x2}, {_y2}, {_z}, {_glowing})
-						delete {loadedNotes::type::%loop-index%}
-						delete {loadedNotes::time::%loop-index%}
-						delete {loadedNotes::face::%loop-index%}
-						delete {loadedNotes::x1::%loop-index%}
-						delete {loadedNotes::y1::%loop-index%}
-						delete {loadedNotes::x2::%loop-index%}
-						delete {loadedNotes::y2::%loop-index%}
-						delete {loadedNotes::glowing::%loop-index%}
-						delete {loadedNotes::section::%loop-index%}
-					exit loop
-				else:
-					if {loadedNotes::time::%loop-index%} - ({timer} / 20) <= 0:
-						run section {loadedNotes::section::%loop-index%}
-						#broadcast "run section {loadedNotes::section::%loop-index%} = %{loadedNotes::section::%loop-index%}%"
-						delete {loadedNotes::type::%loop-index%}
-						delete {loadedNotes::time::%loop-index%}
-						delete {loadedNotes::face::%loop-index%}
-						delete {loadedNotes::x1::%loop-index%}
-						delete {loadedNotes::y1::%loop-index%}
-						delete {loadedNotes::x2::%loop-index%}
-						delete {loadedNotes::y2::%loop-index%}
-						delete {loadedNotes::glowing::%loop-index%}
-						delete {loadedNotes::section::%loop-index%}
+			loop {_preSummon} times:
+				loop {loadedNotes::type::*}:
+					if loop-value-2 is not "execution":
+						set {_summonDistance} to {speed::%uuid of {actor}%} * 20 * ({loadedNotes::time::%loop-index%} - ({timer} / 20)) + 4
+						{_summonDistance} < 50
+						if loop-value-2 is "tap":
+							remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
+							set {_face} to {loadedNotes::face::%loop-index%}
+							set {_x} to {loadedNotes::x::%loop-index%}
+							set {_y} to {loadedNotes::y::%loop-index%}
+							set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
+							set {_glowing} to {loadedNotes::glowing::%loop-index%}
+							drawTap({_face}, {_x}, {_y}, {_z}, {_glowing})
+							delete {loadedNotes::type::%loop-index%}
+							delete {loadedNotes::time::%loop-index%}
+							delete {loadedNotes::face::%loop-index%}
+							delete {loadedNotes::x::%loop-index%}
+							delete {loadedNotes::y::%loop-index%}
+							delete {loadedNotes::glowing::%loop-index%}
+							delete {loadedNotes::section::%loop-index%}
+						if loop-value-2 is "hold":
+							remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
+							set {_face} to {loadedNotes::face::%loop-index%}
+							set {_x} to {loadedNotes::x::%loop-index%}
+							set {_y} to {loadedNotes::y::%loop-index%}
+							set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
+							set {_glowing} to {loadedNotes::glowing::%loop-index%}
+							drawHold({_face}, {_x}, {_y}, {_z}, {_glowing})
+							delete {loadedNotes::type::%loop-index%}
+							delete {loadedNotes::time::%loop-index%}
+							delete {loadedNotes::face::%loop-index%}
+							delete {loadedNotes::x::%loop-index%}
+							delete {loadedNotes::y::%loop-index%}
+							delete {loadedNotes::glowing::%loop-index%}
+							delete {loadedNotes::section::%loop-index%}
+						if loop-value-2 is "drag":
+							remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
+							set {_face} to {loadedNotes::face::%loop-index%}
+							set {_x} to {loadedNotes::x::%loop-index%}
+							set {_y} to {loadedNotes::y::%loop-index%}
+							set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
+							set {_glowing} to {loadedNotes::glowing::%loop-index%}
+							drawDrag({_face}, {_x}, {_y}, {_z}, {_glowing})
+							delete {loadedNotes::type::%loop-index%}
+							delete {loadedNotes::time::%loop-index%}
+							delete {loadedNotes::face::%loop-index%}
+							delete {loadedNotes::x::%loop-index%}
+							delete {loadedNotes::y::%loop-index%}
+							delete {loadedNotes::glowing::%loop-index%}
+							delete {loadedNotes::section::%loop-index%}
+						if loop-value-2 is "flick":
+							remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
+							set {_face} to {loadedNotes::face::%loop-index%}
+							set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
+							{_z} < 50
+							set {_turn} to {loadedNotes::turn::%loop-index%}
+							set {_glowing} to {loadedNotes::glowing::%loop-index%}
+							drawFlick({_face}, {_z}, {_turn}, {_glowing})
+							delete {loadedNotes::type::%loop-index%}
+							delete {loadedNotes::time::%loop-index%}
+							delete {loadedNotes::face::%loop-index%}
+							delete {loadedNotes::turn::%loop-index%}
+							delete {loadedNotes::glowing::%loop-index%}
+							delete {loadedNotes::section::%loop-index%}
+						if loop-value-2 is "double":
+							remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
+							set {_face} to {loadedNotes::face::%loop-index%}
+							set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
+							{_z} < 50
+							set {_x1} to {loadedNotes::x1::%loop-index%}
+							set {_y1} to {loadedNotes::y1::%loop-index%}
+							set {_x2} to {loadedNotes::x2::%loop-index%}
+							set {_y2} to {loadedNotes::y2::%loop-index%}
+							set {_glowing} to {loadedNotes::glowing::%loop-index%}
+							drawDouble({_face}, {_x1}, {_y1}, {_z}, {_x2}, {_y2}, {_z}, {_glowing})
+							delete {loadedNotes::type::%loop-index%}
+							delete {loadedNotes::time::%loop-index%}
+							delete {loadedNotes::face::%loop-index%}
+							delete {loadedNotes::x1::%loop-index%}
+							delete {loadedNotes::y1::%loop-index%}
+							delete {loadedNotes::x2::%loop-index%}
+							delete {loadedNotes::y2::%loop-index%}
+							delete {loadedNotes::glowing::%loop-index%}
+							delete {loadedNotes::section::%loop-index%}
+						exit loop
+					else:
+						if {loadedNotes::time::%loop-index%} - ({timer} / 20) <= 0:
+							run section {loadedNotes::section::%loop-index%}
+							#broadcast "run section {loadedNotes::section::%loop-index%} = %{loadedNotes::section::%loop-index%}%"
+							delete {loadedNotes::type::%loop-index%}
+							delete {loadedNotes::time::%loop-index%}
+							delete {loadedNotes::face::%loop-index%}
+							delete {loadedNotes::x1::%loop-index%}
+							delete {loadedNotes::y1::%loop-index%}
+							delete {loadedNotes::x2::%loop-index%}
+							delete {loadedNotes::y2::%loop-index%}
+							delete {loadedNotes::glowing::%loop-index%}
+							delete {loadedNotes::section::%loop-index%}
 	
 	loop all interactions:
 		set {_loc1} to location of loop-entity
