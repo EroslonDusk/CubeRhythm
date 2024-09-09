@@ -21,7 +21,7 @@ function tap(time: number, face: text, x: number, y: number, glowing: boolean):
 	add {_null} to {loadedNotes::x2::*}
 	add {_null} to {loadedNotes::y2::*}
 	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
 
 function drag(time: number, face: text, x: number, y: number, glowing: boolean):
 	add 1 to {maxNote}
@@ -40,7 +40,7 @@ function drag(time: number, face: text, x: number, y: number, glowing: boolean):
 	add {_null} to {loadedNotes::x2::*}
 	add {_null} to {loadedNotes::y2::*}
 	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
 
 function hold(time: number, face: text, x: number, y: number, glowing: boolean):
 	add 1 to {noteID}
@@ -58,7 +58,7 @@ function hold(time: number, face: text, x: number, y: number, glowing: boolean):
 	add {_null} to {loadedNotes::x2::*}
 	add {_null} to {loadedNotes::y2::*}
 	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
 
 function flick(time: number, face: text, turn: text, glowing: boolean):
 	add 1 to {noteID}
@@ -77,7 +77,7 @@ function flick(time: number, face: text, turn: text, glowing: boolean):
 	add {_null} to {loadedNotes::x2::*}
 	add {_null} to {loadedNotes::y2::*}
 	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
 
 function double(time: number, face: text, x1: number, y1: number, x2: number, y2: number, glowing: boolean):
 	add 1 to {noteID}
@@ -96,7 +96,7 @@ function double(time: number, face: text, x1: number, y1: number, x2: number, y2
 	add {_null} to {loadedNotes::y::*}
 	add {_glowing} to {loadedNotes::glowing::*}
 	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
 
 function execution(time: number, section: section):
 	add 1 to {noteID}
@@ -114,7 +114,7 @@ function execution(time: number, section: section):
 	add {_null} to {loadedNotes::y::*}
 	add false to {loadedNotes::glowing::*}
 	add {_section} to {loadedNotes::section::*}
-	send actionbar "&f已加载 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
 
 function drawTap(face: text, x: number, y: number, z: number, glowing: boolean):
 	set {_x1} to {_x}+0.5
@@ -137,12 +137,16 @@ function drawTap(face: text, x: number, y: number, z: number, glowing: boolean):
 		set {_loc1} to location(-1*{_z}+1, {_y}, {_x}+1, world "world", 270, 0)
 		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 270, 0)
 	summon block display at {_loc1}:
+		set display interpolation start of entity to 0
+		set display interpolation duration of entity to 100
 		set display block data of entity to light_blue_concrete
 		set display scale of entity to vector(1,1,0.5)
 		set {_uuid} to uuid of entity
 		if {_glowing} is true:
 			set glowing of entity to true
 			set display glow color override of {_display} to bukkitColor(0,224,255,255)
+		set {_e} to entity
+	
 	summon interaction at {_loc2}:
 		set interaction height of entity to 2
 		set interaction width of entity to 2
@@ -151,6 +155,11 @@ function drawTap(face: text, x: number, y: number, z: number, glowing: boolean):
 		set metadata value "linkuuid" of entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
 		if {_glowing} is true:
 			set metadata value "glowing" of entity to true
+	
+	wait 2 ticks
+	set display brightness of {_e} to displayBrightness(10,10)
+	set display translation of {_e} to vector(0,0,-100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
+	set display translation of {_e} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "a" or "d"
 
 function drawHold(face: text, x: number, y: number, z: number, glowing: boolean):
 	set {_x1} to {_x}+0.5
@@ -173,12 +182,16 @@ function drawHold(face: text, x: number, y: number, z: number, glowing: boolean)
 		set {_loc1} to location(-1*{_z}+0.9, {_y}, {_x}, world "world", 90, 0)
 		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 90, 0)
 	summon block display at {_loc1}:
+		set display interpolation start of entity to 0
+		set display interpolation duration of entity to 100
 		set display block data of entity to white_concrete
 		set display scale of entity to vector(1,1,2*{speed::%uuid of {actor}%})
 		set {_uuid} to uuid of entity
 		if {_glowing} is true:
 			set glowing of entity to true
 			set display glow color override of {_display} to bukkitColor(255,255,255,100)
+		set {_e} to entity
+	
 	summon interaction at {_loc2}:
 		set interaction height of entity to 2
 		set interaction width of entity to 2
@@ -187,6 +200,10 @@ function drawHold(face: text, x: number, y: number, z: number, glowing: boolean)
 		set metadata value "linkuuid" of entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
 		if {_glowing} is true:
 			set metadata value "glowing" of entity to true
+	
+	wait 2 ticks
+	set display brightness of {_e} to displayBrightness(10,10)
+	set display translation of {_e} to vector(0,0,-100*{speed::%uuid of {actor}%})
 
 function drawDrag(face: text, x: number, y: number, z: number, glowing: boolean):
 	set {_x1} to {_x}+0.5
@@ -209,12 +226,16 @@ function drawDrag(face: text, x: number, y: number, z: number, glowing: boolean)
 		set {_loc1} to location(-1*{_z}+1, {_y}, {_x}+1, world "world", 270, 0)
 		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 270, 0)
 	summon block display at {_loc1}:
+		set display interpolation start of entity to 0
+		set display interpolation duration of entity to 100
 		set display block data of entity to yellow_concrete
 		set display scale of entity to vector(1,1,0.5)
 		set {_uuid} to uuid of entity
 		if {_glowing} is true:
 			set glowing of entity to true
 			set display glow color override of {_display} to bukkitColor(255,235,42,255)
+		set {_e} to entity
+	
 	summon interaction at {_loc2}:
 		set interaction height of entity to 2
 		set interaction width of entity to 2
@@ -223,6 +244,11 @@ function drawDrag(face: text, x: number, y: number, z: number, glowing: boolean)
 		set metadata value "linkuuid" of entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
 		if {_glowing} is true:
 			set metadata value "glowing" of entity to true
+	
+	wait 2 ticks
+	set display brightness of {_e} to displayBrightness(10,10)
+	set display translation of {_e} to vector(0,0,-100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
+	set display translation of {_e} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "a" or "d"
 
 function drawFlick(face: text, z: number, turn: text, glowing: boolean):
 	set {_x} to 0
@@ -254,23 +280,35 @@ function drawFlick(face: text, z: number, turn: text, glowing: boolean):
 		set {_loc2} to location(-1*{_z1}, {_y1}, {_x1}, world "world", 270, 0)
 		set {_loc3} to location(-1*{_z}+0.6, {_y}-2.75, {_x}+0.75, world "world", 270, 0)   
 	summon block display at {_loc1}:
+		set display interpolation start of entity to 0
+		set display interpolation duration of entity to 100
 		set display block data of entity to white_stained_glass_pane[east=true,north=false,south=false,waterlogged=false,west=true]
 		set display scale of entity to vector(5,5,1)
 		set {_uuid} to uuid of entity
 		if {_glowing} is true:
 			set glowing of entity to true
+		set {_e1} to entity
+	
 	if {_turn} is "left":
 		summon text display at {_loc3}:
+			set display interpolation start of entity to 0
+			set display interpolation duration of entity to 100
 			set display text of the entity to "§f←"
 			set display scale of entity to vector(20,20,0)
 			set display text background color of the entity to bukkitColor(0,0,0,0)
 			set metadata value "linkbind" of entity to {_uuid}
+			set {_e2} to entity
+	
 	if {_turn} is "right":
 		summon text display at {_loc3}:
+			set display interpolation start of entity to 0
+			set display interpolation duration of entity to 100
 			set display text of the entity to "§f→"
 			set display scale of entity to vector(20,20,0)
 			set display text background color of the entity to bukkitColor(0,0,0,0)
 			set metadata value "linkbind" of entity to {_uuid}
+			set {_e3} to entity
+	
 	summon interaction at {_loc2}:
 		set interaction height of entity to 2
 		set interaction width of entity to 2
@@ -280,8 +318,29 @@ function drawFlick(face: text, z: number, turn: text, glowing: boolean):
 		set metadata value "linkuuid" of entity to "%{_uuid}%" #击中音符时通过uuid将对应的block display销毁
 		if {_glowing} is true:
 			set metadata value "glowing" of entity to true
+	
+	wait 2 ticks
+	set display brightness of {_e1} to displayBrightness(10,10)
+	set display brightness of {_e2} to displayBrightness(10,10)
+	set display brightness of {_e3} to displayBrightness(10,10)
+	set display translation of {_e1} to vector(0,0,-100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
+	set display translation of {_e2} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
+	set display translation of {_e3} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
+	set display translation of {_e1} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "a" or "d"
+	set display translation of {_e2} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "a" or "d"
+	set display translation of {_e3} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "a" or "d"
 
 function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, yb: number, zb: number, glowing: boolean):
+	if {_xa} < {_xb}:
+		set {_t1} to {_xa}
+		set {_t2} to {_ya}
+		set {_t3} to {_za}
+		set {_xa} to {_xb}
+		set {_ya} to {_yb}
+		set {_za} to {_zb}
+		set {_xb} to {_t1}
+		set {_yb} to {_t2}
+		set {_zb} to {_t3}
 	set {_xa1} to {_xa}+0.5
 	set {_ya1} to {_ya}-0.5
 	set {_za1} to {_za}+1
@@ -302,12 +361,16 @@ function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, 
 		set {_loc1} to location(-1*{_za}+1, {_ya}, {_xa}+1, world "world", 270, 0)
 		set {_loc2} to location(-1*{_za1}, {_ya1}, {_xa1}, world "world", 270, 0)
 	summon block display at {_loc1}:
+		set display interpolation start of entity to 0
+		set display interpolation duration of entity to 100
 		set display block data of entity to orange_concrete
 		set display scale of entity to vector(1,1,0.5)
 		set {_uuid} to uuid of entity
 		if {_glowing} is true:
 			set glowing of entity to true
 			set display glow color override of {_display} to bukkitColor(255,180,0,255)
+		set {_e1} to entity
+	
 	summon interaction at {_loc2}:
 		set interaction height of entity to 2
 		set interaction width of entity to 2
@@ -339,12 +402,16 @@ function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, 
 		set {_loc3} to location(-1*{_zb}+1, {_yb}, {_xb}+1, world "world", 270, 0)
 		set {_loc4} to location(-1*{_zb1}, {_yb1}, {_xb1}, world "world", 270, 0)
 	summon block display at {_loc3}:
+		set display interpolation start of entity to 0
+		set display interpolation duration of entity to 100
 		set display block data of entity to orange_concrete
 		set display scale of entity to vector(1,1,0.5)
 		set {_uuid} to uuid of entity
 		if {_glowing} is true:
 			set glowing of entity to true
 			set display glow color override of {_display} to bukkitColor(255,180,0,255)
+		set {_e2} to entity
+	
 	summon interaction at {_loc4}:
 		set interaction height of entity to 2
 		set interaction width of entity to 2
@@ -370,6 +437,8 @@ function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, 
 		{_loc2}.add(-0.8, 1, 0) if {_face} is "a"
 		{_loc2}.add(0.8, 1, 0) if {_face} is "d"
 		summon block display at {_loc2}:
+			set display interpolation start of entity to 0
+			set display interpolation duration of entity to 100
 			set display block data of entity to white_concrete
 			set display scale of entity to vector(0.1,{_d3},0.1)
 			set metadata value "note1" of entity to {_uuid2}
@@ -380,12 +449,16 @@ function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, 
 			set yaw of entity to -180 if {_face} is "a"
 			set yaw of entity to 90 if {_face} is "s"
 			set yaw of entity to 0 if {_face} is "d"
+			set {_e3} to entity
+	
 	else:
 		{_loc4}.add(0, 1, -0.9) if {_face} is "w"
 		{_loc4}.add(0, 1, 0.9) if {_face} is "s"
 		{_loc4}.add(-0.9, 1, 0) if {_face} is "a"
 		{_loc4}.add(0.9, 1, 0) if {_face} is "d"
 		summon block display at {_loc4}:
+			set display interpolation start of entity to 0
+			set display interpolation duration of entity to 100
 			set display block data of entity to white_concrete
 			set display scale of entity to vector(0.1,{_d3},0.1)
 			set metadata value "note1" of entity to {_uuid2}
@@ -396,3 +469,18 @@ function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, 
 			set yaw of entity to 0 if {_face} is "a"
 			set yaw of entity to -90 if {_face} is "s"
 			set yaw of entity to -180 if {_face} is "d"
+			set {_e4} to entity
+	
+	wait 2 ticks
+	set display brightness of {_e1} to displayBrightness(10,10)
+	set display brightness of {_e2} to displayBrightness(10,10)
+	set display brightness of {_e3} to displayBrightness(10,10)
+	set display brightness of {_e4} to displayBrightness(10,10)
+	set display translation of {_e1} to vector(0,0,-100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
+	set display translation of {_e2} to vector(0,0,-100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
+	set display translation of {_e3} to vector(100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "w" or "s"
+	set display translation of {_e4} to vector(-100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "w" or "s"
+	set display translation of {_e1} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "a" or "d"
+	set display translation of {_e2} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "a" or "d"
+	set display translation of {_e3} to vector(100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "a" or "d"
+	set display translation of {_e4} to vector(-100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "a" or "d"

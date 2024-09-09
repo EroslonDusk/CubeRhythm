@@ -35,9 +35,10 @@ on join:
 on player move:
 	player's gamemode is survival
 	cancel event
+	send action bar "&c!!&7 生存模式下无法移动 &c!!&f" to player
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.0.7.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -208,7 +209,7 @@ function quitGame():
 
 command /start:
 	trigger:
-		send title "&a &a" with subtitle "&a谱面加载中…… (3/3)" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+		send action bar "&f[4/4] &7开始处理数据……" to all players
 		wait 1 tick
 		set {_count} to 0
 		set {_sortedID::*} to sorted indices of {loadedNotes::time::*} in ascending order
@@ -226,15 +227,16 @@ command /start:
 			set {_sorted::glowing::%loop-index%} to {loadedNotes::glowing::%loop-value%}
 			set {_sorted::section::%loop-index%} to {loadedNotes::section::%loop-value%}
 			add 1 to {_count}
-			send action bar "&f已处理 %{_count}% / %{noteID} * 13%" to all players
+			send action bar "&f[4/4] &7已处理 %{_count}%/%{noteID} * 13%" to all players
 		delete {loadedNotes::*}
 		loop indices of {_sorted::*}:
 			loop {_sorted::%loop-value-1%::*}:
 				set {loadedNotes::%loop-value-1%::%loop-index%} to loop-value-2
 				add 1 to {_count}
-				send action bar "&f已处理 %{_count}% / %{noteID} * 13%" to all players
+				send action bar "&f[4/4] &7已处理 %{_count}%/%{noteID} * 13%" to all players
 		wait 1 second
 		send title "&f%{song}%" with subtitle "&8曲: &7%{artist}% &8· 谱: &7%{author}%" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
+		send action bar "&c!!&7 游戏即将开始 &c!!&f" to all players
 		play sound "%{sound}%" to all players
 		loop all text displays:
 			if metadata value "combo" of loop-entity is set:
@@ -271,28 +273,6 @@ command /start:
 
 every ticks:
 	{timer} is set
-	loop all block displays:
-		if metadata value "note1" of loop-entity is set:
-			set {_loc4} to location of loop-entity
-			if metadata value "face" of loop-entity is "w":
-				set {_speed} to {speed::%uuid of {actor}%} * -1
-				{_loc4}.add(0, 0, {_speed}) 
-				teleport loop-entity to {_loc4}
-			if metadata value "face" of loop-entity is "a":
-				set {_speed} to {speed::%uuid of {actor}%} * -1
-				{_loc4}.add({_speed}, 0, 0) 
-				teleport loop-entity to {_loc4}
-			if metadata value "face" of loop-entity is "s":
-				set {_speed} to {speed::%uuid of {actor}%}
-				{_loc4}.add(0, 0, {_speed}) 
-				teleport loop-entity to {_loc4}
-			if metadata value "face" of loop-entity is "d":
-				set {_speed} to {speed::%uuid of {actor}%}
-				{_loc4}.add({_speed}, 0, 0) 
-				teleport loop-entity to {_loc4}
-
-every ticks:
-	{timer} is set
 	set {_count} to 0
 	set {_notes} to 0
 	add 1 to {timer}
@@ -303,7 +283,7 @@ every ticks:
 	loop all interactions:
 		add 1 to {_count}
 	set {_preSummon} to 0
-	if {_count} < 50:
+	if {_count} < 100:
 		loop {loadedNotes::type::*}:
 			add 1 to {_notes}
 			set {_tempDistance} to {speed::%uuid of {actor}%} * 20 * ({loadedNotes::time::%loop-index%} - ({timer} / 20)) + 4
@@ -416,26 +396,9 @@ every ticks:
 		set {_loc1} to location of loop-entity
 		set {_ent1} to loop-entity
 		
-		loop all block displays:
-			if uuid of loop-entity-2 is metadata value "linkuuid" of loop-entity-1:
-				set {_loc2} to location of loop-entity-2
-				set {_entity2} to loop-entity-2
-				exit loop
-		
-		loop all text displays:
-			if metadata value "linkbind" of loop-entity-2 is metadata value "linkuuid" of loop-entity-1:
-				set {_loc3} to location of loop-entity-2
-				set {_entity3} to loop-entity-2
-				exit this loop
-			else:
-				delete {_entity3}
-				delete {_loc3}
-		
 		if metadata value "face" of loop-entity is "w":
 			set {_speed} to {speed::%uuid of {actor}%} * -1
 			{_loc1}.add(0, 0, {_speed})
-			{_loc2}.add(0, 0, {_speed})
-			{_loc3}.add(0, 0, {_speed})
 			set {_temp} to {_loc1}
 			{_temp}.add(0, 1, 0)
 			
@@ -494,8 +457,6 @@ every ticks:
 		if metadata value "face" of loop-entity is "a":
 			set {_speed} to {speed::%uuid of {actor}%} * -1
 			{_loc1}.add({_speed}, 0, 0)
-			{_loc2}.add({_speed}, 0, 0)
-			{_loc3}.add({_speed}, 0, 0)
 			set {_temp} to {_loc1}
 			{_temp}.add(0, 1, 0)
 			
@@ -553,8 +514,6 @@ every ticks:
 			
 		if metadata value "face" of loop-entity is "s":
 			{_loc1}.add(0, 0, {speed::%uuid of {actor}%})
-			{_loc2}.add(0, 0, {speed::%uuid of {actor}%})
-			{_loc3}.add(0, 0, {speed::%uuid of {actor}%})
 			set {_temp} to {_loc1}
 			{_temp}.add(0, 1, 0)
 			
@@ -612,8 +571,6 @@ every ticks:
 			
 		if metadata value "face" of loop-entity is "d":
 			{_loc1}.add({speed::%uuid of {actor}%}, 0, 0)
-			{_loc2}.add({speed::%uuid of {actor}%}, 0, 0)
-			{_loc3}.add({speed::%uuid of {actor}%}, 0, 0)
 			set {_temp} to {_loc1}
 			{_temp}.add(0, 1, 0)
 			
@@ -670,8 +627,6 @@ every ticks:
 				miss()
 			
 		teleport loop-entity to {_loc1}
-		teleport {_entity2} to {_loc2}
-		teleport {_entity3} to {_loc3} if {_entity3} is set
 
 ########################################################
 #                                                      #
@@ -723,10 +678,10 @@ every ticks:
 				set display text of loop-entity to "§f"
 
 function createComboDisplay():
-	set {_loc1} to location(0.5, -8, 40, world "world", 180, 0)
-	set {_loc2} to location(40, -8, 0.5, world "world", 90, 0)
-	set {_loc3} to location(0.5, -8, -40, world "world", 0, 0)
-	set {_loc4} to location(-40, -8, 0.5, world "world", -90, 0) 
+	set {_loc1} to location(0.5, -8, 50, world "world", 180, 0)
+	set {_loc2} to location(50, -8, 0.5, world "world", 90, 0)
+	set {_loc3} to location(0.5, -8, -49, world "world", 0, 0)
+	set {_loc4} to location(-49, -8, 0.5, world "world", -90, 0) 
 	summon text display at {_loc1}:
 		set display text of the entity to "§fReady"
 		set display scale of entity to vector(50,50,0)
