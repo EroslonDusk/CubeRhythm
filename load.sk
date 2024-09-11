@@ -23,40 +23,34 @@ function tap(time: number, face: text, x: number, y: number, glowing: boolean):
 	add 1 to {maxNote}
 	add 1 to {noteID}
 	set {_type} to "tap"
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
 	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, {_face}, {_x}, {_y}, "empty", "empty", "empty", "empty", "empty", "empty", {_glowing}
 
 function drag(time: number, face: text, x: number, y: number, glowing: boolean):
 	add 1 to {maxNote}
 	add 1 to {noteID}
 	set {_type} to "drag"
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
 	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, {_face}, {_x}, {_y}, "empty", "empty", "empty", "empty", "empty", "empty", {_glowing}
 
 function hold(time: number, face: text, x: number, y: number, glowing: boolean):
 	add 1 to {noteID}
 	set {_type} to "hold"
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
 	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, {_face}, {_x}, {_y}, "empty", "empty", "empty", "empty", "empty", "empty", {_glowing}
 
 function flick(time: number, face: text, turn: text, glowing: boolean):
 	add 1 to {maxNote}
 	add 1 to {noteID}
 	set {_type} to "flick"
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
 	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, {_face}, "empty", "empty", "empty", "empty", "empty", "empty", {_turn}, "empty", {_glowing}
 
 function double(time: number, face: text, x1: number, y1: number, x2: number, y2: number, glowing: boolean):
 	add 2 to {maxNote}
 	add 1 to {noteID}
 	set {_type} to "double"
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
 	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, {_face}, "empty", "empty", {_x1}, {_y1}, {_x2}, {_y2}, "empty", "empty", {_glowing}
 
 function execution(time: number, section: section):
 	add 1 to {noteID}
 	set {_type} to "execution"
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
 	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, "empty", "empty", "empty", "empty", "empty", "empty", "empty", "empty", {_section}, "empty"
 
 function drawTap(face: text, x: number, y: number, z: number, glowing: boolean):
@@ -100,7 +94,7 @@ function drawTap(face: text, x: number, y: number, z: number, glowing: boolean):
 			set metadata value "glowing" of entity to true
 	
 	wait 2 ticks
-	set display brightness of {_e} to displayBrightness(10,10)
+	set display brightness of {_e} to displayBrightness(15,15)
 	set display translation of {_e} to vector(0,0,-100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
 	set display translation of {_e} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "a" or "d"
 
@@ -145,7 +139,7 @@ function drawHold(face: text, x: number, y: number, z: number, glowing: boolean)
 			set metadata value "glowing" of entity to true
 	
 	wait 2 ticks
-	set display brightness of {_e} to displayBrightness(10,10)
+	set display brightness of {_e} to displayBrightness(15,15)
 	set display translation of {_e} to vector(0,0,-100*{speed::%uuid of {actor}%})
 
 function drawDrag(face: text, x: number, y: number, z: number, glowing: boolean):
@@ -189,7 +183,7 @@ function drawDrag(face: text, x: number, y: number, z: number, glowing: boolean)
 			set metadata value "glowing" of entity to true
 	
 	wait 2 ticks
-	set display brightness of {_e} to displayBrightness(10,10)
+	set display brightness of {_e} to displayBrightness(15,15)
 	set display translation of {_e} to vector(0,0,-100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
 	set display translation of {_e} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "a" or "d"
 
@@ -263,9 +257,9 @@ function drawFlick(face: text, z: number, turn: text, glowing: boolean):
 			set metadata value "glowing" of entity to true
 	
 	wait 2 ticks
-	set display brightness of {_e1} to displayBrightness(10,10)
-	set display brightness of {_e2} to displayBrightness(10,10)
-	set display brightness of {_e3} to displayBrightness(10,10)
+	set display brightness of {_e1} to displayBrightness(15,15)
+	set display brightness of {_e2} to displayBrightness(15,15)
+	set display brightness of {_e3} to displayBrightness(15,15)
 	set display translation of {_e1} to vector(0,0,-100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
 	set display translation of {_e2} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
 	set display translation of {_e3} to vector(0,0,100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
@@ -415,10 +409,10 @@ function drawDouble(face: text, xa: number, ya: number, za: number, xb: number, 
 			set {_e4} to entity
 	
 	wait 2 ticks
-	set display brightness of {_e1} to displayBrightness(10,10)
-	set display brightness of {_e2} to displayBrightness(10,10)
-	set display brightness of {_e3} to displayBrightness(10,10)
-	set display brightness of {_e4} to displayBrightness(10,10)
+	set display brightness of {_e1} to displayBrightness(15,15)
+	set display brightness of {_e2} to displayBrightness(15,15)
+	set display brightness of {_e3} to displayBrightness(15,15)
+	set display brightness of {_e4} to displayBrightness(15,15)
 	set display translation of {_e1} to vector(0,0,-100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
 	set display translation of {_e2} to vector(0,0,-100*{speed::%uuid of {actor}%}) if {_face} is "w" or "s"
 	set display translation of {_e3} to vector(100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "w" or "s"

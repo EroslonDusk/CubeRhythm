@@ -51,7 +51,7 @@ function fullCombo():
 	summon text display at {_loc1}:
 		set display interpolation delay of entity to 2
 		set display translation of the entity to vector(0,-1.5,0)
-		set display brightness of the entity to displayBrightness(10,10)
+		set display brightness of the entity to displayBrightness(15,15)
 		set display right rotation of the entity to axisAngle(90 * (3.14 / 180), 0, 1, 0)
 		set display text of the entity to "§bFull Combo"
 		set display scale of entity to vector(40,40,40)
@@ -76,7 +76,7 @@ function perfectPerformance():
 	summon text display at {_loc1}:
 		set display interpolation delay of entity to 2
 		set display translation of the entity to vector(0,-1.5,0)
-		set display brightness of the entity to displayBrightness(10,10)
+		set display brightness of the entity to displayBrightness(15,15)
 		set display right rotation of the entity to axisAngle(90 * (3.14 / 180), 0, 1, 0)
 		set display text of the entity to "§ePerfect          ", "    Performance!"
 		set display scale of entity to vector(40,40,40)
@@ -109,7 +109,7 @@ function result():
 	set {_loc1} to location(0.5, 0.5, 10, world "world", 180, 0)
 	summon text display at {_loc1}:
 		set display translation of the entity to vector(-0.2,-1,0)
-		set display brightness of the entity to displayBrightness(10,10)
+		set display brightness of the entity to displayBrightness(15,15)
 		set display text of the entity to "§e"
 		set display scale of entity to vector(10,10,10)
 		set display text background color of the entity to bukkitColor(0,0,0,0)
@@ -127,7 +127,7 @@ function result2():
 	set {_loc1} to location(0.5, 0, 10, world "world", 180, 0)
 	summon text display at {_loc1}:
 		set display translation of the entity to vector(0,-1.5,0)
-		set display brightness of the entity to displayBrightness(10,10)
+		set display brightness of the entity to displayBrightness(15,15)
 		set display text of the entity to "§f"
 		set display scale of entity to vector(3,3,3)
 		set display text background color of the entity to bukkitColor(0,0,0,0)
@@ -149,7 +149,7 @@ function result3():
 	set {_loc1} to location(0.5, 0, 10, world "world", 180, 0)
 	summon text display at {_loc1}:
 		set display translation of the entity to vector(0,-4.5,0)
-		set display brightness of the entity to displayBrightness(10,10)
+		set display brightness of the entity to displayBrightness(15,15)
 		set display line width of the entity to 400
 		set display text of the entity to "&bExact &f%{statistics::exact}%&e(+%{statistics::exacthold}%) &8| &eJust &f%{statistics::just}% &8| &4Miss &c%{statistics::miss}%", "", "&7输入 [/reset] 重置游戏"
 		set display scale of entity to vector(2,2,2)
@@ -170,7 +170,7 @@ function result4():
 	set {_loc1} to location(0.5, 0, 10, world "world", 180, 0)
 	summon text display at {_loc1}:
 		set display translation of the entity to vector(0,4.5,0)
-		set display brightness of the entity to displayBrightness(10,10)
+		set display brightness of the entity to displayBrightness(15,15)
 		set display line width of the entity to 400
 		set display text of the entity to "&f%{song}%&f          %{level}%"
 		set display scale of entity to vector(2,2,2)

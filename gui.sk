@@ -1,32 +1,42 @@
+every ticks:
+	if {process} is set:
+		add 1 to {loadingTime}
+		set {_dots} to round({process} / 2)
+		set {_bar} to "&a"
+		loop {_dots} times:
+			set {_bar} to "%{_bar}%·"
+		set {_bar} to "%{_bar}%&7"
+		loop (50 - {_dots}) times:
+			set {_bar} to "%{_bar}%·"
+		send title "" with subtitle "&8%ceiling({loadingTime}/20)% %{_bar}%&8 %ceiling({loadingTime}/20)%" to all players for 1 second with fade in 0 seconds and fade out 0 seconds
+	else if {loadingTime} is set:
+		delete {loadingTime}
+
 on load:
 	set {loaded} to true
-	delete {loading}
 
 function playChart(id: text):
 	set {noteID} to 0
-	loop enabled scripts:
-		loop-value start with "charts"
-		if loop-value contains "_properties":
-			set {_null} to ""
-		else:
-			disable script loop-value
-	quitGame()
+	set {process} to 0
+	create section stored in {_sync}:
+		loop enabled scripts:
+			loop-value start with "charts"
+			if loop-value contains "_properties":
+				set {_null} to ""
+			else:
+				disable script loop-value
+		quitGame()
+	run section {_sync} sync and wait
 	wait 1 tick
-	send action bar "&f[1/4] &7加载谱面文件……" to all players
-	enable script "charts\-%{_id}%"
+	set {process} to 10
+	create section stored in {_async}:
+		enable script "charts\-%{_id}%"
+	run section {_async} async and wait
 	wait 1 tick
-	set {loading} to {_id}
-
-every 10 ticks:
-	{loading} is set
-	if script "charts\%{loading}%.sk" is loaded:
-		send action bar "&f[3/4] &7加载完毕，等待服务器响应……" to all players
-		set {playing} to {loading}
-		delete {loading}
-		wait 3 seconds
-		execute {actor} command "start"
-		
-		
+	set {process} to 25
+	set {playing} to {_id}
+	wait 0.5 seconds
+	execute {actor} command "start"
 
 function refresh(p: player):
 	delete {loadedCharts::*}
