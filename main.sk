@@ -38,7 +38,7 @@ on player move:
 	send action bar "&c!!&7 生存模式下无法移动 &c!!&f" to player
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.1.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -688,24 +688,28 @@ function createComboDisplay():
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set metadata value "combo" of the entity to true
 		set display text opacity of the entity to 255
+		set display brightness of the entity to displayBrightness(0,2)
 	summon text display at {_loc2}:
 		set display text of the entity to "§f→"
 		set display scale of entity to vector(50,50,0)
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set metadata value "combo" of the entity to true
 		set display text opacity of the entity to 255
+		set display brightness of the entity to displayBrightness(0,2)
 	summon text display at {_loc3}:
 		set display text of the entity to "§f↓"
 		set display scale of entity to vector(50,50,0)
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set metadata value "combo" of the entity to true
 		set display text opacity of the entity to 255
+		set display brightness of the entity to displayBrightness(0,2)
 	summon text display at {_loc4}:
 		set display text of the entity to "§f←"
 		set display scale of entity to vector(50,50,0)
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set metadata value "combo" of the entity to true
 		set display text opacity of the entity to 255
+		set display brightness of the entity to displayBrightness(0,2)
 	set {_loc5} to location(2.5, 3.2, 5, world "world", 180, 0)
 	set {_loc6} to location(5, 3.2, -1.5, world "world", 90, 0)
 	set {_loc7} to location(-1.5, 3.2, -4, world "world", 0, 0)

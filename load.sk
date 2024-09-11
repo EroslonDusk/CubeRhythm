@@ -4,117 +4,60 @@
 #                                                      #
 ########################################################
 
+on load:
+	create section with {_id}, {_type}, {_time}, {_face}, {_x}, {_y}, {_x1}, {_y1}, {_x2}, {_y2}, {_turn}, {_section}, {_glowing} stored in {asyncNoteRegister}:
+		set {loadedNotes::type::%{_id}%} to {_type}
+		set {loadedNotes::time::%{_id}%} to {_time}
+		set {loadedNotes::face::%{_id}%} to {_face}
+		set {loadedNotes::x::%{_id}%} to {_x}
+		set {loadedNotes::y::%{_id}%} to {_y}
+		set {loadedNotes::x1::%{_id}%} to {_x1}
+		set {loadedNotes::y1::%{_id}%} to {_y1}
+		set {loadedNotes::x2::%{_id}%} to {_x2}
+		set {loadedNotes::y2::%{_id}%} to {_y2}
+		set {loadedNotes::turn::%{_id}%} to {_turn}
+		set {loadedNotes::section::%{_id}%} to {_section}
+		set {loadedNotes::glowing::%{_id}%} to {_glowing}
+
 function tap(time: number, face: text, x: number, y: number, glowing: boolean):
 	add 1 to {maxNote}
 	add 1 to {noteID}
-	set {_null} to random uuid
 	set {_type} to "tap"
-	add {_type} to {loadedNotes::type::*}
-	add {_time} to {loadedNotes::time::*}
-	add {_face} to {loadedNotes::face::*}
-	add {_x} to {loadedNotes::x::*}
-	add {_y} to {loadedNotes::y::*}
-	add {_glowing} to {loadedNotes::glowing::*}
-	add {_null} to {loadedNotes::turn::*}
-	add {_null} to {loadedNotes::x1::*}
-	add {_null} to {loadedNotes::y1::*}
-	add {_null} to {loadedNotes::x2::*}
-	add {_null} to {loadedNotes::y2::*}
-	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
+	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, {_face}, {_x}, {_y}, "empty", "empty", "empty", "empty", "empty", "empty", {_glowing}
 
 function drag(time: number, face: text, x: number, y: number, glowing: boolean):
 	add 1 to {maxNote}
 	add 1 to {noteID}
-	set {_null} to random uuid
 	set {_type} to "drag"
-	add {_type} to {loadedNotes::type::*}
-	add {_time} to {loadedNotes::time::*}
-	add {_face} to {loadedNotes::face::*}
-	add {_x} to {loadedNotes::x::*}
-	add {_y} to {loadedNotes::y::*}
-	add {_glowing} to {loadedNotes::glowing::*}
-	add {_null} to {loadedNotes::turn::*}
-	add {_null} to {loadedNotes::x1::*}
-	add {_null} to {loadedNotes::y1::*}
-	add {_null} to {loadedNotes::x2::*}
-	add {_null} to {loadedNotes::y2::*}
-	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
+	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, {_face}, {_x}, {_y}, "empty", "empty", "empty", "empty", "empty", "empty", {_glowing}
 
 function hold(time: number, face: text, x: number, y: number, glowing: boolean):
 	add 1 to {noteID}
-	set {_null} to random uuid
 	set {_type} to "hold"
-	add {_type} to {loadedNotes::type::*}
-	add {_time} to {loadedNotes::time::*}
-	add {_face} to {loadedNotes::face::*}
-	add {_x} to {loadedNotes::x::*}
-	add {_y} to {loadedNotes::y::*}
-	add {_glowing} to {loadedNotes::glowing::*}
-	add {_null} to {loadedNotes::turn::*}
-	add {_null} to {loadedNotes::x1::*}
-	add {_null} to {loadedNotes::y1::*}
-	add {_null} to {loadedNotes::x2::*}
-	add {_null} to {loadedNotes::y2::*}
-	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
+	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, {_face}, {_x}, {_y}, "empty", "empty", "empty", "empty", "empty", "empty", {_glowing}
 
 function flick(time: number, face: text, turn: text, glowing: boolean):
-	add 1 to {noteID}
 	add 1 to {maxNote}
-	set {_null} to random uuid
+	add 1 to {noteID}
 	set {_type} to "flick"
-	add {_type} to {loadedNotes::type::*}
-	add {_time} to {loadedNotes::time::*}
-	add {_face} to {loadedNotes::face::*}
-	add {_turn} to {loadedNotes::turn::*}
-	add {_glowing} to {loadedNotes::glowing::*}
-	add {_null} to {loadedNotes::x::*}
-	add {_null} to {loadedNotes::y::*}
-	add {_null} to {loadedNotes::x1::*}
-	add {_null} to {loadedNotes::y1::*}
-	add {_null} to {loadedNotes::x2::*}
-	add {_null} to {loadedNotes::y2::*}
-	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
+	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, {_face}, "empty", "empty", "empty", "empty", "empty", "empty", {_turn}, "empty", {_glowing}
 
 function double(time: number, face: text, x1: number, y1: number, x2: number, y2: number, glowing: boolean):
-	add 1 to {noteID}
 	add 2 to {maxNote}
-	set {_null} to random uuid
+	add 1 to {noteID}
 	set {_type} to "double"
-	add {_type} to {loadedNotes::type::*}
-	add {_time} to {loadedNotes::time::*}
-	add {_face} to {loadedNotes::face::*}
-	add {_x1} to {loadedNotes::x1::*}
-	add {_y1} to {loadedNotes::y1::*}
-	add {_x2} to {loadedNotes::x2::*}
-	add {_y2} to {loadedNotes::y2::*}
-	add {_null} to {loadedNotes::turn::*}
-	add {_null} to {loadedNotes::x::*}
-	add {_null} to {loadedNotes::y::*}
-	add {_glowing} to {loadedNotes::glowing::*}
-	add {_null} to {loadedNotes::section::*}
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
+	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, {_face}, "empty", "empty", {_x1}, {_y1}, {_x2}, {_y2}, "empty", "empty", {_glowing}
 
 function execution(time: number, section: section):
 	add 1 to {noteID}
-	set {_null} to random uuid
 	set {_type} to "execution"
-	add {_type} to {loadedNotes::type::*}
-	add {_time} to {loadedNotes::time::*}
-	add {_null} to {loadedNotes::face::*}
-	add {_null} to {loadedNotes::x1::*}
-	add {_null} to {loadedNotes::y1::*}
-	add {_null} to {loadedNotes::x2::*}
-	add {_null} to {loadedNotes::y2::*}
-	add {_null} to {loadedNotes::turn::*}
-	add {_null} to {loadedNotes::x::*}
-	add {_null} to {loadedNotes::y::*}
-	add false to {loadedNotes::glowing::*}
-	add {_section} to {loadedNotes::section::*}
-	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players 
+	send actionbar "&f[2/4] &7已读取 %{noteID}% 音符" to all players
+	run section {asyncNoteRegister} async with {noteID}, {_type}, {_time}, "empty", "empty", "empty", "empty", "empty", "empty", "empty", "empty", {_section}, "empty"
 
 function drawTap(face: text, x: number, y: number, z: number, glowing: boolean):
 	set {_x1} to {_x}+0.5
