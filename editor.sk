@@ -22,6 +22,7 @@ command /editor [<text>] [<number>]:
 				delete {savedY::*}
 				delete {savedType::*}
 				set {editMode} to true
+				set {editor::noteType} to "tap"
 				message "&a开启编辑模式"
 				message ""
 				message "&e/editor help &7-&f 查看命令帮助"
@@ -33,13 +34,8 @@ command /editor [<text>] [<number>]:
 				message "&f/editor &c退出编辑模式"
 				message ""
 				clear player's inventory
-				give light blue wool named "&b&lTap" to player
-				give orange wool named "&6&lDouble" to player
-				give yellow wool named "&e&lDrag" to player
-				give white wool named "&f&lHold" to player
-				give pink wool named "&b&l← &d&lFlick(左)" to player
-				give red wool named "&c&lFlick(右) &b&l→" to player
-				give red dye named "&c&l清空场上音符" to player
+				give light blue wool named "&b&lTap&e (右键切换)" to player
+				give stick named "&d&l魔杖&e (右键放置，左键清空，Shift对齐网格)" to player
 				give lime concrete named "&a&l步进1格" to player
 				give red concrete named "&c&l后退1格" to player
 				set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to glass
@@ -50,6 +46,7 @@ command /editor [<text>] [<number>]:
 				delete {savedX::*}
 				delete {savedY::*}
 				delete {savedType::*}
+				delete {editor::noteType}
 				set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to air
 		else if arg-1 is "bpm":
 			arg-2 is set
@@ -96,105 +93,118 @@ on right click:
 	{editMode} is set
 	cancel event
 	player's gamemode is not spectator
-	event-block is glass or any wool
-	if player's tool is light blue wool named "&b&lTap":
-		if block at event-location is glass:
-			wait 1 tick
-			set block at event-location to light blue wool
-			add x location of event-location to {savedX::Tap::*}
-			add y location of event-location to {savedY::Tap::*}
-		else if block at event-location is light blue wool:
-			wait 1 tick
-			set block at event-location to glass
-			loop {savedX::Tap::*}:
-				loop-value is x location of event-location
-				delete {savedX::Tap::%loop-index%}
-				delete {savedY::Tap::%loop-index%}
-				exit loop
-	else if player's tool is orange wool named "&6&lDouble":
-		if block at event-location is glass:
-			wait 1 tick
-			set block at event-location to orange wool
-			add x location of event-location to {savedX::Double::*}
-			add y location of event-location to {savedY::Double::*}
-		else if block at event-location is orange wool:
-			wait 1 tick
-			set block at event-location to glass
-			loop {savedX::Double::*}:
-				loop-value is x location of event-location
-				delete {savedX::Double::%loop-index%}
-				delete {savedY::Double::%loop-index%}
-				exit loop
-	else if player's tool is yellow wool named "&e&lDrag":
-		if block at event-location is glass:
-			wait 1 tick
-			set block at event-location to yellow wool
-			add x location of event-location to {savedX::Drag::*}
-			add y location of event-location to {savedY::Drag::*}
-		else if block at event-location is yellow wool:
-			wait 1 tick
-			set block at event-location to glass
-			loop {savedX::Drag::*}:
-				loop-value is x location of event-location
-				delete {savedX::Drag::%loop-index%}
-				delete {savedY::Drag::%loop-index%}
-				exit loop
-	else if player's tool is white wool named "&f&lHold":
-		if block at event-location is glass:
-			wait 1 tick
-			set block at event-location to white wool
-			add x location of event-location to {savedX::Hold::*}
-			add y location of event-location to {savedY::Hold::*}
-		else if block at event-location is white wool:
-			wait 1 tick
-			set block at event-location to glass
-			loop {savedX::Hold::*}:
-				loop-value is x location of event-location
-				delete {savedX::Hold::%loop-index%}
-				delete {savedY::Hold::%loop-index%}
-				exit loop
-	else if player's tool is pink wool named "&b&l← &d&lFlick(左)":
-		if block at event-location is glass:
-			wait 1 tick
-			set block at event-location to pink wool
-			add x location of event-location to {savedX::Flick::*}
-			add y location of event-location to {savedY::Flick::*}
-			set {savedType::Flick} to "left"
-		else if block at event-location is pink wool:
-			wait 1 tick
-			set block at event-location to glass
-			loop {savedX::Flick::*}:
-				loop-value is x location of event-location
-				delete {savedX::Flick::%loop-index%}
-				delete {savedY::Flick::%loop-index%}
-				delete {savedType::Flick}
-				exit loop
-	else if player's tool is red wool named "&c&lFlick(右) &b&l→":
-		if block at event-location is glass:
-			wait 1 tick
-			set block at event-location to red wool
-			add x location of event-location to {savedX::Flick::*}
-			add y location of event-location to {savedY::Flick::*}
-			set {savedType::Flick} to "right"
-		else if block at event-location is red wool:
-			wait 1 tick
-			set block at event-location to glass
-			loop {savedX::Flick::*}:
-				loop-value is x location of event-location
-				delete {savedX::Flick::%loop-index%}
-				delete {savedY::Flick::%loop-index%}
-				delete {savedType::Flick}
-				exit loop
-	else if player's tool is red dye named "&c&l清空场上音符":
-		delete {savedX::*}
-		delete {savedY::*}
-		delete {savedType::*}
-		set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to glass
+	event-block is glass
+	if player's tool is light blue wool named "&b&lTap&e (右键切换)":
+		set {editor::noteType} to "double"
+		set player's tool to orange wool named "&6&lDouble&e (右键切换)"
+	else if player's tool is orange wool named "&6&lDouble&e (右键切换)":
+		set {editor::noteType} to "drag"
+		set player's tool to yellow wool named "&e&lDrag&e (右键切换)"
+	else if player's tool is yellow wool named "&e&lDrag&e (右键切换)":
+		set {editor::noteType} to "hold"
+		set player's tool to white wool named "&f&lHold&e (右键切换)"
+	else if player's tool is white wool named "&f&lHold&e (右键切换)":
+		set {editor::noteType} to "flickL"
+		set player's tool to magenta wool named "&d&l← Flick&e (右键切换)"
+	else if player's tool is magenta wool named "&d&l← Flick&e (右键切换)":
+		set {editor::noteType} to "flickR"
+		set player's tool to red wool named "&c&lFlick →&e (右键切换)"
+	else if player's tool is red wool named "&c&lFlick →&e (右键切换)":
+		set {editor::noteType} to "tap"
+		set player's tool to light blue wool named "&b&lTap&e (右键切换)"
 	else if player's tool is lime concrete:
 		add 1 to {editor::tick}
 	else if player's tool is red concrete:
 		remove 1 from {editor::tick}
-	
+
+on right click:
+	{editMode} is set
+	cancel event
+	player's gamemode is not spectator
+	event-block is glass
+	if player's tool is stick named "&d&l魔杖&e (右键放置，左键清空，Shift对齐网格)":
+		set {_z} to 4
+		set {_pz} to z location of player
+		set {_v} to vector in direction of player
+		set {_vx} to x of {_v}
+		set {_vy} to y of {_v}
+		set {_vz} to z of {_v}
+		set {_rate} to abs({_z} - {_pz}) / {_vz}
+		set {_vx} to {_vx} * {_rate} + x location of player
+		if player is sneaking:
+			set {_vy} to {_vy} * {_rate} + y location of player + 1.4
+		else:
+			set {_vy} to {_vy} * {_rate} + y location of player + 1.6
+		set {_vz} to {_vz} * {_rate}
+		if player is sneaking:
+			set {_vx} to round({_vx}*2)/2
+			set {_vy} to round({_vy}*2)/2
+			set {_loc} to location({_vx}, {_vy}, {_z}, world "world", 0, 0)
+		else:
+			set {_loc} to location({_vx}, {_vy}, {_z}, world "world", 0, 0)
+		send title "" with subtitle "%{_vx} - 0.5% , %{_vy} - 0.5%" to all players
+	if {editor::noteType} is "tap":
+		summon block display at {_loc}:
+			set display block data of entity to light_blue_concrete
+			set display scale of entity to vector(1,1,1)
+			set glowing of entity to true
+			set display translation of entity to vector(-0.5,-0.5,0.1)
+		add {_vx} to {savedX::Tap::*}
+		add {_vy} to {savedY::Tap::*}
+	if {editor::noteType} is "double":
+		summon block display at {_loc}:
+			set display block data of entity to orange_concrete
+			set display scale of entity to vector(1,1,1)
+			set glowing of entity to true
+			set display translation of entity to vector(-0.5,-0.5,0.1)
+		add {_vx} to {savedX::Double::*}
+		add {_vy} to {savedY::Double::*}
+	if {editor::noteType} is "drag":
+		summon block display at {_loc}:
+			set display block data of entity to yellow_concrete
+			set display scale of entity to vector(1,1,1)
+			set glowing of entity to true
+			set display translation of entity to vector(-0.5,-0.5,0.1)
+		add {_vx} to {savedX::Drag::*}
+		add {_vy} to {savedY::Drag::*}
+	if {editor::noteType} is "hold":
+		summon block display at {_loc}:
+			set display block data of entity to white_concrete
+			set display scale of entity to vector(1,1,1)
+			set glowing of entity to true
+			set display translation of entity to vector(-0.5,-0.5,0.1)
+		add {_vx} to {savedX::Hold::*}
+		add {_vy} to {savedY::Hold::*}
+	if {editor::noteType} is "flickL":
+		summon block display at {_loc}:
+			set display block data of entity to magenta_concrete
+			set display scale of entity to vector(1,1,1)
+			set glowing of entity to true
+			set display translation of entity to vector(-0.5,-0.5,0.1)
+		add {_vx} to {savedX::Flick::*}
+		add {_vy} to {savedY::Flick::*}
+		set {savedType::Flick} to "left"
+	if {editor::noteType} is "flickR":
+		summon block display at {_loc}:
+			set display block data of entity to red_concrete
+			set display scale of entity to vector(1,1,1)
+			set glowing of entity to true
+			set display translation of entity to vector(-0.5,-0.5,0.1)
+		add {_vx} to {savedX::Flick::*}
+		add {_vy} to {savedY::Flick::*}
+		set {savedType::Flick} to "right"
+
+on left click:
+	{editMode} is set
+	cancel event
+	player's gamemode is not spectator
+	event-block is glass
+	if player's tool is stick named "&d&l魔杖&e (右键放置，左键清空，Shift对齐网格)":
+		delete {savedX::*}
+		delete {savedY::*}
+		delete {savedType::*}
+		loop all block displays:
+			delete loop-entity
 
 on chat:
 	{editMode} is set
@@ -228,3 +238,28 @@ on chat:
 		broadcast "&a✔ &d%{_gen}%" if {_gen} contains "flick"
 		broadcast "&a✔ &6%{_gen}%" if {_gen} contains "double"
 		log "%{_gen}%" to file "generated.log"
+
+every ticks:
+	{editMode} is set
+	loop all players:
+		loop-player's gamemode is not spectator
+		tool of loop-player is stick named "&d&l魔杖&e (右键放置，左键清空，Shift对齐网格)"
+		set {_z} to 4
+		set {_pz} to z location of loop-player
+		set {_v} to vector in direction of loop-player
+		set {_vx} to x of {_v}
+		set {_vy} to y of {_v}
+		set {_vz} to z of {_v}
+		set {_rate} to abs({_z} - {_pz}) / {_vz}
+		set {_vx} to {_vx} * {_rate} + x location of loop-player
+		if loop-player is sneaking:
+			set {_vy} to {_vy} * {_rate} + y location of loop-player + 1.4
+		else:
+			set {_vy} to {_vy} * {_rate} + y location of loop-player + 1.6
+		set {_vz} to {_vz} * {_rate}
+		if loop-player is sneaking:
+			set {_vx} to round({_vx}*2)/2
+			set {_vy} to round({_vy}*2)/2
+			draw 2 of dust using dustOption(yellow, 1) at location({_vx}, {_vy}, {_z}, world "world", 0, 0)
+		else:
+			draw 2 of dust using dustOption(lime, 1) at location({_vx}, {_vy}, {_z}, world "world", 0, 0)
