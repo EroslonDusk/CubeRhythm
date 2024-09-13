@@ -181,6 +181,7 @@ on inventory click:
 		setOffsetGUI(player) if index of event-slot = 24
 		add 1 to {offset::%uuid of player%} if index of event-slot = 23
 		setOffsetGUI(player) if index of event-slot = 23
+		setShowOffset(player) if index of event-slot = 31
 	if name of event-inventory is "清除该曲成绩？":
 		set {_id} to metadata value "prepareToDelete" of player
 		if index of event-slot = 20:
@@ -226,6 +227,7 @@ function setOffsetGUI(p: player):
 	set slot 25 of {_infoGUI} to 50 light blue stained glass panes named "&b+50" with lore "&7当前: %{offset::%uuid of {_p}%}%ms"
 	set slot 24 of {_infoGUI} to 10 light blue stained glass panes named "&b+10" with lore "&7当前: %{offset::%uuid of {_p}%}%ms"
 	set slot 23 of {_infoGUI} to 1 light blue stained glass pane named "&b+1" with lore "&7当前: %{offset::%uuid of {_p}%}%ms"
+	set slot 31 of {_infoGUI} to redstone named "&f在判定提示中显示偏移: %{showOffset::%uuid of {_p}%}%" with lore "%nl%&7替换打击特效中的Exact/Just字样为%nl%&7音符到达判定面时间与被击打时间的差值%nl%%nl%&e点击开启/关闭"
 	open {_infoGUI} to {_p}
 
 function setHitSound(p: player):
@@ -241,6 +243,13 @@ function setIndicator(p: player):
 	else:
 		set {indicator::%uuid of {_p}%} to "&a开"
 	infoGUI({_p})
+
+function setShowOffset(p: player):
+	if {showOffset::%uuid of {_p}%} is "&a开":
+		set {showOffset::%uuid of {_p}%} to "&c关"
+	else:
+		set {showOffset::%uuid of {_p}%} to "&a开"
+	setOffsetGUI({_p})
 
 function setAutoPlay(p: player):
 	if {autoPlay::%uuid of {_p}%} is "&a开":

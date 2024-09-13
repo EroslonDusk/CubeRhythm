@@ -22,7 +22,7 @@ every ticks:
 				set metadata value "hited" of {_entity} to true
 		exit loop
 
-function exact(entity: entity):
+function exact(entity: entity, time: number):
 	if metadata value "notetype" of {_entity} is not "hold":
 		add 1 to {combo}
 		play sound "entity.player.hurt" with pitch 2 to all players if {hitSound::%uuid of {actor}%} is "&a开"
@@ -58,7 +58,11 @@ function exact(entity: entity):
 		{_loc}.add(0, 0, 0)
 	summon text display at {_loc}:
 		set {_alpha} to 255
-		set display text of the entity to "&bExact"
+		set display text of the entity to "&bExact" if {showOffset::%uuid of {actor}%} is not "&a开"
+		if {showOffset::%uuid of {actor}%} is "&a开":
+			set display text of the entity to "&b+%round({_time})%" if {_time} > 0
+			set display text of the entity to "&b%round({_time})%" if {_time} < 0
+			set display text of the entity to "&b" if {_time} = 0
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set {_scale} to 3
 		set display scale of the entity to vector({_scale},{_scale},{_scale})
@@ -100,7 +104,7 @@ function exact(entity: entity):
 		else if loop-entity is {_text2}:
 			delete loop-entity
 
-function great(entity: entity, el: text):
+function great(entity: entity, el: text, time: number):
 	play sound "entity.player.hurt" with pitch 2 to all players if {hitSound::%uuid of {actor}%} is "&a开"
 	add 1 to {combo}
 	add 0.7 to {hitNotes}
@@ -137,7 +141,11 @@ function great(entity: entity, el: text):
 		{_loc}.add(0, 0, 0)
 	summon text display at {_loc}:
 		set {_alpha} to 255
-		set display text of the entity to "&eJust"
+		set display text of the entity to "&eJust" if {showOffset::%uuid of {actor}%} is not "&a开"
+		if {showOffset::%uuid of {actor}%} is "&a开":
+			set display text of the entity to "&e+%round({_time})%" if {_time} > 0
+			set display text of the entity to "&e%round({_time})%" if {_time} < 0
+			set display text of the entity to "&b" if {_time} = 0
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set {_scale} to 3
 		set display scale of the entity to vector({_scale},{_scale},{_scale})
@@ -192,16 +200,16 @@ function hitNote(entity: entity):
 	set {_time} to (-1 * {_x} - 4) / {speed::%uuid of {actor}%} * 50 if metadata value "face" of {_entity} is "s" or "d"
 	#broadcast "%{_time}%ms"
 	if abs({_time}) <= 80:
-		exact({_entity})
+		exact({_entity}, {_time})
 		set {_canRemove} to true
 	else if abs({_time}) <= 200:
 		if metadata value "glowing" of {_entity} is true:
-			exact({_entity})
+			exact({_entity}, {_time})
 		else:
 			if {_time} > 0:
-				great({_entity}, "early")
+				great({_entity}, "early", {_time})
 			else:
-				great({_entity}, "late")
+				great({_entity}, "late", {_time})
 		set {_canRemove} to true
 	{_canRemove} is set
 	if metadata value "notetype" of {_entity} is "double":
@@ -240,7 +248,7 @@ function deleteNote(entity: entity):
 			delete loop-entity
 
 function checkIfTurned(entity: entity):
-	exact({_entity})
+	exact({_entity}, 0)
 	set {_face} to metadata value "face" of {_entity}
 	set {_turn} to metadata value "turn" of {_entity}
 	{autoPlay::%uuid of {actor}%} is not "&a开"

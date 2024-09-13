@@ -22,6 +22,7 @@ on join:
 	set {hitSound::%uuid of player%} to "&a开" if {hitSound::%uuid of player%} is not set
 	set {autoPlay::%uuid of player%} to "&c关" if {autoPlay::%uuid of player%} is not set
 	set {indicator::%uuid of player%} to "&c关" if {indicator::%uuid of player%} is not set
+	set {showOffset::%uuid of player%} to "&c关" if {showOffset::%uuid of player%} is not set
 	wait 1 tick
 	if online player count > 1:
 		set player's gamemode to spectator
@@ -38,7 +39,7 @@ on player move:
 	send action bar "&c!!&7 生存模式下无法移动 &c!!&f" to player
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.1.3%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.1.3.2%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -399,7 +400,6 @@ every ticks:
 	loop all interactions:
 		set {_loc1} to location of loop-entity
 		set {_ent1} to loop-entity
-		
 		if metadata value "face" of loop-entity is "w":
 			set {_speed} to {speed::%uuid of {actor}%} * -1
 			{_loc1}.add(0, 0, {_speed})
@@ -439,17 +439,17 @@ every ticks:
 			if z location of loop-entity <= 4 + {speed::%uuid of {actor}%}:
 				if {autoPlay::%uuid of {actor}%} is "&a开":
 					deleteNote(loop-entity)
-					exact(loop-entity)
+					exact(loop-entity, 0)
 				else:
 					metadata value "notetype" of loop-entity is neither "tap" nor "double"
 					if metadata value "notetype" of loop-entity is "drag":
 						metadata value "hited" of loop-entity is true
 						deleteNote(loop-entity)
-						exact(loop-entity)
+						exact(loop-entity, 0)
 					else if metadata value "notetype" of loop-entity is "hold":
 						{holding} > 0
 						deleteNote(loop-entity)
-						exact(loop-entity)
+						exact(loop-entity, 0)
 					else if metadata value "notetype" of loop-entity is "flick":
 						checkIfTurned(loop-entity)
 						deleteNote(loop-entity)
@@ -497,17 +497,17 @@ every ticks:
 			if x location of loop-entity <= 4 + {speed::%uuid of {actor}%}:
 				if {autoPlay::%uuid of {actor}%} is "&a开":
 					deleteNote(loop-entity)
-					exact(loop-entity)
+					exact(loop-entity, 0)
 				else:
 					metadata value "notetype" of loop-entity is neither "tap" nor "double"
 					if metadata value "notetype" of loop-entity is "drag":
 						metadata value "hited" of loop-entity is true
 						deleteNote(loop-entity)
-						exact(loop-entity)
+						exact(loop-entity, 0)
 					else if metadata value "notetype" of loop-entity is "hold":
 						{holding} > 0
 						deleteNote(loop-entity)
-						exact(loop-entity)
+						exact(loop-entity, 0)
 					else if metadata value "notetype" of loop-entity is "flick":
 						checkIfTurned(loop-entity)
 						deleteNote(loop-entity)
@@ -554,17 +554,17 @@ every ticks:
 			if z location of loop-entity >= -4 - {speed::%uuid of {actor}%}:
 				if {autoPlay::%uuid of {actor}%} is "&a开":
 					deleteNote(loop-entity)
-					exact(loop-entity)
+					exact(loop-entity, 0)
 				else:
 					metadata value "notetype" of loop-entity is neither "tap" nor "double"
 					if metadata value "notetype" of loop-entity is "drag":
 						metadata value "hited" of loop-entity is true
 						deleteNote(loop-entity)
-						exact(loop-entity)
+						exact(loop-entity, 0)
 					else if metadata value "notetype" of loop-entity is "hold":
 						{holding} > 0
 						deleteNote(loop-entity)
-						exact(loop-entity)
+						exact(loop-entity, 0)
 					else if metadata value "notetype" of loop-entity is "flick":
 						checkIfTurned(loop-entity)
 						deleteNote(loop-entity)
@@ -611,17 +611,17 @@ every ticks:
 			if x location of loop-entity >= -4 - {speed::%uuid of {actor}%}:
 				if {autoPlay::%uuid of {actor}%} is "&a开":
 					deleteNote(loop-entity)
-					exact(loop-entity)
+					exact(loop-entity, 0)
 				else:
 					metadata value "notetype" of loop-entity is neither "tap" nor "double"
 					if metadata value "notetype" of loop-entity is "drag":
 						metadata value "hited" of loop-entity is true
 						deleteNote(loop-entity)
-						exact(loop-entity)
+						exact(loop-entity, 0)
 					else if metadata value "notetype" of loop-entity is "hold":
 						{holding} > 0
 						deleteNote(loop-entity)
-						exact(loop-entity)
+						exact(loop-entity, 0)
 					else if metadata value "notetype" of loop-entity is "flick":
 						checkIfTurned(loop-entity)
 						deleteNote(loop-entity)
