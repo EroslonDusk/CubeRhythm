@@ -242,7 +242,6 @@ on right click:
 			set display translation of entity to vector(-0.5,-0.5,0.2) if {editor::noteType} is "hold"
 			set metadata value "id" of entity to {_id}
 			set {editorSave::type::%{_id}%} to {editor::noteType}
-			set {editorSave::type::%{_id}%} to "flick" if {editor::noteType} is "flickL" or "flickR"
 			set {editorSave::time::%{_id}%} to {editor::tick}/{editor::length}*(60/{editor::bpm})+{editor::preTime}
 			set {editorSave::loc::%{_id}%} to {_loc}
 			set {editorSave::face::%{_id}%} to {editor::face}
@@ -285,8 +284,9 @@ command /gen:
 				delete {editorSave::loc::%{_id}%}
 				delete {editorSave::face::%{_id}%}
 				delete {editorSave::turn::%{_id}%}
-			else if {editorSave::type::%{_id}%} is "flick":
-				set {_gen} to "%{editorSave::type::%{_id}%}%(%{editorSave::time::%{_id}%}%, ""%{editorSave::face::%{_id}%}%"", ""%{editorSave::turn::%{_id}%}%"", false)"
+			else if {editorSave::type::%{_id}%} is "flickR" or "flickL":
+				set {_tempType1} to "flick"
+				set {_gen} to "%{_tempType1}%(%{editorSave::time::%{_id}%}%, ""%{editorSave::face::%{_id}%}%"", ""%{editorSave::turn::%{_id}%}%"", false)"
 				delete {editorSave::type::%{_id}%}
 				delete {editorSave::time::%{_id}%}
 				delete {editorSave::loc::%{_id}%}
