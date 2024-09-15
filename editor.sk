@@ -126,8 +126,10 @@ function addTick(p: player, t: number):
 			set display block data of entity to magenta_concrete if {editorSave::type::%{_id}%} is "flickL"
 			set display block data of entity to red_concrete if {editorSave::type::%{_id}%} is "flickR"
 			set display scale of entity to vector(1,1,1)
+			set display scale of entity to vector(1,1,3*{speed::%uuid of {_p}%}) if {editorSave::type::%{_id}%} is "hold"
 			set glowing of entity to true
 			set display translation of entity to vector(-0.5,-0.5,0.1)
+			set display translation of entity to vector(-0.5,-0.5,0.2) if {editorSave::type::%{_id}%} is "hold"
 			set display glow color override of entity to bukkitColor(255,255,255,255) if {editorSave::face::%{_id}%} is "w"
 			set display glow color override of entity to bukkitColor(255,255,235,42) if {editorSave::face::%{_id}%} is "a"
 			set display glow color override of entity to bukkitColor(255,255,150,0) if {editorSave::face::%{_id}%} is "s"
@@ -235,6 +237,8 @@ on right click:
 			set display glow color override of entity to bukkitColor(255,255,235,42) if {editor::face} is "a"
 			set display glow color override of entity to bukkitColor(255,255,150,0) if {editor::face} is "s"
 			set display glow color override of entity to bukkitColor(255,255,0,0) if {editor::face} is "d"
+			set display scale of entity to vector(1,1,3*{speed::%uuid of {_p}%}) if {editor::noteType} is "hold"
+			set display translation of entity to vector(-0.5,-0.5,0.2) if {editor::noteType} is "hold"
 			set metadata value "id" of entity to {_id}
 			set {editorSave::type::%{_id}%} to {editor::noteType}
 			set {editorSave::time::%{_id}%} to {editor::tick}/{editor::length}*(60/{editor::bpm})+{editor::preTime}
@@ -310,7 +314,7 @@ command /gen:
 					delete {editorSave::face::%loop-index-2%}
 					delete {editorSave::turn::%loop-index-2%}
 					exit loop
-				set {_gen} to "%{_tempType}%(%{_tempTime}%, ""%{_tempFace}%"", %{_x1}%, %{_y1}%, %{_x2}%, %{_y2}%, false)"
+				set {_gen} to "%{_tempType}%(%{_tempTime}%, ""%{_tempFace}%"", %{_x1} - 0.5%, %{_y1} - 0.5%, %{_x2} - 0.5%, %{_y2} - 0.5%, false)"
 			else:
 				set {_gen} to "empty"
 			if {_gen} contains "<none>":
