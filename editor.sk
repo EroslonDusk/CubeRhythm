@@ -3,51 +3,53 @@ on load:
 	set {editor::tick} to 0 if {editor::tick} is not set
 	set {editor::length} to 1 if {editor::length} is not set
 	set {editor::preTime} to 0 if {editor::preTime} is not set
-	
 
-on swap hand items:
+on player drop:
 	cancel event
-	if {editMode} is true:
-		if player is not sneaking:
-			add 1 to {editor::tick}
-		else:
-			remove 1 from {editor::tick}
 
 command /editor [<text>] [<number>]:
 	trigger:
 		player's gamemode is not spectator
 		if arg-1 is not set:
 			if {editMode} is not set:
-				delete {savedX::*}
-				delete {savedY::*}
-				delete {savedType::*}
+				delete {editorSave::*}
 				set {editMode} to true
 				set {editor::noteType} to "tap"
-				message "&a开启编辑模式"
+				set {editor::face} to "w"
+				message "&a进入编辑模式"
 				message ""
 				message "&e/editor help &7-&f 查看命令帮助"
 				message "&e/editor bpm <number> &7-&f 每分钟拍数"
 				message "&b/step <integer> &7-&f /step 4 表示步长为1/4拍"
 				message "&b/b <number> &7-&f 传送到某一拍"
 				message "&e/editor pretime <number> &7-&f 将第1拍的时间设置为x秒，不是变速曲就设为0并且不要动"
+				message "&a/gen &7-&f 清空已放置的音符并生成谱面代码"
 				message ""
 				message "&f/editor &c退出编辑模式"
 				message ""
+				message "&a按键操作:"
+				message "&b[鼠标滚轮↑] &f步进一格"
+				message "&b[鼠标滚轮↓] &f后退一格"
+				message "&b[1] &f更改音符类型(默认为&bTap&f)"
+				message "&b[9] &f更改判定面(默认为前)"
+				message ""
+				
 				clear player's inventory
-				give light blue wool named "&b&lTap&e (右键切换)" to player
-				give stick named "&d&l魔杖&e (右键放置，左键清空，Shift对齐网格)" to player
-				give lime concrete named "&a&l步进1格" to player
-				give red concrete named "&c&l后退1格" to player
+				set slot 0 of player to a light blue wool named "&b"
+				set slot 4 of player to a stick named "&d&l魔杖&e (右键放置，左键删除，Shift对齐网格)"
+				set slot 8 of player to a white stained glass named "&b"
+				set hotbar slot of player to 4
 				set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to glass
 			else:
 				delete {editMode}
-				message "&c关闭编辑模式"
+				message "&c离开编辑模式"
 				clear player's inventory
-				delete {savedX::*}
-				delete {savedY::*}
-				delete {savedType::*}
+				delete {editorSave::*}
 				delete {editor::noteType}
 				set blocks within location(3, 3, 4, world "world", 0, 0) and location(-3, -3, 4, world "world", 0, 0) to air
+				loop all block displays:
+					delete loop-entity
+		
 		else if arg-1 is "bpm":
 			arg-2 is set
 			set {editor::bpm} to arg-2
@@ -63,9 +65,22 @@ command /editor [<text>] [<number>]:
 			message "&b/step <integer> &7-&f /step 4 表示步长为1/4拍"
 			message "&b/b <number> &7-&f 传送到某一拍"
 			message "&e/editor pretime <number> &7-&f 将第1拍的时间设置为x秒，不是变速曲就设为0并且不要动"
+			message "&a/gen &7-&f 清空已放置的音符并生成谱面代码"
 			message ""
 			message "&f/editor &c退出编辑模式"
 			message ""
+			message "&a按键操作:"
+			message "&b[鼠标滚轮↑] &f步进一格"
+			message "&b[鼠标滚轮↓] &f后退一格"
+			message "&b[1] &f更改音符类型(默认为&bTap&f)"
+			message "&b[9] &f更改判定面(默认为前)"
+			message ""
+		else if arg-1 is "regive":
+			{editMode} is true
+			clear player's inventory
+			set slot 0 of player to a light blue wool named "&b"
+			set slot 4 of player to a stick named "&d&l魔杖&e (右键放置，左键删除，Shift对齐网格)"
+			set slot 8 of player to a white stained glass named "&b"
 
 command /b <number>:
 	trigger:
@@ -87,42 +102,100 @@ command /step <integer>:
 
 every 2 ticks:
 	if {editMode} is set:
-		send action bar "&6BPM: &f%{editor::bpm}% &8| &b位置: &f%floor({editor::tick}/{editor::length}) + 1% : %mod({editor::tick}, {editor::length})% / %{editor::length}% (%{editor::tick}/{editor::length}*(60/{editor::bpm})+{editor::preTime}%s) &8| &a步长: &f1 / %{editor::length}% &8| &f输入w/a/s/d生成 " to all players
+		send action bar "&6BPM: &f%{editor::bpm}%   &b第 &f%floor({editor::tick}/{editor::length}) + 1%&7小节 &f%mod({editor::tick}, {editor::length})%&7/%{editor::length}%拍 &f(%{editor::tick}/{editor::length}*(60/{editor::bpm})+{editor::preTime}%s)   &f共计 %size of {editorSave::type::*}% Notes" to all players
+
+function addTick(p: player, t: number):
+	add {_t} to {editor::tick}
+	set {_current} to {editor::tick}/{editor::length}*(60/{editor::bpm})+{editor::preTime}
+	loop all block displays:
+		metadata value "id" of loop-entity is set
+		delete loop-entity
+	loop {editorSave::time::*}:
+		set {_id} to loop-index
+		set {_time} to loop-value
+		set {_z} to ({_time} - {_current}) * 20 * {speed::%uuid of {_p}%}
+		{_z} >= -1
+		{_z} <= 50
+		set {_loc} to {editorSave::loc::%loop-index%}
+		{_loc}.add(0, 0, {_z})
+		summon block display at {_loc}:
+			set display block data of entity to light_blue_concrete if {editorSave::type::%{_id}%} is "tap"
+			set display block data of entity to orange_concrete if {editorSave::type::%{_id}%} is "double"
+			set display block data of entity to yellow_concrete if {editorSave::type::%{_id}%} is "drag"
+			set display block data of entity to white_concrete if {editorSave::type::%{_id}%} is "hold"
+			set display block data of entity to magenta_concrete if {editorSave::type::%{_id}%} is "flickL"
+			set display block data of entity to red_concrete if {editorSave::type::%{_id}%} is "flickR"
+			set display scale of entity to vector(1,1,1)
+			set glowing of entity to true
+			set display translation of entity to vector(-0.5,-0.5,0.1)
+			set display glow color override of entity to bukkitColor(255,255,255,255) if {editorSave::face::%{_id}%} is "w"
+			set display glow color override of entity to bukkitColor(255,255,235,42) if {editorSave::face::%{_id}%} is "a"
+			set display glow color override of entity to bukkitColor(255,255,150,0) if {editorSave::face::%{_id}%} is "s"
+			set display glow color override of entity to bukkitColor(255,255,0,0) if {editorSave::face::%{_id}%} is "d"
+			set metadata value "id" of entity to {_id}
+
+on tool change:
+	{editMode} is set
+	cancel event
+	player's gamemode is not spectator
+	if event-slot is 1 or 2 or 3:
+		addTick(player, 1)
+		send title "" with subtitle "&a>>>" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		play sound "block.note_block.hat" with pitch 2 to player
+	else if event-slot is 5 or 6 or 7:
+		addTick(player, -1)
+		send title "" with subtitle "&a<<<" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		play sound "block.note_block.hat" with pitch 1.5 to player
+	else if event-slot is 0:
+		play sound "ui.button.click" with pitch 2 to player
+		if slot 0 of player is light blue wool named "&b":
+			set {editor::noteType} to "double"
+			set player's tool to orange wool named "&b"
+			send title "" with subtitle "&6Double" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		else if slot 0 of player is orange wool named "&b":
+			set {editor::noteType} to "drag"
+			set player's tool to yellow wool named "&b"
+			send title "" with subtitle "&eDrag" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		else if slot 0 of player is yellow wool named "&b":
+			set {editor::noteType} to "hold"
+			set player's tool to white wool named "&b"
+			send title "" with subtitle "&fHold" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		else if slot 0 of player is white wool named "&b":
+			set {editor::noteType} to "flickL"
+			set player's tool to magenta wool named "&b"
+			send title "" with subtitle "&a← &dFlick" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		else if slot 0 of player is magenta wool named "&b":
+			set {editor::noteType} to "flickR"
+			set player's tool to red wool named "&b"
+			send title "" with subtitle "&cFlick &a→" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		else if slot 0 of player is red wool named "&b":
+			set {editor::noteType} to "tap"
+			set player's tool to light blue wool named "&b"
+			send title "" with subtitle "&bTap" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+	else if event-slot is 8:
+		play sound "ui.button.click" with pitch 2 to player
+		if slot 8 of player is white stained glass named "&b":
+			set {editor::face} to "a"
+			set player's tool to yellow stained glass named "&b"
+			send title "" with subtitle "&7判定面: &e左" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		else if slot 8 of player is yellow stained glass named "&b":
+			set {editor::face} to "s"
+			set player's tool to orange stained glass named "&b"
+			send title "" with subtitle "&7判定面: &6后" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		else if slot 8 of player is orange stained glass named "&b":
+			set {editor::face} to "d"
+			set player's tool to red stained glass named "&b"
+			send title "" with subtitle "&7判定面: &c右" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		else if slot 8 of player is red stained glass named "&b":
+			set {editor::face} to "w"
+			set player's tool to white stained glass named "&b"
+			send title "" with subtitle "&7判定面: &f前" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
 
 on right click:
 	{editMode} is set
 	cancel event
 	player's gamemode is not spectator
-	event-block is glass
-	if player's tool is light blue wool named "&b&lTap&e (右键切换)":
-		set {editor::noteType} to "double"
-		set player's tool to orange wool named "&6&lDouble&e (右键切换)"
-	else if player's tool is orange wool named "&6&lDouble&e (右键切换)":
-		set {editor::noteType} to "drag"
-		set player's tool to yellow wool named "&e&lDrag&e (右键切换)"
-	else if player's tool is yellow wool named "&e&lDrag&e (右键切换)":
-		set {editor::noteType} to "hold"
-		set player's tool to white wool named "&f&lHold&e (右键切换)"
-	else if player's tool is white wool named "&f&lHold&e (右键切换)":
-		set {editor::noteType} to "flickL"
-		set player's tool to magenta wool named "&d&l← Flick&e (右键切换)"
-	else if player's tool is magenta wool named "&d&l← Flick&e (右键切换)":
-		set {editor::noteType} to "flickR"
-		set player's tool to red wool named "&c&lFlick →&e (右键切换)"
-	else if player's tool is red wool named "&c&lFlick →&e (右键切换)":
-		set {editor::noteType} to "tap"
-		set player's tool to light blue wool named "&b&lTap&e (右键切换)"
-	else if player's tool is lime concrete:
-		add 1 to {editor::tick}
-	else if player's tool is red concrete:
-		remove 1 from {editor::tick}
-
-on right click:
-	{editMode} is set
-	cancel event
-	player's gamemode is not spectator
-	event-block is glass
-	if player's tool is stick named "&d&l魔杖&e (右键放置，左键清空，Shift对齐网格)":
+	if player's tool is stick named "&d&l魔杖&e (右键放置，左键删除，Shift对齐网格)":
 		set {_z} to 4
 		set {_pz} to z location of player
 		set {_v} to vector in direction of player
@@ -136,114 +209,132 @@ on right click:
 		else:
 			set {_vy} to {_vy} * {_rate} + y location of player + 1.6
 		set {_vz} to {_vz} * {_rate}
+		{_vx} <= 4
+		{_vy} <= 4
+		{_vx} >= -3
+		{_vy} >= -3
 		if player is sneaking:
 			set {_vx} to round({_vx}*2)/2
 			set {_vy} to round({_vy}*2)/2
 			set {_loc} to location({_vx}, {_vy}, {_z}, world "world", 0, 0)
 		else:
 			set {_loc} to location({_vx}, {_vy}, {_z}, world "world", 0, 0)
-		send title "" with subtitle "%{_vx} - 0.5% , %{_vy} - 0.5%" to all players
-	if {editor::noteType} is "tap":
+		send title "" with subtitle "%{_vx} - 0.5% , %{_vy} - 0.5%" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		set {_id} to random uuid
 		summon block display at {_loc}:
-			set display block data of entity to light_blue_concrete
+			set display block data of entity to light_blue_concrete if {editor::noteType} is "tap"
+			set display block data of entity to orange_concrete if {editor::noteType} is "double"
+			set display block data of entity to yellow_concrete if {editor::noteType} is "drag"
+			set display block data of entity to white_concrete if {editor::noteType} is "hold"
+			set display block data of entity to magenta_concrete if {editor::noteType} is "flickL"
+			set display block data of entity to red_concrete if {editor::noteType} is "flickR"
 			set display scale of entity to vector(1,1,1)
 			set glowing of entity to true
 			set display translation of entity to vector(-0.5,-0.5,0.1)
-		add {_vx} to {savedX::Tap::*}
-		add {_vy} to {savedY::Tap::*}
-	if {editor::noteType} is "double":
-		summon block display at {_loc}:
-			set display block data of entity to orange_concrete
-			set display scale of entity to vector(1,1,1)
-			set glowing of entity to true
-			set display translation of entity to vector(-0.5,-0.5,0.1)
-		add {_vx} to {savedX::Double::*}
-		add {_vy} to {savedY::Double::*}
-	if {editor::noteType} is "drag":
-		summon block display at {_loc}:
-			set display block data of entity to yellow_concrete
-			set display scale of entity to vector(1,1,1)
-			set glowing of entity to true
-			set display translation of entity to vector(-0.5,-0.5,0.1)
-		add {_vx} to {savedX::Drag::*}
-		add {_vy} to {savedY::Drag::*}
-	if {editor::noteType} is "hold":
-		summon block display at {_loc}:
-			set display block data of entity to white_concrete
-			set display scale of entity to vector(1,1,1)
-			set glowing of entity to true
-			set display translation of entity to vector(-0.5,-0.5,0.1)
-		add {_vx} to {savedX::Hold::*}
-		add {_vy} to {savedY::Hold::*}
-	if {editor::noteType} is "flickL":
-		summon block display at {_loc}:
-			set display block data of entity to magenta_concrete
-			set display scale of entity to vector(1,1,1)
-			set glowing of entity to true
-			set display translation of entity to vector(-0.5,-0.5,0.1)
-		add {_vx} to {savedX::Flick::*}
-		add {_vy} to {savedY::Flick::*}
-		set {savedType::Flick} to "left"
-	if {editor::noteType} is "flickR":
-		summon block display at {_loc}:
-			set display block data of entity to red_concrete
-			set display scale of entity to vector(1,1,1)
-			set glowing of entity to true
-			set display translation of entity to vector(-0.5,-0.5,0.1)
-		add {_vx} to {savedX::Flick::*}
-		add {_vy} to {savedY::Flick::*}
-		set {savedType::Flick} to "right"
+			set display glow color override of entity to bukkitColor(255,255,255,255) if {editor::face} is "w"
+			set display glow color override of entity to bukkitColor(255,255,235,42) if {editor::face} is "a"
+			set display glow color override of entity to bukkitColor(255,255,150,0) if {editor::face} is "s"
+			set display glow color override of entity to bukkitColor(255,255,0,0) if {editor::face} is "d"
+			set metadata value "id" of entity to {_id}
+			set {editorSave::type::%{_id}%} to {editor::noteType}
+			set {editorSave::time::%{_id}%} to {editor::tick}/{editor::length}*(60/{editor::bpm})+{editor::preTime}
+			set {editorSave::loc::%{_id}%} to {_loc}
+			set {editorSave::face::%{_id}%} to {editor::face}
+			set {editorSave::turn::%{_id}%} to "left" if {editor::noteType} is "flickL"
+			set {editorSave::turn::%{_id}%} to "right" if {editor::noteType} is "flickR"
 
 on left click:
 	{editMode} is set
 	cancel event
 	player's gamemode is not spectator
-	event-block is glass
-	if player's tool is stick named "&d&l魔杖&e (右键放置，左键清空，Shift对齐网格)":
-		delete {savedX::*}
-		delete {savedY::*}
-		delete {savedType::*}
+	if player's tool is stick named "&d&l魔杖&e (右键放置，左键删除，Shift对齐网格)":
 		loop all block displays:
-			delete loop-entity
+			metadata value "isPreview" of loop-entity is true
+			set {_cursor} to loop-entity
+		{_cursor} is set
+		if distance between (nearest block display relative to {_cursor}) and {_cursor} <= 1:
+			set {_id} to metadata value "id" of nearest block display relative to {_cursor}
+			delete {editorSave::type::%{_id}%}
+			delete {editorSave::time::%{_id}%}
+			delete {editorSave::loc::%{_id}%}
+			delete {editorSave::face::%{_id}%}
+			delete {editorSave::turn::%{_id}%}
+			delete nearest block display relative to {_cursor}
 
-on chat:
-	{editMode} is set
-	player's gamemode is not spectator
-	cancel event
-	set {_1} to chat message
-	if {_1} is "w" or "a" or "s" or "d":
-		set {_face} to {_1}
-	set {_1} to {editor::tick}/{editor::length}*(60/{editor::bpm})+{editor::preTime}
-	{_1} is set
-	set {_gen} to "empty"
-	if {savedX::Tap::1} is set:
-		set {_gen} to "tap(%{_1}%, ""%{_face}%"", %{savedX::Tap::1} - 0.5%, %{savedY::Tap::1} - 0.5%, false)"
-	if {savedX::Drag::1} is set:
-		set {_gen} to "drag(%{_1}%, ""%{_face}%"", %{savedX::Drag::1} - 0.5%, %{savedY::Drag::1} - 0.5%, false)"
-	if {savedX::Hold::1} is set:
-		set {_gen} to "hold(%{_1}%, ""%{_face}%"", %{savedX::Hold::1} - 0.5%, %{savedY::Hold::1} - 0.5%, false)"
-	if {savedX::Flick::1} is set:
-		set {_gen} to "flick(%{_1}%, ""%{_face}%"", ""%{savedType::Flick}%"", false)"
-	if {savedX::Double::1} is set:
-		set {_gen} to "double(%{_1}%, ""%{_face}%"", %{savedX::Double::1} - 0.5%, %{savedY::Double::1} - 0.5%, %{savedX::Double::2} - 0.5%, %{savedY::Double::2} - 0.5%, false)"
-	{_gen} is not "empty"
-	if {_gen} contains "<none>":
-		replace all "<none>" with "&e<none>&c" in {_gen}
-		broadcast "&c✘ &c%{_gen}%"
-		broadcast "&f你的音符格式出现了缺失，请修改音符再尝试生成"
-	else:
-		broadcast "&a✔ &b%{_gen}%" if {_gen} contains "tap"
-		broadcast "&a✔ &e%{_gen}%" if {_gen} contains "drag"
-		broadcast "&a✔ &f%{_gen}%" if {_gen} contains "hold"
-		broadcast "&a✔ &d%{_gen}%" if {_gen} contains "flick"
-		broadcast "&a✔ &6%{_gen}%" if {_gen} contains "double"
-		log "%{_gen}%" to file "generated.log"
+command /gen:
+	trigger:	
+		{editMode} is set
+		player's gamemode is not spectator
+		size of {editorSave::type::*} > 0
+		set {_sorted::*} to sorted indices of {editorSave::time::*} in ascending order
+		set {_count} to 0
+		loop {_sorted::*}:
+			set {_id} to loop-value
+			set {_x} to x location of {editorSave::loc::%{_id}%}
+			set {_y} to y location of {editorSave::loc::%{_id}%}
+			if {editorSave::type::%{_id}%} is "tap" or "hold" or "drag":
+				set {_gen} to "%{editorSave::type::%{_id}%}%(%{editorSave::time::%{_id}%}%, ""%{editorSave::face::%{_id}%}%"", %{_x} - 0.5%, %{_y} - 0.5%, false)"
+				delete {editorSave::type::%{_id}%}
+				delete {editorSave::time::%{_id}%}
+				delete {editorSave::loc::%{_id}%}
+				delete {editorSave::face::%{_id}%}
+				delete {editorSave::turn::%{_id}%}
+			else if {editorSave::type::%{_id}%} is "flick":
+				set {_gen} to "%{editorSave::type::%{_id}%}%(%{editorSave::time::%{_id}%}%, ""%{editorSave::face::%{_id}%}%"", ""%{editorSave::turn::%{_id}%}%"", false)"
+				delete {editorSave::type::%{_id}%}
+				delete {editorSave::time::%{_id}%}
+				delete {editorSave::loc::%{_id}%}
+				delete {editorSave::face::%{_id}%}
+				delete {editorSave::turn::%{_id}%}
+			else if {editorSave::type::%{_id}%} is "double":
+				set {_tempType} to {editorSave::type::%{_id}%}
+				set {_tempTime} to {editorSave::time::%{_id}%}
+				set {_tempFace} to {editorSave::face::%{_id}%}
+				set {_x1} to x location of {editorSave::loc::%{_id}%}
+				set {_y1} to y location of {editorSave::loc::%{_id}%}
+				delete {editorSave::type::%{_id}%}
+				delete {editorSave::time::%{_id}%}
+				delete {editorSave::loc::%{_id}%}
+				delete {editorSave::face::%{_id}%}
+				delete {editorSave::turn::%{_id}%}
+				delete {_x2}
+				delete {_y2}
+				loop {editorSave::type::*}:
+					loop-value-2 is "double"
+					{editorSave::time::%loop-index-2%} - {_tempTime} is between -0.05 and 0.05
+					set {_x2} to x location of {editorSave::loc::%loop-index-2%}
+					set {_y2} to y location of {editorSave::loc::%loop-index-2%}
+					delete {editorSave::type::%loop-index-2%}
+					delete {editorSave::time::%loop-index-2%}
+					delete {editorSave::loc::%loop-index-2%}
+					delete {editorSave::face::%loop-index-2%}
+					delete {editorSave::turn::%loop-index-2%}
+					exit loop
+				set {_gen} to "%{_tempType}%(%{_tempTime}%, ""%{_tempFace}%"", %{_x1}%, %{_y1}%, %{_x2}%, %{_y2}%, false)"
+			else:
+				set {_gen} to "empty"
+			if {_gen} contains "<none>":
+				replace all "<none>" with "&e<none>&c" in {_gen}
+				broadcast "&c✘ &c%{_gen}%"
+			else:
+				{_gen} is not "empty"
+				add 1 to {_count}
+				log "%{_gen}%" to file "generated.log"
+		loop all block displays:
+			metadata value "id" of loop-entity is set
+			delete loop-entity
+		delete {editorSave::*}
+		send title "" with subtitle "&a已清空面板" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
+		send "" to player
+		send "&a处理完毕，成功生成了 %{_count}% 个音符" to player
+		send "&7(前往 &fplugins\skript\logs\generated.log&7 查看生成结果)" to player
+		send "" to player
 
 every ticks:
 	{editMode} is set
 	loop all players:
 		loop-player's gamemode is not spectator
-		tool of loop-player is stick named "&d&l魔杖&e (右键放置，左键清空，Shift对齐网格)"
+		tool of loop-player is stick named "&d&l魔杖&e (右键放置，左键删除，Shift对齐网格)"
 		set {_z} to 4
 		set {_pz} to z location of loop-player
 		set {_v} to vector in direction of loop-player
@@ -257,9 +348,28 @@ every ticks:
 		else:
 			set {_vy} to {_vy} * {_rate} + y location of loop-player + 1.6
 		set {_vz} to {_vz} * {_rate}
+		loop all block displays:
+			delete loop-entity-2 if metadata value "isPreview" of loop-entity-2 is true
+		{_vx} <= 4
+		{_vy} <= 4
+		{_vx} >= -3
+		{_vy} >= -3
 		if loop-player is sneaking:
 			set {_vx} to round({_vx}*2)/2
 			set {_vy} to round({_vy}*2)/2
-			draw 2 of dust using dustOption(yellow, 1) at location({_vx}, {_vy}, {_z}, world "world", 0, 0)
-		else:
-			draw 2 of dust using dustOption(lime, 1) at location({_vx}, {_vy}, {_z}, world "world", 0, 0)
+		set {_loc} to location({_vx}, {_vy}, {_z}, world "world", 0, 0)
+		summon block display at {_loc}:
+			set display block data of entity to light_blue_concrete if {editor::noteType} is "tap"
+			set display block data of entity to orange_concrete if {editor::noteType} is "double"
+			set display block data of entity to white_concrete if {editor::noteType} is "hold"
+			set display block data of entity to yellow_concrete if {editor::noteType} is "drag"
+			set display block data of entity to magenta_concrete if {editor::noteType} is "flickL"
+			set display block data of entity to red_concrete if {editor::noteType} is "flickR"
+			set display scale of entity to vector(1,1,1)
+			set glowing of entity to true
+			set display translation of entity to vector(-0.5,-0.5,0.1)
+			set display glow color override of entity to bukkitColor(255,255,255,255) if {editor::face} is "w"
+			set display glow color override of entity to bukkitColor(255,255,235,42) if {editor::face} is "a"
+			set display glow color override of entity to bukkitColor(255,255,150,0) if {editor::face} is "s"
+			set display glow color override of entity to bukkitColor(255,255,0,0) if {editor::face} is "d"
+			set metadata value "isPreview" of entity to true
