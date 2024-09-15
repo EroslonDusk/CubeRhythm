@@ -223,6 +223,7 @@ on right click:
 			set {_loc} to location({_vx}, {_vy}, {_z}, world "world", 0, 0)
 		send title "" with subtitle "%{_vx} - 0.5% , %{_vy} - 0.5%" to player for 0.5 seconds with fade in 0 seconds and fade out 0.5 seconds
 		set {_id} to random uuid
+		set {_length} to 3*{speed::%uuid of player%}
 		summon block display at {_loc}:
 			set display block data of entity to light_blue_concrete if {editor::noteType} is "tap"
 			set display block data of entity to orange_concrete if {editor::noteType} is "double"
@@ -237,10 +238,11 @@ on right click:
 			set display glow color override of entity to bukkitColor(255,255,235,42) if {editor::face} is "a"
 			set display glow color override of entity to bukkitColor(255,255,150,0) if {editor::face} is "s"
 			set display glow color override of entity to bukkitColor(255,255,0,0) if {editor::face} is "d"
-			set display scale of entity to vector(1,1,3*{speed::%uuid of {_p}%}) if {editor::noteType} is "hold"
+			set display scale of entity to vector(1,1,{_length}) if {editor::noteType} is "hold"
 			set display translation of entity to vector(-0.5,-0.5,0.2) if {editor::noteType} is "hold"
 			set metadata value "id" of entity to {_id}
 			set {editorSave::type::%{_id}%} to {editor::noteType}
+			set {editorSave::type::%{_id}%} to "flick" if {editor::noteType} is "flickL" or "flickR"
 			set {editorSave::time::%{_id}%} to {editor::tick}/{editor::length}*(60/{editor::bpm})+{editor::preTime}
 			set {editorSave::loc::%{_id}%} to {_loc}
 			set {editorSave::face::%{_id}%} to {editor::face}
