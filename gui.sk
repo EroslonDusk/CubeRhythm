@@ -63,6 +63,9 @@ function registerChart(id: text, name: text, level: text, artist: text, author: 
 	set {length::%{_id}%} to {_length}
 	set {chartOffset::%{_id}%} to {_offset}
 
+function setBPM(id: text, bpm: number):
+	set {bpm::%{_id}%} to {_bpm}
+
 command /play:
 	trigger:
 		player's gamemode is not spectator
@@ -92,7 +95,7 @@ function infoGUI(p: player):
 			set slot {_slot} of {_infoGUI} to music disc cat named "&f%{loadedCharts::name::%loop-value%}%" with lore "%nl%&8· &7难度: &f%{loadedCharts::level::%loop-value%}%%nl%&8· &7作曲: &f%{loadedCharts::artist::%loop-value%}%%nl%&8· &7谱师: &f%{loadedCharts::author::%loop-value%}%%nl%&8· &7时长: &f%{length::%{loadedCharts::id::%loop-value%}%}%%nl%&8· &7最好成绩: &f%{_best}% &7%getRank({_best})%%nl%%nl%&7输入 /reset 离开游戏%nl%%nl%&8[&a左键&8] &f开始游玩%nl%&8[&d右键&8] &c删除成绩%nl%&f"
 		open {_infoGUI} to {_p}
 	else:
-		send "&c游戏期间不可打开面板！如果要退出游玩，请输入 /reset ！" to {_p}
+		send "&c游戏期间不可打开面板！如果要退出游玩，请输入 /reset ！\n&7如果游戏尚未开始，请输入 /sk reload main" to {_p}
 
 function getRank(score: number) :: text:
 	return "&eSSS+" if {_score} >= 1000000

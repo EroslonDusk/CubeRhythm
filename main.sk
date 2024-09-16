@@ -190,6 +190,7 @@ command /reset:
 		quitGame()
 
 function quitGame():
+	remove blindness from {actor}
 	delete {actor} if {playing} is set
 	delete {timer}
 	clear all players' inventory
@@ -206,6 +207,7 @@ function quitGame():
 	set {noteID} to 0
 	set {score} to 0
 	set {hitNotes} to 0
+	delete {beat}
 	delete {statistics::*}
 	createComboDisplay()
 	delete {playing}
@@ -263,6 +265,7 @@ command /start:
 		set {timer} to 0
 		set {combo} to 0
 		set {score} to 0
+		set {beat} to 0
 		set {hitNotes} to 0
 		set {alphaTime} to 11
 		set {statistics::exact} to 0
@@ -774,3 +777,70 @@ function createComboDisplay():
 		set display scale of entity to vector(2,2,0)
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set metadata value "level" of the entity to true
+
+every ticks:
+	{timer} is set
+	{bpm::%{playing}%} is set
+	set {_ticksPerBeat} to 60 / {bpm::%{playing}%} * 20
+	summonBeatLine({_ticksPerBeat})
+
+function summonBeatLine(ticksPerBeat: number):
+	set {_lineDistance} to ({_ticksPerBeat} * {beat} - {timer} + 0.02 * {offset::%uuid of {actor}%} + 0.02 * {chartOffset::%{playing}%}) * {speed::%uuid of {actor}%}
+	if {_lineDistance} < 50:
+		add 1 to {beat}
+		mod({beat}, 4) = 0
+		set {_dura} to floor(({_lineDistance}-4)/{speed::%uuid of {actor}%})
+		set {_glowing} to false
+		set {_glowing} to true if {actor} have potion blindness
+		drawLine("w", 4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
+		drawLine("w", -4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
+		drawLine("a", 4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
+		drawLine("a", -4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
+		drawLine("s", 4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
+		drawLine("s", -4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
+		drawLine("d", 4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
+		drawLine("d", -4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
+
+function drawLine(face: text, x: number, y: number, z: number, pitch: number, length: number, duration: number, glowing: boolean, gc1: number, gc2: number, gc3: number, gc4: number):
+	{_duration} > 2
+	set {_x} to {_x}+0.5
+	set {_y} to {_y}-0.5
+	set {_z} to {_z}+1+{speed::%uuid of {actor}%}
+	if {_face} is "w":
+		set {_loc} to location({_x}, {_y}+1, {_z}-0.95, world "world", 0, 0)
+	if {_face} is "a":
+		remove 1 from {_x}
+		set {_loc} to location({_z}-0.95, {_y}+1, -1*{_x}, world "world", 90, 0)
+	if {_face} is "s":
+		remove 1 from {_x}
+		remove 1 from {_z}
+		set {_loc} to location(-1*{_x}, {_y}+1, -1*{_z}+0.95, world "world", 180, 0)
+	if {_face} is "d":
+		remove 1 from {_z}
+		set {_loc} to location(-1*{_z}+0.95, {_y}+1, {_x}, world "world", 270, 0)
+	summon block display at {_loc}:
+		set display interpolation start of entity to 0
+		set display interpolation duration of entity to 100
+		set display block data of entity to white_concrete
+		set display scale of entity to vector(0.05,{_length},0.05)
+		set metadata value "face" of entity to {_face}
+		set metadata value "decoration" of entity to true
+		set pitch of entity to {_pitch}
+		set yaw of entity to 90 if {_face} is "w"
+		set yaw of entity to 0 if {_face} is "a"
+		set yaw of entity to -90 if {_face} is "s"
+		set yaw of entity to -180 if {_face} is "d"
+		if {_glowing} is true:
+			set glowing of entity to true
+			set display glow color override of entity to bukkitColor({_gc1},{_gc2},{_gc3},{_gc4})
+		set {_entity} to entity
+	wait 2 ticks
+	set display brightness of {_entity} to displayBrightness(15,15)
+	set display translation of {_entity} to vector(-100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "w" or "s"
+	set display translation of {_entity} to vector(-100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "a" or "d"
+	loop {_duration}-2 times:
+		wait 1 tick
+	loop all block displays:
+		loop-entity is {_entity}
+		delete loop-entity
+		exit loop
