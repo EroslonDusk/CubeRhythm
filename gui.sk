@@ -92,7 +92,11 @@ function infoGUI(p: player):
 			{_slot} is set
 			set {_best} to {best::%uuid of {_p}%::%{loadedCharts::id::%loop-value%}%}
 			set {_best} to 0 if {_best} is not set
-			set slot {_slot} of {_infoGUI} to music disc cat named "&f%{loadedCharts::name::%loop-value%}%" with lore "%nl%&8· &7难度: &f%{loadedCharts::level::%loop-value%}%%nl%&8· &7作曲: &f%{loadedCharts::artist::%loop-value%}%%nl%&8· &7谱师: &f%{loadedCharts::author::%loop-value%}%%nl%&8· &7时长: &f%{length::%{loadedCharts::id::%loop-value%}%}%%nl%&8· &7最好成绩: &f%{_best}% &7%getRank({_best})%%nl%%nl%&7输入 /reset 离开游戏%nl%%nl%&8[&a左键&8] &f开始游玩%nl%&8[&d右键&8] &c删除成绩%nl%&f"
+			set {_t} to "%{length::%{loadedCharts::id::%loop-value%}%}% seconds" parsed as timespan
+			set {_dura} to ({_t} from (unix date of 0)) formatted as "m:ss"
+			set {_bpm} to {bpm::%{loadedCharts::id::%loop-value%}%}
+			set {_bpm} to "&7未知" if {_bpm} is not set
+			set slot {_slot} of {_infoGUI} to music disc cat named "&f%{loadedCharts::name::%loop-value%}%" with lore "%nl%&8· &7难度: &f%{loadedCharts::level::%loop-value%}%%nl%&8· &7作曲: &f%{loadedCharts::artist::%loop-value%}%%nl%&8· &7谱师: &f%{loadedCharts::author::%loop-value%}%%nl%&8· &7时长: &f%{_dura}%%nl%&8· &7BPM: &f%{_bpm}%%nl%&8· &7最好成绩: &f%{_best}% &7%getRank({_best})%%nl%%nl%&7输入 /reset 离开游戏%nl%%nl%&8[&a左键&8] &f开始游玩%nl%&8[&d右键&8] &c删除成绩%nl%&f"
 		open {_infoGUI} to {_p}
 	else:
 		send "&c游戏期间不可打开面板！如果要退出游玩，请输入 /reset ！\n&7如果游戏尚未开始，请输入 /sk reload main" to {_p}

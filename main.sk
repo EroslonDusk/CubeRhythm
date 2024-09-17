@@ -39,7 +39,7 @@ on player move:
 	send action bar "&c!!&7 生存模式下无法移动 &c!!&f" to player
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.2.1%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.2.3%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -265,7 +265,7 @@ command /start:
 		set {timer} to 0
 		set {combo} to 0
 		set {score} to 0
-		set {beat} to 0
+		set {beat} to -8
 		set {hitNotes} to 0
 		set {alphaTime} to 11
 		set {statistics::exact} to 0
@@ -785,10 +785,11 @@ every ticks:
 	summonBeatLine({_ticksPerBeat})
 
 function summonBeatLine(ticksPerBeat: number):
-	set {_lineDistance} to ({_ticksPerBeat} * {beat} - {timer} + 0.02 * {offset::%uuid of {actor}%} + 0.02 * {chartOffset::%{playing}%}) * {speed::%uuid of {actor}%}
+	set {_lineDistance} to ({_ticksPerBeat} * {beat} - {timer} + 0.02 * {offset::%uuid of {actor}%} + 0.02 * {chartOffset::%{playing}%} + 62) * {speed::%uuid of {actor}%}
+	#broadcast "(%{_ticksPerBeat}% * %{beat}% - %{timer}% + %0.02 * {offset::%uuid of {actor}%}% + %0.02 * {chartOffset::%{playing}%}% + 62) * %{speed::%uuid of {actor}%}% = %{_lineDistance}%" if {_lineDistance} < 50
 	if {_lineDistance} < 50:
 		add 1 to {beat}
-		mod({beat}, 4) = 0
+		mod({beat}-1, 2) = 0
 		set {_dura} to floor(({_lineDistance}-4)/{speed::%uuid of {actor}%})
 		set {_glowing} to false
 		set {_glowing} to true if {actor} have potion blindness
