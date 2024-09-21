@@ -1,0 +1,146 @@
+function drawLine(face: text, x: number, y: number, z: number, pitch: number, length: number, duration: number, glowing: boolean, gc1: number, gc2: number, gc3: number, gc4: number):
+	{_duration} > 2
+	set {_x} to {_x}+0.5
+	set {_y} to {_y}-0.5
+	set {_z} to {_z}+1+{speed::%uuid of {actor}%}
+	if {_face} is "w":
+		set {_loc} to location({_x}, {_y}+1, {_z}-0.95, world "world", 0, 0)
+	if {_face} is "a":
+		remove 1 from {_x}
+		set {_loc} to location({_z}-0.95, {_y}+1, -1*{_x}, world "world", 90, 0)
+	if {_face} is "s":
+		remove 1 from {_x}
+		remove 1 from {_z}
+		set {_loc} to location(-1*{_x}, {_y}+1, -1*{_z}+0.95, world "world", 180, 0)
+	if {_face} is "d":
+		remove 1 from {_z}
+		set {_loc} to location(-1*{_z}+0.95, {_y}+1, {_x}, world "world", 270, 0)
+	summon block display at {_loc}:
+		set display interpolation start of entity to 0
+		set display interpolation duration of entity to 100
+		set display block data of entity to white_concrete
+		set display scale of entity to vector(0.05,{_length},0.05)
+		set metadata value "face" of entity to {_face}
+		set metadata value "decoration" of entity to true
+		set pitch of entity to {_pitch}
+		set yaw of entity to 90 if {_face} is "w"
+		set yaw of entity to 0 if {_face} is "a"
+		set yaw of entity to -90 if {_face} is "s"
+		set yaw of entity to -180 if {_face} is "d"
+		if {_glowing} is true:
+			set glowing of entity to true
+			set display glow color override of entity to bukkitColor({_gc1},{_gc2},{_gc3},{_gc4})
+		set {_entity} to entity
+	wait 2 ticks
+	set display brightness of {_entity} to displayBrightness(15,15)
+	set display translation of {_entity} to vector(-100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "w" or "s"
+	set display translation of {_entity} to vector(-100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "a" or "d"
+	loop {_duration}-2 times:
+		wait 1 tick
+	loop all block displays:
+		loop-entity is {_entity}
+		delete loop-entity
+		exit loop
+#
+#	直接在谱面中绘制线段，与小节线生成原理相同
+#	从x y z开始，length为长度，pitch-90°为旋转角度射出的一条线段
+#	会随谱面同步移动，时间到消失
+#
+#	drawLine("判定面", X, Y, Z, 旋转角度(-90到90，0为竖直向上), 长度, 持续时间(Tick数), 是否发光, 发光不透明度, 发光颜色R值, 发光颜色G值, 发光颜色B值)
+#
+
+
+
+function blind(duration: timespan):
+	apply blindness without any particles to {actor} for 1 hour
+	loop all block displays:
+		metadata value "decoration" of loop-entity is true
+		set glowing of loop-entity to true
+	wait {_time}
+	remove blindness from {actor}
+	loop all block displays:
+		metadata value "decoration" of loop-entity is true
+		set glowing of loop-entity to false
+#
+#	给予玩家一段时间失明效果，失明生效时小节线发光
+#
+#	blind(时间(使用skript格式))
+#
+#	举个例子:
+#
+#on load:
+#	create section stored in {blind1}:
+#		blind(1.5 seconds)
+#		delete {blind1}
+
+
+
+function forceExact(ticks: integer, tag: text):
+	loop {ticks} times:
+		{actor} is set
+		loop all interactions:
+			set metadata value "forceexact" of loop-entity to true if metadata value "tag" of loop-entity is {_tag}
+		wait 1 tick
+	loop all interactions:
+		delete metadata value "forceexact" of loop-entity if metadata value "tag" of loop-entity is {_tag}
+#
+#	超级时间，该时间内所有与tag相符的音符，击中不会产生Just判定
+#
+#	forceExact(持续时间(Tick数), "Tag")
+#
+#	举个例子：
+#
+#on load:
+#	create section stored in {st1}:
+#		forceExact(20, "custom")
+#		delete {st1}
+
+
+
+function setTextDisplay(face: text, x: number, y: number, z: number, pitch: number, scale: number, opacity: number, duration: timespan, text: text):
+	add 0.5 to {_x}
+	remove 1 from {_x} if {_face} is "s" or "a"
+	add 1 to {_z} if {_face} is "w" or "a"
+	remove 0.5 from {_y}
+	if {_face} is "w":
+		set {_loc} to location({_x}, {_y}, {_z}, world "world", -90, {_pitch})
+	if {_face} is "a":
+		set {_loc} to location({_z}, {_y}, -1*{_x}, world "world", 180, {_pitch})
+	if {_face} is "s":
+		set {_loc} to location(-1*{_x}, {_y}, -1*{_z}, world "world", 90, {_pitch})
+	if {_face} is "d":
+		set {_loc} to location(-1*{_z}, {_y}, {_x}, world "world", 0, {_pitch})
+	{_loc}.add(0, 1, 0)
+	summon text display at {_loc}:
+		set display text of the entity to {_text} if {showOffset::%uuid of {actor}%} is not "&a开"
+		set display scale of the entity to vector({_scale},{_scale},{_scale})
+		set display right rotation of the entity to axisAngle(90 * (3.14 / 180), 0, 1, 0)
+		set display translation of the entity to vector({_scale}*-0.015,{_scale}*-0.15,0)
+		set display text opacity of the entity to {_opacity}
+		set display text background color of the entity to bukkitColor(0,0,0,0)
+		set {_entity} to entity
+	wait {_duration}
+	loop all text displays:
+		loop-entity is {_entity}
+		delete loop-entity
+#
+#	以前方判定面为基准，x y z为坐标，生成文字展示实体并持续一段时间
+#	如果你需要在非前判定面生成，坐标仍按照前判定面的格式，脚本会自动更正
+#
+#	setTextDisplay("判定面", X, Y, Z, 旋转角度(-90到90，0为水平), 缩放倍数, 不透明度(最大255), 持续时间(使用skript格式), "文本")
+#
+#	举个例子，加载后会在四周贴上“福字”，持续10秒：
+#
+#on load:
+#	setTextDisplay("w", 0, 0, 4, 45, 8, 255, 10 seconds, "&c█")
+#	setTextDisplay("a", 0, 0, 4, 45, 8, 255, 10 seconds, "&c█")
+#	setTextDisplay("s", 0, 0, 4, 45, 8, 255, 10 seconds, "&c█")
+#	setTextDisplay("d", 0, 0, 4, 45, 8, 255, 10 seconds, "&c█")
+#	setTextDisplay("w", 0.075, -0.075, 4, 45, 8, 255, 10 seconds, "&e▄")
+#	setTextDisplay("a", 0.075, -0.075, 4, 45, 8, 255, 10 seconds, "&e▄")
+#	setTextDisplay("s", 0.075, -0.075, 4, 45, 8, 255, 10 seconds, "&e▄")
+#	setTextDisplay("d", 0.075, -0.075, 4, 45, 8, 255, 10 seconds, "&e▄")
+#	setTextDisplay("w", 0, 0.075, 3.95, 0, 4, 255, 10 seconds, "&c福")
+#	setTextDisplay("a", 0, 0.075, 3.95, 0, 4, 255, 10 seconds, "&c福")
+#	setTextDisplay("s", 0, 0.075, 3.95, 0, 4, 255, 10 seconds, "&c福")
+#	setTextDisplay("d", 0, 0.075, 3.95, 0, 4, 255, 10 seconds, "&c福")

@@ -203,7 +203,7 @@ function hitNote(entity: entity):
 		exact({_entity}, {_time})
 		set {_canRemove} to true
 	else if abs({_time}) <= 200:
-		if metadata value "glowing" of {_entity} is true:
+		if metadata value "forceexact" of {_entity} is true:
 			exact({_entity}, {_time})
 		else:
 			if {_time} > 0:

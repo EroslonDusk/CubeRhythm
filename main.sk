@@ -23,6 +23,7 @@ on join:
 	set {autoPlay::%uuid of player%} to "&c关" if {autoPlay::%uuid of player%} is not set
 	set {indicator::%uuid of player%} to "&c关" if {indicator::%uuid of player%} is not set
 	set {showOffset::%uuid of player%} to "&c关" if {showOffset::%uuid of player%} is not set
+	set {showLine::%uuid of player%} to "&a开" if {showLine::%uuid of player%} is not set
 	wait 1 tick
 	if online player count > 1:
 		set player's gamemode to spectator
@@ -39,7 +40,7 @@ on player move:
 	send action bar "&c!!&7 生存模式下无法移动 &c!!&f" to player
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.2.3%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.2.4%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -232,6 +233,7 @@ command /start:
 				set {_sorted::turn::%loop-index%} to {loadedNotes::turn::%loop-value%}
 				set {_sorted::glowing::%loop-index%} to {loadedNotes::glowing::%loop-value%}
 				set {_sorted::section::%loop-index%} to {loadedNotes::section::%loop-value%}
+				set {_sorted::tag::%loop-index%} to {loadedNotes::tag::%loop-value%}
 				add 1 to {_count}
 				set {process} to {_count}/({noteID}*13)*50+50
 			delete {loadedNotes::*}
@@ -313,7 +315,7 @@ every ticks:
 							set {_y} to {loadedNotes::y::%loop-index%}
 							set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
 							set {_glowing} to {loadedNotes::glowing::%loop-index%}
-							drawTap({_face}, {_x}, {_y}, {_z}, {_glowing})
+							drawTap({_face}, {_x}, {_y}, {_z}, {_glowing}, {loadedNotes::tag::%loop-index%})
 							delete {loadedNotes::type::%loop-index%}
 							delete {loadedNotes::time::%loop-index%}
 							delete {loadedNotes::face::%loop-index%}
@@ -321,6 +323,7 @@ every ticks:
 							delete {loadedNotes::y::%loop-index%}
 							delete {loadedNotes::glowing::%loop-index%}
 							delete {loadedNotes::section::%loop-index%}
+							delete {loadedNotes::tag::%loop-index%}
 						if loop-value-2 is "hold":
 							remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
 							set {_face} to {loadedNotes::face::%loop-index%}
@@ -328,7 +331,7 @@ every ticks:
 							set {_y} to {loadedNotes::y::%loop-index%}
 							set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
 							set {_glowing} to {loadedNotes::glowing::%loop-index%}
-							drawHold({_face}, {_x}, {_y}, {_z}, {_glowing})
+							drawHold({_face}, {_x}, {_y}, {_z}, {_glowing}, {loadedNotes::tag::%loop-index%})
 							delete {loadedNotes::type::%loop-index%}
 							delete {loadedNotes::time::%loop-index%}
 							delete {loadedNotes::face::%loop-index%}
@@ -336,6 +339,7 @@ every ticks:
 							delete {loadedNotes::y::%loop-index%}
 							delete {loadedNotes::glowing::%loop-index%}
 							delete {loadedNotes::section::%loop-index%}
+							delete {loadedNotes::tag::%loop-index%}
 						if loop-value-2 is "drag":
 							remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
 							set {_face} to {loadedNotes::face::%loop-index%}
@@ -343,7 +347,7 @@ every ticks:
 							set {_y} to {loadedNotes::y::%loop-index%}
 							set {_z} to {speed::%uuid of {actor}%} * 20 * {loadedNotes::time::%loop-index%} + 4
 							set {_glowing} to {loadedNotes::glowing::%loop-index%}
-							drawDrag({_face}, {_x}, {_y}, {_z}, {_glowing})
+							drawDrag({_face}, {_x}, {_y}, {_z}, {_glowing}, {loadedNotes::tag::%loop-index%})
 							delete {loadedNotes::type::%loop-index%}
 							delete {loadedNotes::time::%loop-index%}
 							delete {loadedNotes::face::%loop-index%}
@@ -351,6 +355,7 @@ every ticks:
 							delete {loadedNotes::y::%loop-index%}
 							delete {loadedNotes::glowing::%loop-index%}
 							delete {loadedNotes::section::%loop-index%}
+							delete {loadedNotes::tag::%loop-index%}
 						if loop-value-2 is "flick":
 							remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
 							set {_face} to {loadedNotes::face::%loop-index%}
@@ -358,13 +363,14 @@ every ticks:
 							{_z} < 50
 							set {_turn} to {loadedNotes::turn::%loop-index%}
 							set {_glowing} to {loadedNotes::glowing::%loop-index%}
-							drawFlick({_face}, {_z}, {_turn}, {_glowing})
+							drawFlick({_face}, {_z}, {_turn}, {_glowing}, {loadedNotes::tag::%loop-index%})
 							delete {loadedNotes::type::%loop-index%}
 							delete {loadedNotes::time::%loop-index%}
 							delete {loadedNotes::face::%loop-index%}
 							delete {loadedNotes::turn::%loop-index%}
 							delete {loadedNotes::glowing::%loop-index%}
 							delete {loadedNotes::section::%loop-index%}
+							delete {loadedNotes::tag::%loop-index%}
 						if loop-value-2 is "double":
 							remove ({timer} / 20) from {loadedNotes::time::%loop-index%}
 							set {_face} to {loadedNotes::face::%loop-index%}
@@ -375,7 +381,7 @@ every ticks:
 							set {_x2} to {loadedNotes::x2::%loop-index%}
 							set {_y2} to {loadedNotes::y2::%loop-index%}
 							set {_glowing} to {loadedNotes::glowing::%loop-index%}
-							drawDouble({_face}, {_x1}, {_y1}, {_z}, {_x2}, {_y2}, {_z}, {_glowing})
+							drawDouble({_face}, {_x1}, {_y1}, {_z}, {_x2}, {_y2}, {_z}, {_glowing}, {loadedNotes::tag::%loop-index%})
 							delete {loadedNotes::type::%loop-index%}
 							delete {loadedNotes::time::%loop-index%}
 							delete {loadedNotes::face::%loop-index%}
@@ -385,6 +391,7 @@ every ticks:
 							delete {loadedNotes::y2::%loop-index%}
 							delete {loadedNotes::glowing::%loop-index%}
 							delete {loadedNotes::section::%loop-index%}
+							delete {loadedNotes::tag::%loop-index%}
 						exit loop
 					else:
 						if {loadedNotes::time::%loop-index%} - ({timer} / 20) <= 0:
@@ -781,6 +788,7 @@ function createComboDisplay():
 every ticks:
 	{timer} is set
 	{bpm::%{playing}%} is set
+	{showLine::%uuid of {actor}%} is "&a开"
 	set {_ticksPerBeat} to 60 / {bpm::%{playing}%} * 20
 	summonBeatLine({_ticksPerBeat})
 
@@ -801,47 +809,3 @@ function summonBeatLine(ticksPerBeat: number):
 		drawLine("s", -4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
 		drawLine("d", 4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
 		drawLine("d", -4.5, -4, {_lineDistance}, 0, 9, {_dura}, {_glowing}, 255, 255, 255, 255)
-
-function drawLine(face: text, x: number, y: number, z: number, pitch: number, length: number, duration: number, glowing: boolean, gc1: number, gc2: number, gc3: number, gc4: number):
-	{_duration} > 2
-	set {_x} to {_x}+0.5
-	set {_y} to {_y}-0.5
-	set {_z} to {_z}+1+{speed::%uuid of {actor}%}
-	if {_face} is "w":
-		set {_loc} to location({_x}, {_y}+1, {_z}-0.95, world "world", 0, 0)
-	if {_face} is "a":
-		remove 1 from {_x}
-		set {_loc} to location({_z}-0.95, {_y}+1, -1*{_x}, world "world", 90, 0)
-	if {_face} is "s":
-		remove 1 from {_x}
-		remove 1 from {_z}
-		set {_loc} to location(-1*{_x}, {_y}+1, -1*{_z}+0.95, world "world", 180, 0)
-	if {_face} is "d":
-		remove 1 from {_z}
-		set {_loc} to location(-1*{_z}+0.95, {_y}+1, {_x}, world "world", 270, 0)
-	summon block display at {_loc}:
-		set display interpolation start of entity to 0
-		set display interpolation duration of entity to 100
-		set display block data of entity to white_concrete
-		set display scale of entity to vector(0.05,{_length},0.05)
-		set metadata value "face" of entity to {_face}
-		set metadata value "decoration" of entity to true
-		set pitch of entity to {_pitch}
-		set yaw of entity to 90 if {_face} is "w"
-		set yaw of entity to 0 if {_face} is "a"
-		set yaw of entity to -90 if {_face} is "s"
-		set yaw of entity to -180 if {_face} is "d"
-		if {_glowing} is true:
-			set glowing of entity to true
-			set display glow color override of entity to bukkitColor({_gc1},{_gc2},{_gc3},{_gc4})
-		set {_entity} to entity
-	wait 2 ticks
-	set display brightness of {_entity} to displayBrightness(15,15)
-	set display translation of {_entity} to vector(-100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "w" or "s"
-	set display translation of {_entity} to vector(-100*{speed::%uuid of {actor}%}, 0, 0) if {_face} is "a" or "d"
-	loop {_duration}-2 times:
-		wait 1 tick
-	loop all block displays:
-		loop-entity is {_entity}
-		delete loop-entity
-		exit loop
