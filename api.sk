@@ -84,7 +84,7 @@ function forceExact(ticks: integer, tag: text):
 	loop all interactions:
 		delete metadata value "forceexact" of loop-entity if metadata value "tag" of loop-entity is {_tag}
 #
-#	超级时间，该时间内所有与tag相符的音符，击中不会产生Just判定
+#	超级时间，该时间内轨道上拥有特定Tag的音符，击中不会产生Just判定
 #
 #	forceExact(持续时间(Tick数), "Tag")
 #
@@ -144,3 +144,32 @@ function setTextDisplay(face: text, x: number, y: number, z: number, pitch: numb
 #	setTextDisplay("a", 0, 0.075, 3.95, 0, 4, 255, 10 seconds, "&c福")
 #	setTextDisplay("s", 0, 0.075, 3.95, 0, 4, 255, 10 seconds, "&c福")
 #	setTextDisplay("d", 0, 0.075, 3.95, 0, 4, 255, 10 seconds, "&c福")
+
+
+
+function changeGlowingColor(tag: text, opacity: number, r: number, g: number, b: number, duration: integer):
+	loop {duration} times:
+		{actor} is set
+		wait 1 tick
+		loop all block displays:
+			set display glow color override of loop-entity to bukkitColor({_opacity},{_r},{_g},{_b}) if metadata value "tag" of loop-entity is {_tag}
+#
+#	在一段时间内更改轨道上拥有特定Tag的音符的发光颜色
+#
+#	changeGlowingColor("Tag", 发光不透明度, R, G, B, 持续时间(Tick数))
+#
+
+
+function hideNote(tag: text, duration: integer):
+	loop {duration} times:
+		{actor} is set
+		wait 1 tick
+		loop all block displays:
+			delete loop-entity if metadata value "tag" of loop-entity is {_tag}
+#
+#	在一段时间内删除轨道上拥有特定Tag的方块展示实体以实现隐藏音符
+#
+#	hideNote("Tag", 持续时间(Tick数))
+#
+
+
