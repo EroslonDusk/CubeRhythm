@@ -40,7 +40,7 @@ on player move:
 	send action bar "&c!!&7 生存模式下无法移动 &c!!&f" to player
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.2.4.2%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.2.4.3%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -60,8 +60,10 @@ on right click:
 	set {cancel::A} to true
 	#broadcast "&aPassed A"
 	#broadcast "cancel add: A"
-	if metadata value "notetype" of target of player ignoring blocks is "tap" or "double":
-		hitNote(target of player ignoring blocks)
+	set {_entity} to target of player ignoring blocks if target of player ignoring blocks is set
+	set {_entity} to clicked entity if target of player ignoring blocks is not set
+	if metadata value "notetype" of {_entity} is "tap" or "double":
+		hitNote({_entity})
 	wait 1 tick
 	delete {cancel::A}
 
@@ -110,7 +112,7 @@ on damage:
 	holding()
 	if target of attacker ignoring blocks is set:
 		set {_target} to target of attacker ignoring blocks
-	else if victim is set:
+	else:
 		set {_target} to victim
 	#broadcast "%nl%&aD: on damage 点击实体:%victim% 朝向实体:%target of attacker ignoring blocks%"
 	#broadcast "&cFind A" if {cancel::A} is true

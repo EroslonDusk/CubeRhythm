@@ -209,25 +209,25 @@ function calcEasingValue(x: number, type: text) :: number:
 		set {_y} to (sin(({_x} * 180) / 2)) if {_type} is "easeOutSine" or "sinb"
 		set {_y} to (-1 * (cos(180 * {_x}) - 1) / 2) if {_type} is "easeInOutSine" or "sinc"
 		set {_y} to ({_x} ^ 2) if {_type} is "easeInQuad" or "2a"
-		set {_y} to (1 - (1 - {_x}) * (1 - {_x})) if {_type} is "easeOutQuad" or "2b"
+		set {_y} to (1 - (1 - {_x}) ^ 2) if {_type} is "easeOutQuad" or "2b"
 		if {_x} < 0.5:
 			set {_y} to (2 * {_x} ^ 2) if {_type} is "easeInOutQuad" or "2c"
 		else:
 			set {_y} to (1 - (-2 * {_x} + 2) ^ 2 / 2) if {_type} is "easeInOutQuad" or "2c"
 		set {_y} to ({_x} ^ 3) if {_type} is "easeInCubic" or "3a"
-		set {_y} to ((1 - {_x}) ^ 3) if {_type} is "easeOutCubic" or "3b"
+		set {_y} to (1 - (1 - {_x}) ^ 3) if {_type} is "easeOutCubic" or "3b"
 		if {_x} < 0.5:
 			set {_y} to (4 * {_x} ^ 3) if {_type} is "easeInOutCubic" or "3c"
 		else:
 			set {_y} to (1 - (-2 * {_x} + 2) ^ 3 / 2) if {_type} is "easeInOutCubic" or "3c"
 		set {_y} to ({_x} ^ 4) if {_type} is "easeInQuart" or "4a"
-		set {_y} to ((1 - {_x}) ^ 4) if {_type} is "easeOutQuart" or "4b"
+		set {_y} to (1 - (1 - {_x}) ^ 4) if {_type} is "easeOutQuart" or "4b"
 		if {_x} < 0.5:
 			set {_y} to (8 * {_x} ^ 4) if {_type} is "easeInOutQuart" or "4c"
 		else:
 			set {_y} to (1 - (-2 * {_x} + 2) ^ 4 / 2) if {_type} is "easeInOutQuart" or "4c"
 		set {_y} to ({_x} ^ 5) if {_type} is "easeInQuint" or "5a"
-		set {_y} to ((1 - {_x}) ^ 5) if {_type} is "easeInQuint" or "5b"
+		set {_y} to (1 - (1 - {_x}) ^ 5) if {_type} is "easeInQuint" or "5b"
 		if {_x} < 0.5:
 			set {_y} to (16 * {_x} ^ 5) if {_type} is "easeInOutQuint" or "5c"
 		else:

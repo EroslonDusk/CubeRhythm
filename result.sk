@@ -39,8 +39,6 @@ function end():
 		{actor} is set
 		result()
 		result2()
-		wait 2 seconds
-		{actor} is set
 		result3()
 		result4()
 	else:
@@ -106,7 +104,8 @@ function result():
 		set {best::%uuid of {actor}%::%{playing}%} to {score}
 		send title "&e新记录!" with subtitle "&e &e" to all players for 1 second with fade in 0.5 seconds and fade out 0.5 seconds
 	
-	set {_loc1} to location(0.5, 0.5, 10, world "world", 180, 0)
+	set {_loc1} to location(-3.5, 0.5, 12, world "world", 180, 0)
+	set {_loc2} to location(5.5, 0.5, 12, world "world", 180, 0)
 	summon text display at {_loc1}:
 		set display translation of the entity to vector(-0.2,-1,0)
 		set display brightness of the entity to displayBrightness(15,15)
@@ -114,76 +113,81 @@ function result():
 		set display scale of entity to vector(10,10,10)
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set metadata value "result" of the entity to true
-		set display text opacity of the entity to 0
+		set display text opacity of the entity to 255
+		easingMotion(entity, {_loc1}, {_loc2}, "cirb", "1", "1", "1", 25)
 		set {_entity} to the entity
 	loop 60 times:
-		add 255/20 to {_alpha}
-		set {_alpha} to 255 if {_alpha} > 255
-		set display text opacity of {_entity} to {_alpha}
 		wait 1 tick
 		set display text of {_entity} to getRank({displayScore})
 
 function result2():
-	set {_loc1} to location(0.5, 0, 10, world "world", 180, 0)
+	set {_loc1} to location(-7, 2, 10, world "world", 180, 0)
+	set {_loc2} to location(-1.5, 2, 10, world "world", 180, 0)
 	summon text display at {_loc1}:
 		set display translation of the entity to vector(0,-1.5,0)
 		set display brightness of the entity to displayBrightness(15,15)
 		set display text of the entity to "§f"
-		set display scale of entity to vector(3,3,3)
+		set display scale of entity to vector(8,8,8)
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set metadata value "result" of the entity to true
-		set display text opacity of the entity to 0
+		set display text opacity of the entity to 255
+		easingMotion(entity, {_loc1}, {_loc2}, "cirb", "1", "1", "1", 30)
 		set {_entity} to the entity
 		set {_tempScore2} to {score}
 		set {_tempScore} to {_tempScore2} * 0.75
 	loop 60 times:
-		add 255/20 to {_alpha}
 		set {_tempScore} to 0.75 * {_tempScore}
 		set {displayScore} to round({_tempScore2} - {_tempScore})
-		set {_alpha} to 255 if {_alpha} > 255
-		set display text opacity of {_entity} to {_alpha}
-		set display text of {_entity} to "§f%{displayScore}%"
+		set {_color} to "§f"
+		if {displayScore} >= 1000000:
+			set display text of {_entity} to "%{_color}%%{displayScore}%"
+		else if {displayScore} >= 100000:
+			set display text of {_entity} to "§80%{_color}%%{displayScore}%"
+		else if {displayScore} >= 10000:
+			set display text of {_entity} to "§800%{_color}%%{displayScore}%"
+		else if {displayScore} >= 1000:
+			set display text of {_entity} to "§8000%{_color}%%{displayScore}%"
+		else if {displayScore} >= 100:
+			set display text of {_entity} to "§80000%{_color}%%{displayScore}%"
+		else if {displayScore} >= 10:
+			set display text of {_entity} to "§800000%{_color}%%{displayScore}%"
+		else:
+			set display text of {_entity} to "§8000000%{_color}%%{displayScore}%"
 		wait 1 tick
 
 function result3():
-	set {_loc1} to location(0.5, 0, 10, world "world", 180, 0)
+	set {_loc1} to location(-5.5, 2, 10, world "world", 180, 0)
+	set {_loc2} to location(0, 2, 10, world "world", 180, 0)
 	summon text display at {_loc1}:
 		set display translation of the entity to vector(0,-4.5,0)
 		set display brightness of the entity to displayBrightness(15,15)
 		set display line width of the entity to 400
-		set display text of the entity to "&bExact &f%{statistics::exact}%&e(+%{statistics::exacthold}%) &8| &eJust &f%{statistics::just}% &8| &4Miss &c%{statistics::miss}%", "", "&7输入 [/reset] 重置游戏"
+		set display text of the entity to "&bExact &f%{statistics::exact}%&e(+%{statistics::exacthold}%)%nl%&eJust &f%{statistics::just}%%nl%&4Miss &c%{statistics::miss}%", "", "&7输入 [/reset] 重置游戏"
 		set display scale of entity to vector(2,2,2)
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set metadata value "result" of the entity to true
-		set display text opacity of the entity to 0
+		set display text alignment of the entity to left aligned
+		set display text opacity of the entity to 14
+		easingMotion(entity, {_loc1}, {_loc2}, "cirb", "1", "1", "1", 30)
 		set {_entity} to the entity
-	set {_height} to 2
 	loop 30 times:
-		set {_height} to {_height} * 0.9
-		set display translation of {_entity} to vector(0,-4.5-{_height},0)
 		add 255/10 to {_alpha}
 		set {_alpha} to 255 if {_alpha} > 255
 		set display text opacity of {_entity} to {_alpha}
 		wait 1 tick
 
 function result4():
-	set {_loc1} to location(0.5, 0, 10, world "world", 180, 0)
+	set {_length} to length of "&f%{song}%&f %{level}%" * 0.12
+	set {_loc1} to location(-2.9 - {_length}, 3, 10, world "world", 180, 0)
+	set {_loc2} to location(2.6 - {_length}, 3, 10, world "world", 180, 0)
 	summon text display at {_loc1}:
-		set display translation of the entity to vector(0,4.5,0)
 		set display brightness of the entity to displayBrightness(15,15)
 		set display line width of the entity to 400
-		set display text of the entity to "&f%{song}%&f          %{level}%"
-		set display scale of entity to vector(2,2,2)
+		set display text of the entity to "&f%{song}%&f %{level}%"
+		set display scale of entity to vector(3,3,3)
 		set display text background color of the entity to bukkitColor(0,0,0,0)
 		set metadata value "result" of the entity to true
-		set display text opacity of the entity to 0
-		set {_entity} to the entity
-	set {_height} to 2
-	loop 30 times:
-		set {_height} to {_height} * 0.9
-		set display translation of {_entity} to vector(0,4.5+{_height},0)
-		add 255/10 to {_alpha}
-		set {_alpha} to 255 if {_alpha} > 255
-		set display text opacity of {_entity} to {_alpha}
-		wait 1 tick
+		set display text opacity of the entity to 255
+		set display text alignment of the entity to left aligned
+		easingMotion(entity, {_loc1}, {_loc2}, "cirb", "1", "1", "1", 30)
 
