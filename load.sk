@@ -6,19 +6,60 @@
 
 on load:
 	create section with {_id}, {_type}, {_time}, {_face}, {_x}, {_y}, {_x1}, {_y1}, {_x2}, {_y2}, {_turn}, {_section}, {_glowing}, {_tag} stored in {asyncNoteRegister}:
-		set {loadedNotes::type::%{_id}%} to {_type}
-		set {loadedNotes::time::%{_id}%} to {_time}
-		set {loadedNotes::face::%{_id}%} to {_face}
-		set {loadedNotes::x::%{_id}%} to {_x}
-		set {loadedNotes::y::%{_id}%} to {_y}
-		set {loadedNotes::x1::%{_id}%} to {_x1}
-		set {loadedNotes::y1::%{_id}%} to {_y1}
-		set {loadedNotes::x2::%{_id}%} to {_x2}
-		set {loadedNotes::y2::%{_id}%} to {_y2}
-		set {loadedNotes::turn::%{_id}%} to {_turn}
-		set {loadedNotes::section::%{_id}%} to {_section}
-		set {loadedNotes::glowing::%{_id}%} to {_glowing}
-		set {loadedNotes::tag::%{_id}%} to {_tag}
+		if {editMode} is not true:
+			set {loadedNotes::type::%{_id}%} to {_type}
+			set {loadedNotes::time::%{_id}%} to {_time}
+			set {loadedNotes::face::%{_id}%} to {_face}
+			set {loadedNotes::x::%{_id}%} to {_x}
+			set {loadedNotes::y::%{_id}%} to {_y}
+			set {loadedNotes::x1::%{_id}%} to {_x1}
+			set {loadedNotes::y1::%{_id}%} to {_y1}
+			set {loadedNotes::x2::%{_id}%} to {_x2}
+			set {loadedNotes::y2::%{_id}%} to {_y2}
+			set {loadedNotes::turn::%{_id}%} to {_turn}
+			set {loadedNotes::section::%{_id}%} to {_section}
+			set {loadedNotes::glowing::%{_id}%} to {_glowing}
+			set {loadedNotes::tag::%{_id}%} to {_tag}
+		else:
+			set {_uuid} to random uuid
+			if {_type} is not "double":
+				set {_loc} to location({_x} + 0.5, {_y} + 0.5, 4, world "world", 0, 0)
+				if {_turn} is "right":
+					set {editorSave::type::%{_uuid}%} to "flickR"
+				else if {_turn} is "left":
+					set {editorSave::type::%{_uuid}%} to "flickL"
+				else:
+					set {editorSave::type::%{_uuid}%} to {_type}
+				set {editorSave::loc::%{_uuid}%} to location(0.5, 0.5, 4, world "world", 0, 0) if {editorSave::type::%{_uuid}%} is "flickR" or "flickL" or "execution"
+				set {editorSave::time::%{_uuid}%} to {_time} if {_time} is set
+				set {editorSave::loc::%{_uuid}%} to {_loc} if {_loc} is set
+				set {editorSave::face::%{_uuid}%} to {_face} if {_face} is set
+				set {editorSave::turn::%{_uuid}%} to {_turn} if {_turn} is set
+				set {editorSave::section::%{_uuid}%} to "暂不支持" if {_section} is set
+				set {editorSave::glowing::%{_uuid}%} to {_glowing} if {_glowing} is set
+				set {editorSave::tag::%{_uuid}%} to {_tag} if {_tag} is set
+			else:
+				set {_loc1} to location({_x1} + 0.5, {_y1} + 0.5, 4, world "world", 0, 0)
+				set {_loc2} to location({_x2} + 0.5, {_y2} + 0.5, 4, world "world", 0, 0)
+				set {editorSave::type::%{_uuid}%} to {_type} if {_type} is set
+				set {editorSave::time::%{_uuid}%} to {_time} if {_time} is set
+				set {editorSave::loc::%{_uuid}%} to {_loc1} if {_loc1} is set
+				set {editorSave::face::%{_uuid}%} to {_face} if {_face} is set
+				set {editorSave::turn::%{_uuid}%} to {_turn} if {_turn} is set
+				set {editorSave::section::%{_uuid}%} to "暂不支持" if {_section} is set
+				set {editorSave::glowing::%{_uuid}%} to {_glowing} if {_glowing} is set
+				set {editorSave::tag::%{_uuid}%} to {_tag} if {_tag} is set
+				set {_uuid2} to random uuid
+				set {editorSave::type::%{_uuid2}%} to {_type} if {_type} is set
+				set {editorSave::time::%{_uuid2}%} to {_time} if {_time} is set
+				set {editorSave::loc::%{_uuid2}%} to {_loc2} if {_loc2} is set
+				set {editorSave::face::%{_uuid2}%} to {_face} if {_face} is set
+				set {editorSave::turn::%{_uuid2}%} to {_turn} if {_turn} is set
+				set {editorSave::section::%{_uuid2}%} to "暂不支持" if {_section} is set
+				set {editorSave::glowing::%{_uuid2}%} to {_glowing} if {_glowing} is set
+				set {editorSave::tag::%{_uuid2}%} to {_tag} if {_tag} is set
+				
+			
 
 function execution(time: number, section: section):
 	add 1 to {noteID}

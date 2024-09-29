@@ -1,3 +1,23 @@
+options:
+    structurePath: plugins/Skript/schematics
+
+function pasteSchematic(id: text, loc: location):
+	paste schematic "{@structurePath}/empty.schem" at {_loc}
+	wait 1 tick
+	paste schematic "{@structurePath}/%{_id}%.schem" at {_loc}
+#
+#	清空出生点黑箱范围内的所有方块，并在原点处粘贴结构
+#	最好将出生点设为原点，关于如何保存结构和设置原点请看下面：
+#	1. 在出生点附近建好结构
+#	2. 手持烈焰棒 左/右键地图两个定点确定选区（和小木斧一样）
+#	3. 手持烈焰棒 Shift+右键出生点脚下屏障作为原点
+#	4. 输入/sksave <结构名>将选区保存为 结构名.schem 并存储在plugins/Skript/schematics文件夹里
+#	如何导入结构：
+#	将.schem文件丢进plugins/Skript/schematics
+#
+#	pasteSchematic("结构名（不用加.schem）", 原点位置(变量))
+#
+
 function drawLine(face: text, x: number, y: number, z: number, pitch: number, length: number, duration: number, glowing: boolean, gc1: number, gc2: number, gc3: number, gc4: number):
 	{_duration} > 2
 	set {_x} to {_x}+0.5
@@ -258,6 +278,24 @@ function calcEasingValue(x: number, type: text) :: number:
 			set {_y} to (-1 * (2 ^ (20 * {_x} - 10) * sin((20 * {_x} - 11.125) * {_c5})) / 2) if {_type} is "easeInOutElastic" or "elac"
 		else:
 			set {_y} to ((2 ^ (-20 * {_x} + 10) * sin((20 * {_x} - 11.125) * {_c5})) / 2 + 1) if {_type} is "easeInOutElastic" or "elac"
+		set {_y} to (1 - calcEasingValue((1 - {_x}), "easeOutBounce")) if {_type} is "easeInBounce" or "bouna"
+		set {_n1} to 7.5625
+		set {_d1} to 2.75
+		if {_x} < (1 / {_d1}):
+			set {_y} to ({_n1} * {_x} ^ 2) if {_type} is "easeOutBounce" or "bounb"
+		else if {_x} < (2 / {_d1}):
+			set {_x} to {_x} - 1.5 / {_d1}
+			set {_y} to ({_n1} * {_x} * {_x} + 0.75) if {_type} is "easeOutBounce" or "bounb"
+		else if {_x} < (2.5 / {_d1}):
+			set {_x} to {_x} - 2.25 / {_d1}
+			set {_y} to ({_n1} * {_x} * {_x} + 0.9375) if {_type} is "easeOutBounce" or "bounb"
+		else:
+			set {_x} to {_x} - 2.625 / {_d1}
+			set {_y} to ({_n1} * {_x} * {_x} + 0.984375) if {_type} is "easeOutBounce" or "bounb"
+		if {_x} < 0.5:
+			set {_y} to ((1 - calcEasingValue((1 - 2 * {_x}), "easeOutBounce")) / 2) if {_type} is "easeInOutBounce" or "bounc" #这家伙有问题
+		else:
+			set {_y} to ((1 + calcEasingValue((2 * {_x} - 1), "easeOutBounce")) / 2) if {_type} is "easeInOutBounce" or "bounc" #这家伙有问题
 	return {_y}
 #
 #	在给定时间内将实体从一点移动到另一点，期间实体的位置和变化速度取决于给出的缓动函数
@@ -266,108 +304,317 @@ function calcEasingValue(x: number, type: text) :: number:
 #
 #	easingMotion(实体(变量), 开始位置(变量), 结束位置(变量), "X坐标缓动函数名称/ID", "Y坐标缓动函数名称/ID", "Z坐标缓动函数名称/ID", "Yaw&Pitch缓动函数名称/ID", 持续时间(Tick数))
 #
-#	暂不支持 easeInBounce easeOutBounce easeInOutBounce
-#
 #	举个例子:
 #on load:
-#	delete all block displays
+#	delete all displays
+#	wait 5 seconds
 #	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
 #	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
-#	loop 5 times:
+#	loop 15 times:
 #		summon block display at {_loc1}:
 #			set display block data of entity to diamond_block
 #			set display scale of entity to vector(1,1,1)
 #			set glowing of entity to true
 #			set display glow color override of entity to bukkitColor(0,50,255,255)
-#			easingMotion(entity, {_loc1}, {_loc2}, "1", "1", "1", "1", 60)
-#		wait 5 ticks
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "1", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
 #	set {_loc1} to location(8, 4, 10, world "world", 0, 0)
 #	set {_loc2} to location(-8, -4, 10, world "world", 0, 0)
-#	loop 5 times:
+#	loop 15 times:
 #		summon block display at {_loc1}:
 #			set display block data of entity to diamond_block
 #			set display scale of entity to vector(1,1,1)
 #			set glowing of entity to true
 #			set display glow color override of entity to bukkitColor(0,50,255,255)
-#			easingMotion(entity, {_loc1}, {_loc2}, "1", "sinc", "1", "1", 60)
-#		wait 5 ticks
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "sina", "1", "1", 20)
+#		summon block display at {_loc1}:
+#			set display block data of entity to gold_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "sinb", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
 #	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
 #	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
-#	loop 5 times:
+#	loop 15 times:
 #		summon block display at {_loc1}:
-#			set display block data of entity to diamond_block
+#			set display block data of entity to emerald_block
 #			set display scale of entity to vector(1,1,1)
 #			set glowing of entity to true
 #			set display glow color override of entity to bukkitColor(0,50,255,255)
-#			easingMotion(entity, {_loc1}, {_loc2}, "1", "2c", "1", "1", 60)
-#		wait 5 ticks
-#	set {_loc1} to location(8, 4, 10, world "world", 0, 0)
-#	set {_loc2} to location(-8, -4, 10, world "world", 0, 0)
-#	loop 5 times:
-#		summon block display at {_loc1}:
-#			set display block data of entity to diamond_block
-#			set display scale of entity to vector(1,1,1)
-#			set glowing of entity to true
-#			set display glow color override of entity to bukkitColor(0,50,255,255)
-#			easingMotion(entity, {_loc1}, {_loc2}, "1", "3c", "1", "1", 60)
-#		wait 5 ticks
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "sinc", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
 #	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
 #	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
-#	loop 5 times:
+#	loop 15 times:
 #		summon block display at {_loc1}:
 #			set display block data of entity to diamond_block
 #			set display scale of entity to vector(1,1,1)
 #			set glowing of entity to true
 #			set display glow color override of entity to bukkitColor(0,50,255,255)
-#			easingMotion(entity, {_loc1}, {_loc2}, "1", "4c", "1", "1", 60)
-#		wait 5 ticks
-#	set {_loc1} to location(8, 4, 10, world "world", 0, 0)
-#	set {_loc2} to location(-8, -4, 10, world "world", 0, 0)
-#	loop 5 times:
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "2a", "1", "1", 20)
 #		summon block display at {_loc1}:
-#			set display block data of entity to diamond_block
+#			set display block data of entity to gold_block
 #			set display scale of entity to vector(1,1,1)
 #			set glowing of entity to true
 #			set display glow color override of entity to bukkitColor(0,50,255,255)
-#			easingMotion(entity, {_loc1}, {_loc2}, "1", "5c", "1", "1", 60)
-#		wait 5 ticks
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "2b", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
 #	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
 #	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
-#	loop 5 times:
+#	loop 15 times:
 #		summon block display at {_loc1}:
-#			set display block data of entity to diamond_block
+#			set display block data of entity to emerald_block
 #			set display scale of entity to vector(1,1,1)
 #			set glowing of entity to true
 #			set display glow color override of entity to bukkitColor(0,50,255,255)
-#			easingMotion(entity, {_loc1}, {_loc2}, "1", "expc", "1", "1", 60)
-#		wait 5 ticks
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "2c", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
 #	set {_loc1} to location(8, 4, 10, world "world", 0, 0)
 #	set {_loc2} to location(-8, -4, 10, world "world", 0, 0)
-#	loop 5 times:
+#	loop 15 times:
 #		summon block display at {_loc1}:
 #			set display block data of entity to diamond_block
 #			set display scale of entity to vector(1,1,1)
 #			set glowing of entity to true
 #			set display glow color override of entity to bukkitColor(0,50,255,255)
-#			easingMotion(entity, {_loc1}, {_loc2}, "1", "circ", "1", "1", 60)
-#		wait 5 ticks
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "3a", "1", "1", 20)
+#		summon block display at {_loc1}:
+#			set display block data of entity to gold_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "3b", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
 #	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
 #	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
-#	loop 5 times:
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to emerald_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "3c", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
+#	loop 15 times:
 #		summon block display at {_loc1}:
 #			set display block data of entity to diamond_block
 #			set display scale of entity to vector(1,1,1)
 #			set glowing of entity to true
 #			set display glow color override of entity to bukkitColor(0,50,255,255)
-#			easingMotion(entity, {_loc1}, {_loc2}, "1", "backc", "1", "1", 60)
-#		wait 5 ticks
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "4a", "1", "1", 20)
+#		summon block display at {_loc1}:
+#			set display block data of entity to gold_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "4b", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to emerald_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "4c", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
 #	set {_loc1} to location(8, 4, 10, world "world", 0, 0)
 #	set {_loc2} to location(-8, -4, 10, world "world", 0, 0)
-#	loop 5 times:
+#	loop 15 times:
 #		summon block display at {_loc1}:
 #			set display block data of entity to diamond_block
 #			set display scale of entity to vector(1,1,1)
 #			set glowing of entity to true
 #			set display glow color override of entity to bukkitColor(0,50,255,255)
-#			easingMotion(entity, {_loc1}, {_loc2}, "1", "elac", "1", "1", 60)
-#		wait 5 ticks
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "5a", "1", "1", 20)
+#		summon block display at {_loc1}:
+#			set display block data of entity to gold_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "5b", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to emerald_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "5c", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to diamond_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "expa", "1", "1", 20)
+#		summon block display at {_loc1}:
+#			set display block data of entity to gold_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "expb", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to emerald_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "expc", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, 4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, -4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to diamond_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "cira", "1", "1", 20)
+#		summon block display at {_loc1}:
+#			set display block data of entity to gold_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "cirb", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to emerald_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "circ", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to diamond_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "backa", "1", "1", 20)
+#		summon block display at {_loc1}:
+#			set display block data of entity to gold_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "backb", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to emerald_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "backc", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, 4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, -4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to diamond_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "elaa", "1", "1", 20)
+#		summon block display at {_loc1}:
+#			set display block data of entity to gold_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "elab", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to emerald_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "elac", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, 4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, -4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to diamond_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "bouna", "1", "1", 20)
+#		summon block display at {_loc1}:
+#			set display block data of entity to gold_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "bounb", "1", "1", 20)
+#		wait 1 tick
+#	wait 20 ticks
+#	delete all displays
+#	set {_loc1} to location(8, -4, 10, world "world", 0, 0)
+#	set {_loc2} to location(-8, 4, 10, world "world", 0, 0)
+#	loop 15 times:
+#		summon block display at {_loc1}:
+#			set display block data of entity to emerald_block
+#			set display scale of entity to vector(1,1,1)
+#			set glowing of entity to true
+#			set display glow color override of entity to bukkitColor(0,50,255,255)
+#			easingMotion(entity, {_loc1}, {_loc2}, "1", "bounc", "1", "1", 20)
+#		wait 1 tick

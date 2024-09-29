@@ -18,6 +18,7 @@ on load:
 function playChart(id: text):
 	set {noteID} to 0
 	set {process} to 0
+	delete {editorSave::*} if {editMode} is true
 	create section stored in {_sync}:
 		loop enabled scripts:
 			loop-value start with "charts"
@@ -25,7 +26,7 @@ function playChart(id: text):
 				set {_null} to ""
 			else:
 				disable script loop-value
-		quitGame()
+		quitGame() if {editMode} is not true
 	run section {_sync} sync and wait
 	wait 1 tick
 	set {process} to 10
@@ -33,10 +34,19 @@ function playChart(id: text):
 		enable script "charts\-%{_id}%"
 	run section {_async} async and wait
 	wait 1 tick
-	set {process} to 25
-	set {playing} to {_id}
-	wait 0.5 seconds
-	execute {actor} command "start"
+	if {editMode} is true:
+		set {editor::bpm} to {bpm::%{_id}%}
+		set {editor::tick} to 0
+		set {editor::preTime} to 0
+		addTick({actor}, 0)
+		delete {process}
+		send title "" with subtitle "&a谱面已读取完毕" to all players for 1 second with fade in 0 seconds and fade out 0 seconds
+	else:
+		set {process} to 25
+		set {playing} to {_id}
+		wait 0.5 seconds
+		execute {actor} command "start"
+	delete {actor} if {editMode} is true
 
 function refresh(p: player):
 	delete {loadedCharts::*}
@@ -162,6 +172,7 @@ function settingsGUI(p: player):
 	open {_infoGUI} to {_p}
 
 on inventory click:
+	"%current inventory of player%" is "inventory of <none>"
 	cancel event
 	if name of event-inventory is "选择谱面":
 		if index of event-slot < 45:

@@ -9,8 +9,12 @@ on load:
 	delete {actor}
 	clear all players' inventory
 	delete {playing}
+	set {spawnLocation} to location(0.5, -1.5, 0.5, world "world", 0, 0)
+	set time in world "world" to 0:00
+	pasteSchematic("default", {spawnLocation})
 
 on break:
+	player's gamemode is not creative
 	cancel event
 
 on join:
@@ -40,7 +44,7 @@ on player move:
 	send action bar "&c!!&7 生存模式下无法移动 &c!!&f" to player
 
 on server list ping:
-	set the motd to "&aCube&b Rhythm &8| &eRelease 1.2.4.3%nl%&c⚠&e 离线单机版，不支持多人游戏！"
+	set the motd to "&aCube&b Rhythm &8| &eRelease 1.2.4.6%nl%&c⚠&e 离线单机版，不支持多人游戏！"
 
 ########################################################
 #                                                      #
@@ -214,6 +218,9 @@ function quitGame():
 	delete {statistics::*}
 	createComboDisplay()
 	delete {playing}
+	set time in world "world" to 0:00
+	pasteSchematic("default", {spawnLocation})
+	
 
 command /start:
 	trigger:
