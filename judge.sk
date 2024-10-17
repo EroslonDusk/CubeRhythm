@@ -314,7 +314,3 @@ function deleteEntity(entity: entity):
 		loop-entity is {_entity}
 		delete loop-entity
 		exit loop
-
-#every ticks:
-#	loop all players:
-#		send action bar "%{timer}%" to loop-player
