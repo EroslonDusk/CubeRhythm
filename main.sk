@@ -116,7 +116,7 @@ function getNearestTarget(loc: location, p: player) :: entity:
 			abs(z location of loop-value - z location of {_loc}) < 1.5
 			abs(y location of loop-value - y location of {_loc} + 0.5) < 1.5
 			x location of loop-value < {_z}
-			set {_z} to z location of loop-value
+			set {_z} to x location of loop-value
 			set {_target} to loop-value
 		if {_face} is "s":
 			abs(x location of loop-value - x location of {_loc}) < 1.5
@@ -128,7 +128,7 @@ function getNearestTarget(loc: location, p: player) :: entity:
 			abs(z location of loop-value - z location of {_loc}) < 1.5
 			abs(y location of loop-value - y location of {_loc} + 0.5) < 1.5
 			x location of loop-value > {_z}
-			set {_z} to z location of loop-value
+			set {_z} to x location of loop-value
 			set {_target} to loop-value
 	return {_target}
 
